@@ -1,0 +1,35 @@
+.channel-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.channel-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #b0b0b0;
+}
+
+.channel-item:hover {
+  background: #0f3460;
+  color: #ffffff;
+}
+
+.channel-item.active {
+  background: #f7931a;
+  color: white;
+}
+
+.channel-name {
+  flex: 1;
+}
+
+.member-count {
+  font-size: 12px;
+  opacity: 0.7;
+}
