@@ -1,14 +1,114 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#1a1a2e" />
-    <meta name="description" content="去中心化币圈社群聊天软件" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>币圈社区 - 去中心化聊天</title>
-  </head>
-  <body>
-    <noscript>您需要启用JavaScript才能运行此应用。</noscript>
-    <div id="root"></div>
-  </body>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1a2e;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+        }
+        h1 {
+            color: #f7931a;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #b0b0b0;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #f7931a;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(247, 147, 26, 0.3);
+        }
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+        .feature {
+            background: #16213e;
+            padding: 20px;
+            border-radius: 10px;
+            width: 150px;
+        }
+        .feature-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .feature-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .feature-desc {
+            font-size: 0.8em;
+            color: #b0b0b0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 币圈社区</h1>
+        <p>去中心化币圈社群聊天软件</p>
+        <a href="#" class="btn" onclick="connectWallet()">连接钱包开始使用</a>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">💬</div>
+                <div class="feature-title">去中心化聊天</div>
+                <div class="feature-desc">基于区块链的消息传递</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💰</div>
+                <div class="feature-title">代币奖励</div>
+                <div class="feature-desc">活跃获得CHAT代币</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">👥</div>
+                <div class="feature-title">频道管理</div>
+                <div class="feature-desc">创建和加入频道</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function connectWallet() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    alert('钱包连接成功！完整的聊天功能正在开发中...');
+                } catch (error) {
+                    alert('连接失败：' + error.message);
+                }
+            } else {
+                alert('请安装MetaMask钱包');
+                window.open('https://metamask.io/download/', '_blank');
+            }
+        }
+    </script>
+</body>
 </html>
