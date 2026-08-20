@@ -1,1 +1,27 @@
+:root {
+  --primary: #f7931a;
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --bg-tertiary: #0f3460;
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+  --border: #2d2d44;
+}
 
+.app {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.main-content {
+  display: flex;
+  height: calc(100vh - 64px);
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+    height: auto;
+  }
+}
