@@ -1,86 +1,107 @@
 import React, { useState } from 'react';
-import { ethers } from 'ethers';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
-import Header from './components/Header';
-import Sidebar from './components/Sidebar';
-import ChatArea from './components/ChatArea';
-import { useWeb3 } from './hooks/useWeb3';
-import { useChat } from './hooks/useChat';
 
 function App() {
+  const [account, setAccount] = useState(null);
+  const [channels, setChannels] = useState([
+    { id: 1, name: '综合讨论', members: 125 },
+    { id: 2, name: '技术分析', members: 89 },
+    { id: 3, name: '项目动态', members: 67 }
+  ]);
   const [selectedChannel, setSelectedChannel] = useState(null);
-  const [showCreateChannel, setShowCreateChannel] = useState(false);
-  
-  const {
-    account,
-    connectWallet,
-    disconnectWallet,
-    chatContract,
-    tokenContract,
-    isConnected
-  } = useWeb3();
-  
-  const {
-    channels,
-    isRegistered,
-    userInfo,
-    registerUser,
-    createChannel,
-    sendMessage,
-    loadChannels
-  } = useChat(chatContract, tokenContract, account);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
 
-  const handleConnect = async () => {
-    try {
-      await connectWallet();
-      toast.success('钱包连接成功！');
-    } catch (error) {
-      toast.error('连接失败：' + error.message);
+  const connectWallet = async () => {
+    if (window.ethereum) {
+      try {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        setAccount(accounts[0]);
+      } catch (error) {
+        alert('连接失败：' + error.message);
+      }
+    } else {
+      alert('请安装MetaMask钱包');
     }
   };
 
-  const handleCreateChannel = async (channelData) => {
-    try {
-      await createChannel(channelData);
-      toast.success('频道创建成功！');
-      setShowCreateChannel(false);
-      loadChannels();
-    } catch (error) {
-      toast.error('创建失败：' + error.message);
+  const sendMessage = () => {
+    if (newMessage.trim() && selectedChannel) {
+      const msg = {
+        id: Date.now(),
+        sender: account ? account.slice(0, 6) : '匿名',
+        text: newMessage,
+        time: new Date().toLocaleTimeString()
+      };
+      setMessages([...messages, msg]);
+      setNewMessage('');
     }
   };
 
   return (
     <div className="app">
-      <Header 
-        isConnected={isConnected}
-        account={account}
-        onConnect={handleConnect}
-        onDisconnect={disconnectWallet}
-      />
-      
-      <div className="main-content">
-        <Sidebar
-          channels={channels}
-          selectedChannel={selectedChannel}
-          onChannelSelect={setSelectedChannel}
-          onCreateChannel={() => setShowCreateChannel(true)}
-          isConnected={isConnected}
-        />
-        
-        <ChatArea
-          channel={selectedChannel}
-          account={account}
-          isRegistered={isRegistered}
-          userInfo={userInfo}
-          onRegister={registerUser}
-          onSendMessage={sendMessage}
-        />
-      </div>
+      <header className="header">
+        <div className="logo">🚀 币圈社区</div>
+        <button className="connect-btn" onClick={connectWallet}>
+          {account ? `✅ ${account.slice(0, 6)}...${account.slice(-4)}` : '🔗 连接钱包'}
+        </button>
+      </header>
 
-      <ToastContainer position="bottom-right" theme="dark" />
+      <div className="main-content">
+        <aside className="sidebar">
+          <h3>频道列表</h3>
+          {channels.map(channel => (
+            <div
+              key={channel.id}
+              className={`channel-item ${selectedChannel?.id === channel.id ? 'active' : ''}`}
+              onClick={() => setSelectedChannel(channel)}
+            >
+              # {channel.name}
+              <span className="member-count">{channel.members}</span>
+            </div>
+          ))}
+        </aside>
+
+        <div className="chat-area">
+          {selectedChannel ? (
+            <>
+              <div className="chat-header">
+                <h2># {selectedChannel.name}</h2>
+                <span>{selectedChannel.members} 成员</span>
+              </div>
+              <div className="messages">
+                {messages.length === 0 ? (
+                  <p className="no-messages">暂无消息，发送第一条消息吧！</p>
+                ) : (
+                  messages.map(msg => (
+                    <div key={msg.id} className="message">
+                      <strong>{msg.sender}</strong>
+                      <span>{msg.text}</span>
+                      <small>{msg.time}</small>
+                    </div>
+                  ))
+                )}
+              </div>
+              <div className="message-input">
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                  placeholder="输入消息..."
+                />
+                <button onClick={sendMessage}>发送</button>
+              </div>
+            </>
+          ) : (
+            <div className="welcome">
+              <h2>选择一个频道开始聊天</h2>
+              <p>连接钱包后即可参与讨论</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
