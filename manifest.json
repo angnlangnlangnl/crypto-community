@@ -1,0 +1,9 @@
+{
+  "short_name": "币圈社区",
+  "name": "去中心化币圈社群聊天",
+  "icons": [],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#1a1a2e",
+  "background_color": "#1a1a2e"
+}
