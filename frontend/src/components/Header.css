@@ -1,0 +1,64 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  height: 64px;
+  background: #16213e;
+  border-bottom: 1px solid #2d2d44;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #f7931a;
+}
+
+.logo-icon {
+  font-size: 24px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.balance {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #b0b0b0;
+  font-size: 14px;
+}
+
+.account {
+  color: #b0b0b0;
+  font-size: 14px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+  background: #0f3460;
+  color: #ffffff;
+}
+
+.btn-primary {
+  background: #f7931a;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
