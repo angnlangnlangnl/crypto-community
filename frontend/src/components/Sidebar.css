@@ -1,0 +1,79 @@
+.sidebar {
+  width: 250px;
+  background: #16213e;
+  border-right: 1px solid #2d2d44;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sidebar-header h3 {
+  color: #ffffff;
+}
+
+.create-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f7931a;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.channel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.channel-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #b0b0b0;
+}
+
+.channel-item:hover {
+  background: #0f3460;
+  color: #ffffff;
+}
+
+.channel-item.active {
+  background: #f7931a;
+  color: white;
+}
+
+.member-count {
+  margin-left: auto;
+  font-size: 12px;
+}
+
+.empty {
+  text-align: center;
+  padding: 30px 10px;
+  color: #b0b0b0;
+}
+
+.empty button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  background: #f7931a;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
