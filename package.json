@@ -1,1 +1,29 @@
-
+{
+  "name": "crypto-community",
+  "version": "1.0.0",
+  "description": "去中心化币圈社群聊天软件 - BSC链DApp",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network bscTestnet",
+    "node": "hardhat node",
+    "clean": "hardhat clean",
+    "frontend": "cd frontend && npm start",
+    "build": "cd frontend && npm run build"
+  },
+  "keywords": ["blockchain", "crypto", "chat", "bsc", "defi", "web3"],
+  "author": "angnlangnlangnl",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@nomiclabs/hardhat-waffle": "^2.0.6",
+    "chai": "^4.3.7",
+    "ethereum-waffle": "^4.0.10",
+    "ethers": "^5.7.2",
+    "hardhat": "^2.19.0",
+    "@openzeppelin/contracts": "^4.9.3",
+    "dotenv": "^16.3.1"
+  }
+}
