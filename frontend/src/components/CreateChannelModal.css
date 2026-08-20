@@ -1,0 +1,105 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #16213e;
+  border-radius: 10px;
+  padding: 30px;
+  width: 90%;
+  max-width: 400px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #b0b0b0;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #b0b0b0;
+  font-size: 14px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  background: #0f3460;
+  border: 1px solid #2d2d44;
+  border-radius: 5px;
+  color: #ffffff;
+}
+
+.type-selector {
+  display: flex;
+  gap: 10px;
+}
+
+.type-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  background: #0f3460;
+  border: 2px solid #2d2d44;
+  border-radius: 5px;
+  color: #b0b0b0;
+  cursor: pointer;
+}
+
+.type-option.active {
+  border-color: #f7931a;
+  color: #f7931a;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background: #0f3460;
+  color: #ffffff;
+}
+
+.modal-actions .create-btn {
+  background: #f7931a;
+}
+
+.modal-actions .create-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
