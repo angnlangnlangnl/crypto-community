@@ -23,6 +23,9 @@ body {
   height: 64px;
   background: #16213e;
   border-bottom: 1px solid #2d2d44;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .logo {
@@ -38,7 +41,7 @@ body {
 }
 
 .account-address {
-  color: #b0b0b0;
+  color: #00c853;
   font-size: 14px;
 }
 
@@ -49,6 +52,11 @@ body {
   border: 1px solid #2d2d44;
   border-radius: 20px;
   cursor: pointer;
+  font-size: 13px;
+}
+
+.btn-disconnect:hover {
+  background: #ff1744;
 }
 
 .connect-btn {
@@ -59,6 +67,7 @@ body {
   border-radius: 25px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: bold;
   transition: all 0.3s;
 }
 
@@ -91,16 +100,22 @@ body {
 }
 
 .connect-btn-large {
-  padding: 15px 40px;
+  padding: 18px 40px;
   background: #f7931a;
   color: white;
   border: none;
   border-radius: 30px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
-  margin-bottom: 50px;
+  margin-bottom: 40px;
   transition: all 0.3s;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
 .connect-btn-large:hover {
@@ -108,42 +123,31 @@ body {
   box-shadow: 0 10px 30px rgba(247, 147, 26, 0.4);
 }
 
-.features {
+.steps {
   display: flex;
-  gap: 20px;
+  gap: 30px;
   flex-wrap: wrap;
   justify-content: center;
 }
 
-.feature-card {
-  background: #16213e;
-  padding: 30px;
-  border-radius: 15px;
-  width: 200px;
-  transition: all 0.3s;
-  cursor: pointer;
-}
-
-.feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-}
-
-.feature-icon {
-  font-size: 40px;
-  margin-bottom: 15px;
-}
-
-.feature-title {
-  font-weight: bold;
-  margin-bottom: 10px;
-  font-size: 16px;
-}
-
-.feature-desc {
-  font-size: 13px;
+.step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   color: #b0b0b0;
-  line-height: 1.5;
+  font-size: 14px;
+}
+
+.step-number {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #f7931a;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
 }
 
 /* 主内容 */
@@ -175,7 +179,7 @@ body {
   border-radius: 8px;
   cursor: pointer;
   color: #b0b0b0;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
   transition: all 0.3s;
 }
 
@@ -215,7 +219,7 @@ body {
 }
 
 .chat-header span {
-  color: #b0b0b0;
+  color: #00c853;
   font-size: 14px;
 }
 
@@ -228,12 +232,7 @@ body {
 .no-messages {
   text-align: center;
   color: #b0b0b0;
-  margin-top: 80px;
-}
-
-.no-messages p {
-  margin-bottom: 10px;
-  font-size: 16px;
+  margin-top: 60px;
 }
 
 .message {
@@ -330,6 +329,7 @@ body {
   border-radius: 25px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: bold;
   transition: all 0.3s;
 }
 
@@ -342,26 +342,6 @@ body {
   cursor: not-allowed;
 }
 
-/* 欢迎提示 */
-.welcome {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #b0b0b0;
-}
-
-.welcome h2 {
-  margin-bottom: 10px;
-  color: #ffffff;
-  font-size: 24px;
-}
-
-.welcome p {
-  font-size: 16px;
-}
-
 /* 响应式 */
 @media (max-width: 768px) {
   .main-content {
@@ -371,19 +351,15 @@ body {
   
   .sidebar {
     width: 100%;
-    max-height: 200px;
+    max-height: 150px;
   }
   
   .landing h1 {
-    font-size: 28px;
+    font-size: 24px;
   }
   
-  .features {
-    flex-direction: column;
-  }
-  
-  .feature-card {
-    width: 100%;
-    max-width: 300px;
+  .connect-btn-large {
+    font-size: 16px;
+    padding: 15px 30px;
   }
 }
