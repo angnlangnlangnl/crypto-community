@@ -11,9 +11,10 @@ function App() {
     { id: 4, name: '空投活动', members: 45 }
   ]);
   const [selectedChannel, setSelectedChannel] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState({});
   const [newMessage, setNewMessage] = useState('');
 
+  // 连接钱包
   const connectWallet = async () => {
     if (window.ethereum) {
       try {
@@ -21,6 +22,8 @@ function App() {
         const accounts = await window.ethereum.request({ method: 'eth_accounts' });
         setAccount(accounts[0]);
         setIsConnected(true);
+        // 自动选择第一个频道
+        setSelectedChannel(channels[0]);
       } catch (error) {
         alert('连接失败：' + error.message);
       }
@@ -30,38 +33,54 @@ function App() {
     }
   };
 
+  // 断开钱包
   const disconnectWallet = () => {
     setAccount(null);
     setIsConnected(false);
     setSelectedChannel(null);
-    setMessages([]);
+    setMessages({});
   };
 
+  // 选择频道
+  const selectChannel = (channel) => {
+    setSelectedChannel(channel);
+  };
+
+  // 发送消息
   const sendMessage = () => {
     if (newMessage.trim() && selectedChannel) {
+      const channelId = selectedChannel.id;
       const msg = {
         id: Date.now(),
         sender: account ? account.slice(0, 6) + '...' + account.slice(-4) : '匿名',
         text: newMessage.trim(),
         time: new Date().toLocaleTimeString('zh-CN')
       };
-      setMessages([...messages, msg]);
+      
+      setMessages(prev => ({
+        ...prev,
+        [channelId]: [...(prev[channelId] || []), msg]
+      }));
       setNewMessage('');
     }
   };
 
+  // 获取当前频道的消息
+  const currentMessages = selectedChannel ? (messages[selectedChannel.id] || []) : [];
+
   return (
     <div className="app">
+      {/* 头部 */}
       <header className="header">
         <div className="logo">🚀 币圈社区</div>
         <div className="header-right">
           {isConnected ? (
             <>
               <span className="account-address">
-                {account.slice(0, 6)}...{account.slice(-4)}
+                ✅ {account.slice(0, 6)}...{account.slice(-4)}
               </span>
               <button className="btn-disconnect" onClick={disconnectWallet}>
-                断开连接
+                断开
               </button>
             </>
           ) : (
@@ -74,93 +93,86 @@ function App() {
 
       {isConnected ? (
         <div className="main-content">
+          {/* 侧边栏 */}
           <aside className="sidebar">
-            <h3>频道列表</h3>
+            <h3>📢 频道列表</h3>
             {channels.map(channel => (
               <div
                 key={channel.id}
                 className={`channel-item ${selectedChannel?.id === channel.id ? 'active' : ''}`}
-                onClick={() => setSelectedChannel(channel)}
+                onClick={() => selectChannel(channel)}
               >
                 <span># {channel.name}</span>
-                <span className="member-count">{channel.members}</span>
+                <span className="member-count">{channel.members}人</span>
               </div>
             ))}
           </aside>
 
+          {/* 聊天区域 */}
           <div className="chat-area">
-            {selectedChannel ? (
-              <>
-                <div className="chat-header">
-                  <h2># {selectedChannel.name}</h2>
-                  <span>{selectedChannel.members} 成员</span>
+            <div className="chat-header">
+              <h2># {selectedChannel ? selectedChannel.name : '选择频道'}</h2>
+              <span>{selectedChannel ? selectedChannel.members : 0} 成员在线</span>
+            </div>
+
+            <div className="messages">
+              {currentMessages.length === 0 ? (
+                <div className="no-messages">
+                  <p style={{fontSize: '48px', marginBottom: '20px'}}>💬</p>
+                  <p style={{fontSize: '18px', marginBottom: '10px'}}>暂无消息</p>
+                  <p>在下方输入框发送第一条消息吧！</p>
                 </div>
-                <div className="messages">
-                  {messages.length === 0 ? (
-                    <div className="no-messages">
-                      <p>💬 暂无消息</p>
-                      <p>发送第一条消息吧！</p>
+              ) : (
+                currentMessages.map(msg => (
+                  <div key={msg.id} className="message">
+                    <div className="message-avatar">
+                      {msg.sender.slice(0, 2)}
                     </div>
-                  ) : (
-                    messages.map(msg => (
-                      <div key={msg.id} className="message">
-                        <div className="message-avatar">
-                          {msg.sender.slice(0, 2)}
-                        </div>
-                        <div className="message-content">
-                          <div className="message-header">
-                            <strong>{msg.sender}</strong>
-                            <small>{msg.time}</small>
-                          </div>
-                          <div className="message-text">{msg.text}</div>
-                        </div>
+                    <div className="message-content">
+                      <div className="message-header">
+                        <strong>{msg.sender}</strong>
+                        <small>{msg.time}</small>
                       </div>
-                    ))
-                  )}
-                </div>
-                <div className="message-input">
-                  <input
-                    type="text"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                    placeholder={`发送消息到 # ${selectedChannel.name}...`}
-                  />
-                  <button onClick={sendMessage} disabled={!newMessage.trim()}>
-                    发送
-                  </button>
-                </div>
-              </>
-            ) : (
-              <div className="welcome">
-                <h2>👈 选择一个频道开始聊天</h2>
-                <p>点击左侧频道列表进入讨论</p>
-              </div>
-            )}
+                      <div className="message-text">{msg.text}</div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="message-input">
+              <input
+                type="text"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                placeholder={`发送消息到 # ${selectedChannel ? selectedChannel.name : '...'}`}
+              />
+              <button onClick={sendMessage} disabled={!newMessage.trim()}>
+                发送 📤
+              </button>
+            </div>
           </div>
         </div>
       ) : (
         <div className="landing">
-          <h1>欢迎来到币圈社区</h1>
-          <p>连接钱包开始使用去中心化聊天</p>
+          <h1>🚀 欢迎来到币圈社区</h1>
+          <p>连接钱包后即可进入聊天室</p>
           <button className="connect-btn-large" onClick={connectWallet}>
-            🔗 连接MetaMask钱包
+            🔗 点击连接MetaMask钱包
           </button>
-          <div className="features">
-            <div className="feature-card">
-              <div className="feature-icon">💬</div>
-              <div className="feature-title">去中心化聊天</div>
-              <div className="feature-desc">基于BSC链的消息传递，安全可靠</div>
+          <div className="steps">
+            <div className="step">
+              <span className="step-number">1</span>
+              <span>安装MetaMask钱包</span>
             </div>
-            <div className="feature-card">
-              <div className="feature-icon">💰</div>
-              <div className="feature-title">代币奖励</div>
-              <div className="feature-desc">活跃参与获得CHAT代币激励</div>
+            <div className="step">
+              <span className="step-number">2</span>
+              <span>点击连接钱包按钮</span>
             </div>
-            <div className="feature-card">
-              <div className="feature-icon">👥</div>
-              <div className="feature-title">社区治理</div>
-              <div className="feature-desc">DAO模式，社区成员共同决策</div>
+            <div className="step">
+              <span className="step-number">3</span>
+              <span>自动进入聊天室</span>
             </div>
           </div>
         </div>
