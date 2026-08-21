@@ -26,6 +26,8 @@
             border-bottom: 1px solid #d9d9d9;
             flex-shrink: 0;
             min-width: 0;
+            position: relative;
+            z-index: 10;
         }
         
         .header-left {
@@ -142,6 +144,8 @@
             overflow: hidden;
             max-height: 60px;
             opacity: 1;
+            position: relative;
+            z-index: 10;
         }
         .connect-banner.hidden {
             max-height: 0;
@@ -200,9 +204,11 @@
             cursor: default;
         }
         
+        /* ===== 消息区域 ===== */
         .messages {
             flex: 1;
             padding: 15px;
+            padding-top: 70px; /* 为固定浮窗留出空间 */
             overflow-y: auto;
             background: #ededed;
             display: flex;
@@ -212,53 +218,46 @@
             position: relative;
         }
         
-        /* ===== 会议倒计时 - 固定悬浮窗 ===== */
-        .countdown-float {
+        /* ===== 会议倒计时 - 固定浮窗 ===== */
+        .countdown-banner {
             position: fixed;
-            bottom: 80px;
-            right: 16px;
-            background: rgba(26, 115, 232, 0.92);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 16px;
-            padding: 10px 16px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-            box-shadow: 0 8px 32px rgba(26, 115, 232, 0.35);
+            top: 98px; /* 头部+连接条高度 */
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 100;
-            min-width: 72px;
+            background: rgba(26, 115, 232, 0.13);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(26, 115, 232, 0.30);
+            border-radius: 20px;
+            padding: 6px 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(26, 115, 232, 0.18);
             transition: all 0.3s ease;
-            pointer-events: none;
-            user-select: none;
+            white-space: nowrap;
         }
-        .countdown-float .cd-icon {
+        .countdown-banner .cd-icon {
             font-size: 18px;
             line-height: 1;
         }
-        .countdown-float .cd-label {
-            font-size: 10px;
+        .countdown-banner .cd-label {
+            font-size: 14px;
             font-weight: 500;
-            color: rgba(255, 255, 255, 0.85);
-            letter-spacing: 0.3px;
+            color: #1a73e8;
         }
-        .countdown-float .cd-time {
-            font-size: 22px;
+        .countdown-banner .cd-time {
+            font-size: 17px;
             font-weight: 700;
-            color: #ffffff;
+            color: #1a73e8;
             font-variant-numeric: tabular-nums;
+            min-width: 52px;
+            text-align: center;
             letter-spacing: 0.5px;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.15);
         }
-        .countdown-float .cd-time.ended {
-            color: #ffd6d6;
-        }
-        
-        /* 在聊天消息顶部不再显示倒计时 */
-        .countdown-banner {
-            display: none;
+        .countdown-banner .cd-time.ended {
+            color: #e74c3c;
         }
         
         .time-divider {
@@ -387,6 +386,8 @@
             flex-shrink: 0;
             flex-wrap: nowrap;
             overflow-x: auto;
+            position: relative;
+            z-index: 10;
         }
         .toolbar::-webkit-scrollbar {
             height: 2px;
@@ -464,6 +465,8 @@
             border-top: 1px solid #e0e0e0;
             flex-shrink: 0;
             padding-bottom: max(8px, env(safe-area-inset-bottom));
+            position: relative;
+            z-index: 10;
         }
         
         .icon-btn {
@@ -712,18 +715,13 @@
             .toolbar { gap: 6px; padding: 2px 8px 8px 8px; }
             .notification-wrap { font-size: 14px; }
             .notification-wrap .badge { font-size: 8px; min-width: 14px; height: 14px; top: -4px; right: -6px; }
+            .countdown-banner { padding: 4px 14px; gap: 6px; top: 88px; }
+            .countdown-banner .cd-icon { font-size: 15px; }
+            .countdown-banner .cd-label { font-size: 12px; }
+            .countdown-banner .cd-time { font-size: 14px; min-width: 40px; }
             .menu-icon { width: 18px; height: 18px; gap: 2.5px; }
             .menu-icon span { width: 18px; height: 2px; }
-            .countdown-float {
-                bottom: 72px;
-                right: 12px;
-                padding: 8px 12px;
-                min-width: 60px;
-                border-radius: 14px;
-            }
-            .countdown-float .cd-icon { font-size: 15px; }
-            .countdown-float .cd-label { font-size: 9px; }
-            .countdown-float .cd-time { font-size: 18px; }
+            .messages { padding-top: 60px; }
         }
         
         @media (min-width: 768px) {
@@ -738,10 +736,15 @@
             .more-panel, .emoji-panel {
                 border-radius: 20px 20px 0 0;
             }
-            .countdown-float {
-                right: calc(50% - 400px + 16px);
+            .countdown-banner {
+                top: 98px;
             }
         }
+        /* 连接条隐藏后，倒计时跟随上移 */
+        .connect-banner.hidden ~ .messages .countdown-banner {
+            top: 58px;
+        }
+        /* 由于倒计时是fixed在body下，无法用兄弟选择器，用JS动态调整 */
     </style>
 </head>
 <body>
@@ -777,20 +780,18 @@
     
     <!-- 消息区域 -->
     <div class="messages" id="messages">
-        <!-- 原倒计时已移除，改用悬浮窗 -->
+        <!-- 会议倒计时 - 固定浮窗 -->
+        <div class="countdown-banner" id="countdownBanner">
+            <span class="cd-icon">⏰</span>
+            <span class="cd-label">会议倒计时</span>
+            <span class="cd-time" id="countdownDisplay">05:00</span>
+        </div>
         <div class="time-divider" id="timeDivider"></div>
         <div class="empty-state" id="emptyState">
             <div class="icon">💬</div>
             <p>暂无消息</p>
             <p>连接钱包后开始聊天</p>
         </div>
-    </div>
-    
-    <!-- 会议倒计时 - 固定悬浮窗 -->
-    <div class="countdown-float" id="countdownFloat">
-        <span class="cd-icon">⏰</span>
-        <span class="cd-label">会议倒计时</span>
-        <span class="cd-time" id="countdownDisplay">05:00</span>
     </div>
     
     <!-- 输入框上方工具栏 -->
@@ -933,6 +934,16 @@
             }, 1000);
         }
         
+        // ===== 调整倒计时位置 =====
+        function updateCountdownPosition() {
+            const banner = document.getElementById('connectBanner');
+            const countdown = document.getElementById('countdownBanner');
+            if (!banner || !countdown) return;
+            const isHidden = banner.classList.contains('hidden');
+            // 连接条隐藏时上移，显示时下移
+            countdown.style.top = isHidden ? '58px' : '98px';
+        }
+        
         // ===== 表情包数据 =====
         const emojiList = [
             '😀', '😁', '😂', '🤣', '😃', '😄', '😅',
@@ -977,6 +988,8 @@
                     
                     const banner = document.getElementById('connectBanner');
                     banner.classList.add('hidden');
+                    // 更新倒计时位置
+                    updateCountdownPosition();
                     
                     const shortAddr = userAddress.slice(0, 4) + '...' + userAddress.slice(-4);
                     document.getElementById('headerAddress').textContent = shortAddr;
@@ -1244,6 +1257,9 @@
         }
         
         document.getElementById('chatTitle').textContent = '🚀 币圈社区 (719)';
+        
+        // 初始化倒计时位置
+        setTimeout(updateCountdownPosition, 100);
     </script>
 </body>
 </html>
