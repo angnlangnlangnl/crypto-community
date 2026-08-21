@@ -113,6 +113,7 @@
             line-height: 1;
         }
         
+        /* ===== 连接提示条 - 整体隐藏 ===== */
         .connect-banner {
             background: #f7f7f7;
             padding: 8px 15px;
@@ -121,6 +122,18 @@
             gap: 10px;
             border-bottom: 1px solid #e0e0e0;
             flex-shrink: 0;
+            transition: all 0.4s ease;
+            overflow: hidden;
+            max-height: 60px;
+            opacity: 1;
+        }
+        .connect-banner.hidden {
+            max-height: 0;
+            opacity: 0;
+            padding: 0 15px;
+            border-bottom: none;
+            margin: 0;
+            pointer-events: none;
         }
         
         .connect-banner .avatar {
@@ -164,17 +177,7 @@
             font-size: 12px;
             flex-shrink: 0;
             white-space: nowrap;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-        .connect-btn.hidden {
-            opacity: 0;
-            transform: scale(0.8);
-            pointer-events: none;
-            width: 0;
-            padding: 0 0;
-            margin: 0;
-            border: none;
-            overflow: hidden;
+            transition: opacity 0.3s ease;
         }
         .connect-btn:disabled {
             background: #ccc;
@@ -721,7 +724,7 @@
         </div>
     </div>
     
-    <!-- 连接提示条 -->
+    <!-- 连接提示条 - 整体隐藏 -->
     <div class="connect-banner" id="connectBanner">
         <div class="avatar">🦊</div>
         <div class="info">
@@ -917,7 +920,7 @@
         function updateOnlineCount() {}
         updateOnlineCount();
         
-        // ----- 钱包连接 -----
+        // ----- 钱包连接 - 连接后整个banner隐藏 -----
         async function connectWallet() {
             if (window.ethereum) {
                 try {
@@ -930,11 +933,9 @@
                     document.getElementById('walletStatus').textContent = '✅ ' + userAddress.slice(0, 8) + '...' + userAddress.slice(-6);
                     document.getElementById('walletStatus').style.color = '#07c160';
                     
-                    // 隐藏连接按钮
-                    const connectBtn = document.getElementById('connectBtn');
-                    connectBtn.classList.add('hidden');
-                    connectBtn.textContent = '已连接';
-                    connectBtn.disabled = true;
+                    // 整个连接条隐藏
+                    const banner = document.getElementById('connectBanner');
+                    banner.classList.add('hidden');
                     
                     // 更新顶部地址
                     const shortAddr = userAddress.slice(0, 4) + '...' + userAddress.slice(-4);
