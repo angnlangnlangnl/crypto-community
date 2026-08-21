@@ -53,10 +53,41 @@
         .header-right {
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 14px;
             font-size: 20px;
             cursor: pointer;
             color: #333;
+        }
+        
+        .header-address {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            background: #e8e8e8;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-family: monospace;
+            letter-spacing: 0.3px;
+        }
+        
+        .enter-meeting-btn {
+            font-size: 13px;
+            font-weight: 500;
+            color: #07c160;
+            background: none;
+            border: 1px solid #07c160;
+            border-radius: 16px;
+            padding: 4px 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .enter-meeting-btn:hover {
+            background: #07c160;
+            color: white;
+        }
+        .enter-meeting-btn:active {
+            transform: scale(0.96);
         }
         
         .connect-banner {
@@ -325,6 +356,78 @@
             border-radius: 2px;
         }
         
+        /* ========== 表情包弹窗 ========== */
+        .emoji-overlay {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 999;
+            animation: fadeIn 0.2s ease;
+        }
+        .emoji-overlay.active {
+            display: flex;
+        }
+        .emoji-panel {
+            background: #f7f7f7;
+            width: 100%;
+            max-width: 800px;
+            border-radius: 16px 16px 0 0;
+            padding: 20px 15px 30px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+        .emoji-overlay.active .emoji-panel {
+            transform: translateY(0);
+        }
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 12px 8px;
+            margin-bottom: 16px;
+        }
+        .emoji-item {
+            font-size: 32px;
+            text-align: center;
+            cursor: pointer;
+            padding: 8px 4px;
+            border-radius: 12px;
+            transition: background 0.15s;
+        }
+        .emoji-item:active {
+            background: rgba(0,0,0,0.08);
+            transform: scale(0.92);
+        }
+        .emoji-close-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #e8e8e8;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+        }
+        .emoji-close-btn:active {
+            background: #d0d0d0;
+        }
+        .emoji-panel .panel-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
         /* ========== 加号弹窗 (More Panel) ========== */
         .more-overlay {
             position: fixed;
@@ -382,9 +485,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
             background: white;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .more-item .icon svg {
+            width: 32px;
+            height: 32px;
+            stroke: #333;
         }
         .more-item .label {
             font-size: 12px;
@@ -414,7 +521,10 @@
         /* 适配小屏 */
         @media (max-width: 420px) {
             .more-grid { gap: 12px 6px; }
-            .more-item .icon { width: 48px; height: 48px; font-size: 24px; }
+            .more-item .icon { width: 48px; height: 48px; }
+            .more-item .icon svg { width: 28px; height: 28px; }
+            .emoji-grid { gap: 8px 4px; }
+            .emoji-item { font-size: 26px; padding: 6px 2px; }
         }
         
         @media (min-width: 768px) {
@@ -426,7 +536,7 @@
             .msg-wrapper {
                 max-width: 65%;
             }
-            .more-panel {
+            .more-panel, .emoji-panel {
                 border-radius: 20px 20px 0 0;
             }
         }
@@ -440,9 +550,9 @@
             <span class="chat-title" id="chatTitle">🚀 币圈社区 (719)</span>
         </div>
         <div class="header-right">
-            <span id="onlineCount">👥 719</span>
-            <!-- 使用您提供的视频SVG图标 -->
-            <span id="videoIcon" style="display:inline-flex; align-items:center; width:24px; height:24px;">
+            <span class="header-address" id="headerAddress">0x12...34ab</span>
+            <button class="enter-meeting-btn" onclick="handleEnterMeeting()">进入会议</button>
+            <span style="display:inline-flex; align-items:center; width:24px; height:24px;">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polygon points="23 7 16 12 23 17 23 7"/>
                     <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
@@ -486,8 +596,8 @@
         <!-- 输入框 -->
         <input type="text" class="input-field" id="msgInput" placeholder="输入消息..." onkeypress="if(event.key==='Enter')sendMessage()">
         
-        <!-- 表情按钮 -->
-        <button class="icon-btn" onclick="showEmojiPanel()">😊</button>
+        <!-- 表情按钮 - 触发表情包弹窗 -->
+        <button class="icon-btn" onclick="toggleEmojiPanel()">😊</button>
         
         <!-- 加号按钮 - 触发弹窗 -->
         <button class="icon-btn" onclick="toggleMorePanel()" id="plusBtn">
@@ -501,29 +611,67 @@
         <button class="send-btn" id="sendBtn" onclick="sendMessage()">发送</button>
     </div>
 
+    <!-- 表情包弹窗 -->
+    <div class="emoji-overlay" id="emojiOverlay" onclick="if(event.target===this) toggleEmojiPanel()">
+        <div class="emoji-panel">
+            <div class="panel-title">😊 表情包</div>
+            <div class="emoji-grid" id="emojiGrid">
+                <!-- 由JS动态生成 -->
+            </div>
+            <button class="emoji-close-btn" onclick="toggleEmojiPanel()">取消</button>
+        </div>
+    </div>
+
     <!-- 加号弹窗 (More Panel) -->
     <div class="more-overlay" id="moreOverlay" onclick="if(event.target===this) toggleMorePanel()">
         <div class="more-panel">
             <div class="more-grid">
+                <!-- 图片 -->
                 <div class="more-item" onclick="handleMoreAction('图片')">
-                    <div class="icon">🖼️</div>
+                    <div class="icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="20" height="20" rx="2" ry="2"/>
+                            <circle cx="9" cy="9" r="2"/>
+                            <path d="M22 15l-5-5-6 6"/>
+                        </svg>
+                    </div>
                     <span class="label">图片</span>
                 </div>
+                <!-- 视频 -->
                 <div class="more-item" onclick="handleMoreAction('视频')">
-                    <div class="icon">🎬</div>
+                    <div class="icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="4" width="20" height="16" rx="3" ry="3"/>
+                            <polygon points="9 7 17 12 9 17 9 7"/>
+                        </svg>
+                    </div>
                     <span class="label">视频</span>
                 </div>
+                <!-- 转账 -->
+                <div class="more-item" onclick="handleMoreAction('转账')">
+                    <div class="icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="5" width="20" height="14" rx="2"/>
+                            <line x1="2" y1="10" x2="22" y2="10"/>
+                            <circle cx="18" cy="14" r="1.5" fill="currentColor"/>
+                            <polyline points="14 3 12 6 10 3"/>
+                        </svg>
+                    </div>
+                    <span class="label">转账</span>
+                </div>
+                <!-- 代币红包 -->
                 <div class="more-item" onclick="handleMoreAction('代币红包')">
                     <div class="icon">🧧</div>
                     <span class="label">代币红包</span>
                 </div>
-                <div class="more-item" onclick="handleMoreAction('直播间')">
-                    <div class="icon">📡</div>
-                    <span class="label">直播间</span>
-                </div>
-                <div class="more-item" onclick="handleMoreAction('会议')">
-                    <div class="icon">🤝</div>
-                    <span class="label">会议</span>
+                <!-- 收藏 - 新增 -->
+                <div class="more-item" onclick="handleMoreAction('收藏')">
+                    <div class="icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                        </svg>
+                    </div>
+                    <span class="label">收藏</span>
                 </div>
             </div>
             <button class="more-close-btn" onclick="toggleMorePanel()">取消</button>
@@ -536,6 +684,25 @@
         let messageCount = 0;
         let isVoiceMode = false;
         
+        // ===== 表情包数据 =====
+        const emojiList = [
+            '😀', '😁', '😂', '🤣', '😃', '😄', '😅',
+            '😆', '😉', '😊', '😋', '😎', '😍', '🥰',
+            '😘', '😗', '😙', '😚', '🥲', '😜', '🤪',
+            '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐',
+            '🤨', '😐', '😑', '😶', '😏', '😒', '🙄',
+            '😬', '🤥', '😌', '😔', '😪', '🤤', '😴',
+            '😷', '🤒', '🤕', '🤢', '🤮', '🥴', '😵',
+            '🤯', '🥳', '🥺', '😡', '😠', '🤬', '😈',
+            '💀', '☠️', '💩', '🤡', '👹', '👺', '👻',
+            '💋', '💌', '💘', '💝', '💖', '💗', '💓',
+            '💔', '❤️', '🧡', '💛', '💚', '💙', '💜',
+            '🖤', '🤍', '🤎', '💕', '💞', '💯', '🔥',
+            '⭐', '🌟', '✨', '💫', '🌈', '☀️', '🌙',
+            '☁️', '⛅', '🌊', '🌸', '🌺', '🌻', '🌹',
+            '🍀', '🌿', '☘️', '🍁', '🍂', '🍃', '🍄'
+        ];
+        
         // ----- 时间 & 在线人数 -----
         function setTime() {
             const now = new Date();
@@ -544,9 +711,8 @@
         setTime();
         setInterval(setTime, 30000);
         
-        // 在线人数固定719
         function updateOnlineCount() {
-            document.getElementById('onlineCount').textContent = '👥 719';
+            // 已固定显示在标题中
         }
         updateOnlineCount();
         
@@ -564,6 +730,9 @@
                     document.getElementById('connectBtn').textContent = '已连接';
                     document.getElementById('connectBtn').style.background = '#ccc';
                     document.getElementById('connectBtn').disabled = true;
+                    
+                    const shortAddr = userAddress.slice(0, 4) + '...' + userAddress.slice(-4);
+                    document.getElementById('headerAddress').textContent = shortAddr;
                     
                     if (messageCount === 0) {
                         const emptyState = document.getElementById('emptyState');
@@ -708,19 +877,48 @@
             }
         }
         
-        // ----- 表情 (占位) -----
-        function showEmojiPanel() {
-            alert('表情面板功能开发中');
+        // ===== 表情包弹窗 =====
+        function toggleEmojiPanel() {
+            const overlay = document.getElementById('emojiOverlay');
+            overlay.classList.toggle('active');
+            // 首次打开时渲染表情
+            if (overlay.classList.contains('active')) {
+                renderEmojis();
+            }
         }
         
-        // ========== 加号弹窗 (More Panel) ==========
+        function renderEmojis() {
+            const grid = document.getElementById('emojiGrid');
+            if (grid.children.length > 0) return; // 已渲染
+            emojiList.forEach(emoji => {
+                const item = document.createElement('div');
+                item.className = 'emoji-item';
+                item.textContent = emoji;
+                item.onclick = function(e) {
+                    e.stopPropagation();
+                    selectEmoji(emoji);
+                };
+                grid.appendChild(item);
+            });
+        }
+        
+        function selectEmoji(emoji) {
+            toggleEmojiPanel(); // 关闭弹窗
+            // 将表情插入输入框
+            const input = document.getElementById('msgInput');
+            input.value += emoji;
+            updateSendBtn();
+            input.focus();
+        }
+        
+        // ===== 加号弹窗 (More Panel) =====
         function toggleMorePanel() {
             const overlay = document.getElementById('moreOverlay');
             overlay.classList.toggle('active');
         }
         
         function handleMoreAction(action) {
-            toggleMorePanel(); // 关闭弹窗
+            toggleMorePanel();
             addSystemMessage(`📌 发起「${action}」功能 (演示)`);
             setTimeout(() => {
                 const replies = [
@@ -731,6 +929,15 @@
                 ];
                 addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
             }, 500 + Math.random() * 1000);
+        }
+        
+        // ===== 进入会议 =====
+        function handleEnterMeeting() {
+            addSystemMessage('📞 正在进入会议...');
+            setTimeout(() => {
+                addSystemMessage('✅ 已加入会议，当前参会人数 12 人');
+                addOtherMessage('欢迎加入会议！', '会议主持人');
+            }, 800);
         }
         
         // 初始化头部标题
