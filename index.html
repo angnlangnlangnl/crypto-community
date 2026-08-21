@@ -19,7 +19,7 @@
         
         .header {
             background: #ededed;
-            padding: 12px 15px;
+            padding: 10px 15px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -31,16 +31,16 @@
         .header-left {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             flex-shrink: 0;
         }
         
         .back-btn {
-            font-size: 20px;
+            font-size: 18px;
             cursor: pointer;
             color: #333;
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -48,7 +48,7 @@
         }
         
         .chat-title {
-            font-size: 17px;
+            font-size: 15px;
             font-weight: 600;
             color: #333;
             white-space: nowrap;
@@ -58,7 +58,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 20px;
+            font-size: 18px;
             cursor: pointer;
             color: #333;
             flex-shrink: 0;
@@ -66,11 +66,11 @@
         }
         
         .header-address {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             color: #333;
             background: #e8e8e8;
-            padding: 4px 12px;
+            padding: 3px 10px;
             border-radius: 12px;
             font-family: monospace;
             letter-spacing: 0.3px;
@@ -79,17 +79,18 @@
         }
         
         .enter-meeting-btn {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             color: #07c160;
             background: none;
             border: 1px solid #07c160;
-            border-radius: 16px;
-            padding: 4px 12px;
+            border-radius: 14px;
+            padding: 3px 10px;
             cursor: pointer;
             transition: all 0.2s;
             white-space: nowrap;
             flex-shrink: 0;
+            line-height: 1.4;
         }
         .enter-meeting-btn:hover {
             background: #07c160;
@@ -101,7 +102,7 @@
         
         .header-more {
             flex-shrink: 0;
-            font-size: 20px;
+            font-size: 18px;
             line-height: 1;
         }
         
@@ -540,9 +541,11 @@
             .more-item .icon svg { width: 28px; height: 28px; }
             .emoji-grid { gap: 8px 4px; }
             .emoji-item { font-size: 26px; padding: 6px 2px; }
-            .header-address { font-size: 12px; padding: 3px 8px; }
-            .enter-meeting-btn { font-size: 11px; padding: 3px 8px; }
+            .header-address { font-size: 11px; padding: 2px 8px; }
+            .enter-meeting-btn { font-size: 11px; padding: 2px 8px; }
             .header-right { gap: 6px; }
+            .chat-title { font-size: 14px; }
+            .back-btn { font-size: 16px; width: 24px; height: 24px; }
         }
         
         @media (min-width: 768px) {
