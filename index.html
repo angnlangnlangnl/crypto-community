@@ -78,7 +78,6 @@
             flex-shrink: 0;
         }
         
-        /* ===== 通知图标 + 角标 ===== */
         .notification-wrap {
             position: relative;
             display: inline-flex;
@@ -165,8 +164,18 @@
             font-size: 12px;
             flex-shrink: 0;
             white-space: nowrap;
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
-        
+        .connect-btn.hidden {
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+            width: 0;
+            padding: 0 0;
+            margin: 0;
+            border: none;
+            overflow: hidden;
+        }
         .connect-btn:disabled {
             background: #ccc;
             cursor: default;
@@ -181,6 +190,46 @@
             flex-direction: column;
             gap: 12px;
             min-height: 0;
+            position: relative;
+        }
+        
+        /* ===== 会议倒计时 - 顶部居中悬停 ===== */
+        .countdown-banner {
+            align-self: center;
+            background: rgba(26, 115, 232, 0.12);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(26, 115, 232, 0.25);
+            border-radius: 20px;
+            padding: 8px 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 16px rgba(26, 115, 232, 0.12);
+            margin-bottom: 4px;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+        .countdown-banner .cd-icon {
+            font-size: 20px;
+            line-height: 1;
+        }
+        .countdown-banner .cd-label {
+            font-size: 15px;
+            font-weight: 500;
+            color: #1a73e8;
+        }
+        .countdown-banner .cd-time {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a73e8;
+            font-variant-numeric: tabular-nums;
+            min-width: 56px;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+        .countdown-banner .cd-time.ended {
+            color: #e74c3c;
         }
         
         .time-divider {
@@ -374,37 +423,6 @@
         .toolbar-btn.official:hover {
             background: #9c27b0;
             color: white;
-        }
-        
-        /* ===== 会议倒计时 ===== */
-        .countdown-wrap {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(26, 115, 232, 0.10);
-            border-radius: 14px;
-            padding: 3px 12px 3px 10px;
-            white-space: nowrap;
-            flex-shrink: 0;
-            border: 1px solid rgba(26, 115, 232, 0.20);
-        }
-        .countdown-wrap .cd-icon {
-            font-size: 14px;
-            line-height: 1;
-        }
-        .countdown-wrap .cd-text {
-            font-size: 12px;
-            font-weight: 500;
-            color: #1a73e8;
-            font-variant-numeric: tabular-nums;
-        }
-        .countdown-wrap .cd-time {
-            font-size: 12px;
-            font-weight: 600;
-            color: #1a73e8;
-            font-variant-numeric: tabular-nums;
-            min-width: 44px;
-            text-align: center;
         }
         
         /* ========== 微信底部输入栏 ========== */
@@ -665,10 +683,10 @@
             .toolbar { gap: 6px; padding: 2px 8px 8px 8px; }
             .notification-wrap { font-size: 14px; }
             .notification-wrap .badge { font-size: 8px; min-width: 14px; height: 14px; top: -4px; right: -6px; }
-            .countdown-wrap { padding: 2px 8px 2px 6px; }
-            .countdown-wrap .cd-text { font-size: 10px; }
-            .countdown-wrap .cd-time { font-size: 10px; min-width: 36px; }
-            .countdown-wrap .cd-icon { font-size: 12px; }
+            .countdown-banner { padding: 6px 16px; gap: 6px; }
+            .countdown-banner .cd-icon { font-size: 16px; }
+            .countdown-banner .cd-label { font-size: 13px; }
+            .countdown-banner .cd-time { font-size: 15px; min-width: 44px; }
         }
         
         @media (min-width: 768px) {
@@ -715,6 +733,12 @@
     
     <!-- 消息区域 -->
     <div class="messages" id="messages">
+        <!-- 会议倒计时 - 顶部居中 -->
+        <div class="countdown-banner" id="countdownBanner">
+            <span class="cd-icon">⏰</span>
+            <span class="cd-label">会议倒计时</span>
+            <span class="cd-time" id="countdownDisplay">05:00</span>
+        </div>
         <div class="time-divider" id="timeDivider"></div>
         <div class="empty-state" id="emptyState">
             <div class="icon">💬</div>
@@ -723,14 +747,8 @@
         </div>
     </div>
     
-    <!-- 输入框上方工具栏 - 新增倒计时 -->
+    <!-- 输入框上方工具栏 -->
     <div class="toolbar">
-        <!-- 会议倒计时 -->
-        <div class="countdown-wrap">
-            <span class="cd-icon">⏰</span>
-            <span class="cd-text">会议倒计时</span>
-            <span class="cd-time" id="countdownDisplay">05:00</span>
-        </div>
         <button class="toolbar-btn token" onclick="handleTokenInfo()">代币信息</button>
         <button class="toolbar-btn economy" onclick="handleToolbarAction('经济模式')">经济模式</button>
         <button class="toolbar-btn meeting" onclick="handleEnterMeeting()">进入会议</button>
@@ -740,7 +758,6 @@
     
     <!-- 底部输入栏 - 微信布局 -->
     <div class="input-area">
-        <!-- 语音按钮 -->
         <button class="icon-btn" onclick="toggleVoiceMode()" id="voiceBtn">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="9" y="2" width="6" height="12" rx="3"/>
@@ -749,13 +766,10 @@
             </svg>
         </button>
         
-        <!-- 输入框 -->
         <input type="text" class="input-field" id="msgInput" placeholder="输入消息..." onkeypress="if(event.key==='Enter')sendMessage()">
         
-        <!-- 表情按钮 - 触发表情包弹窗 -->
         <button class="icon-btn" onclick="toggleEmojiPanel()">😊</button>
         
-        <!-- 加号按钮 - 触发弹窗 -->
         <button class="icon-btn" onclick="toggleMorePanel()" id="plusBtn">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round">
                 <line x1="12" y1="5" x2="12" y2="19"/>
@@ -763,7 +777,6 @@
             </svg>
         </button>
         
-        <!-- 发送按钮 -->
         <button class="send-btn" id="sendBtn" onclick="sendMessage()">发送</button>
     </div>
 
@@ -776,11 +789,10 @@
         </div>
     </div>
 
-    <!-- 加号弹窗 (More Panel) -->
+    <!-- 加号弹窗 -->
     <div class="more-overlay" id="moreOverlay" onclick="if(event.target===this) toggleMorePanel()">
         <div class="more-panel">
             <div class="more-grid">
-                <!-- 图片 -->
                 <div class="more-item" onclick="handleMoreAction('图片')">
                     <div class="icon">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -791,7 +803,6 @@
                     </div>
                     <span class="label">图片</span>
                 </div>
-                <!-- 视频 -->
                 <div class="more-item" onclick="handleMoreAction('视频')">
                     <div class="icon">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -801,7 +812,6 @@
                     </div>
                     <span class="label">视频</span>
                 </div>
-                <!-- 转账 -->
                 <div class="more-item" onclick="handleMoreAction('转账')">
                     <div class="icon">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -813,12 +823,10 @@
                     </div>
                     <span class="label">转账</span>
                 </div>
-                <!-- 代币红包 -->
                 <div class="more-item" onclick="handleMoreAction('代币红包')">
                     <div class="icon">🧧</div>
                     <span class="label">代币红包</span>
                 </div>
-                <!-- 收藏 -->
                 <div class="more-item" onclick="handleMoreAction('收藏')">
                     <div class="icon">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -840,7 +848,7 @@
         let notifCount = 3;
         
         // ===== 会议倒计时 =====
-        let countdownSeconds = 300; // 5分钟
+        let countdownSeconds = 300;
         let countdownInterval = null;
         
         function updateCountdown() {
@@ -854,8 +862,10 @@
                 clearInterval(countdownInterval);
                 countdownInterval = null;
                 display.textContent = '00:00';
-                // 自动触发进入会议
+                display.classList.add('ended');
                 handleEnterMeeting();
+            } else {
+                display.classList.remove('ended');
             }
         }
         
@@ -864,6 +874,8 @@
                 clearInterval(countdownInterval);
             }
             countdownSeconds = 300;
+            const display = document.getElementById('countdownDisplay');
+            if (display) display.classList.remove('ended');
             updateCountdown();
             countdownInterval = setInterval(() => {
                 countdownSeconds--;
@@ -902,9 +914,7 @@
         setTime();
         setInterval(setTime, 30000);
         
-        function updateOnlineCount() {
-            // 已固定显示在标题中
-        }
+        function updateOnlineCount() {}
         updateOnlineCount();
         
         // ----- 钱包连接 -----
@@ -916,12 +926,17 @@
                     userAddress = accounts[0];
                     isConnected = true;
                     
+                    // 更新钱包状态
                     document.getElementById('walletStatus').textContent = '✅ ' + userAddress.slice(0, 8) + '...' + userAddress.slice(-6);
                     document.getElementById('walletStatus').style.color = '#07c160';
-                    document.getElementById('connectBtn').textContent = '已连接';
-                    document.getElementById('connectBtn').style.background = '#ccc';
-                    document.getElementById('connectBtn').disabled = true;
                     
+                    // 隐藏连接按钮
+                    const connectBtn = document.getElementById('connectBtn');
+                    connectBtn.classList.add('hidden');
+                    connectBtn.textContent = '已连接';
+                    connectBtn.disabled = true;
+                    
+                    // 更新顶部地址
                     const shortAddr = userAddress.slice(0, 4) + '...' + userAddress.slice(-4);
                     document.getElementById('headerAddress').textContent = shortAddr;
                     
@@ -1123,25 +1138,18 @@
         
         // ===== 进入会议 - 唤醒腾讯会议 =====
         function handleEnterMeeting() {
-            // 停止倒计时
             if (countdownInterval) {
                 clearInterval(countdownInterval);
                 countdownInterval = null;
             }
             const display = document.getElementById('countdownDisplay');
-            if (display) display.textContent = '已开始';
+            if (display) {
+                display.textContent = '已开始';
+                display.classList.add('ended');
+            }
             
             addSystemMessage('📞 正在进入会议...');
             
-            // 尝试唤醒腾讯会议 (Tencent Meeting)
-            // 使用 weixin:// 或 tencent:// 协议
-            const meetingSchemes = [
-                'tencent://meeting?',
-                'wemeet://page/inmeeting?',
-                'https://meeting.tencent.com/'
-            ];
-            
-            // 尝试打开腾讯会议
             const link = document.createElement('a');
             link.href = 'tencent://meeting?';
             link.style.display = 'none';
@@ -1149,7 +1157,6 @@
             link.click();
             document.body.removeChild(link);
             
-            // 备用方案 - 使用微信内置浏览器可能不支持，尝试打开web版
             setTimeout(() => {
                 window.open('https://meeting.tencent.com/', '_blank');
             }, 300);
