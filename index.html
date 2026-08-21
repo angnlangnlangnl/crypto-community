@@ -78,28 +78,6 @@
             flex-shrink: 0;
         }
         
-        .enter-meeting-btn {
-            font-size: 12px;
-            font-weight: 500;
-            color: #07c160;
-            background: none;
-            border: 1px solid #07c160;
-            border-radius: 14px;
-            padding: 3px 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-            flex-shrink: 0;
-            line-height: 1.4;
-        }
-        .enter-meeting-btn:hover {
-            background: #07c160;
-            color: white;
-        }
-        .enter-meeting-btn:active {
-            transform: scale(0.96);
-        }
-        
         .header-more {
             flex-shrink: 0;
             font-size: 18px;
@@ -289,6 +267,75 @@
         .empty-state p {
             font-size: 14px;
             margin-bottom: 5px;
+        }
+        
+        /* ========== 输入框上方工具栏 ========== */
+        .toolbar {
+            background: #f7f7f7;
+            padding: 6px 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-top: 1px solid #e0e0e0;
+            flex-shrink: 0;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+        }
+        .toolbar::-webkit-scrollbar {
+            height: 2px;
+        }
+        .toolbar::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 2px;
+        }
+        .toolbar-btn {
+            font-size: 12px;
+            font-weight: 500;
+            color: #333;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 14px;
+            padding: 4px 12px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .toolbar-btn:active {
+            transform: scale(0.95);
+            background: #e8e8e8;
+        }
+        .toolbar-btn.meeting {
+            color: #07c160;
+            border-color: #07c160;
+        }
+        .toolbar-btn.meeting:hover {
+            background: #07c160;
+            color: white;
+        }
+        .toolbar-btn.official {
+            color: #f7931a;
+            border-color: #f7931a;
+        }
+        .toolbar-btn.official:hover {
+            background: #f7931a;
+            color: white;
+        }
+        .toolbar-btn.notice {
+            color: #1a73e8;
+            border-color: #1a73e8;
+        }
+        .toolbar-btn.notice:hover {
+            background: #1a73e8;
+            color: white;
+        }
+        .toolbar-btn.economy {
+            color: #9c27b0;
+            border-color: #9c27b0;
+        }
+        .toolbar-btn.economy:hover {
+            background: #9c27b0;
+            color: white;
         }
         
         /* ========== 微信底部输入栏 ========== */
@@ -542,10 +589,10 @@
             .emoji-grid { gap: 8px 4px; }
             .emoji-item { font-size: 26px; padding: 6px 2px; }
             .header-address { font-size: 11px; padding: 2px 8px; }
-            .enter-meeting-btn { font-size: 11px; padding: 2px 8px; }
             .header-right { gap: 6px; }
             .chat-title { font-size: 14px; }
             .back-btn { font-size: 16px; width: 24px; height: 24px; }
+            .toolbar-btn { font-size: 11px; padding: 3px 8px; }
         }
         
         @media (min-width: 768px) {
@@ -572,7 +619,6 @@
         </div>
         <div class="header-right">
             <span class="header-address" id="headerAddress">0x12...34ab</span>
-            <button class="enter-meeting-btn" onclick="handleEnterMeeting()">进入会议</button>
             <span class="header-more">⋯</span>
         </div>
     </div>
@@ -595,6 +641,14 @@
             <p>暂无消息</p>
             <p>连接钱包后开始聊天</p>
         </div>
+    </div>
+    
+    <!-- 输入框上方工具栏 -->
+    <div class="toolbar">
+        <button class="toolbar-btn meeting" onclick="handleEnterMeeting()">进入会议</button>
+        <button class="toolbar-btn official" onclick="handleToolbarAction('查阅官网')">查阅官网</button>
+        <button class="toolbar-btn notice" onclick="handleToolbarAction('官方通知')">官方通知</button>
+        <button class="toolbar-btn economy" onclick="handleToolbarAction('经济模式')">经济模式</button>
     </div>
     
     <!-- 底部输入栏 - 微信布局 -->
@@ -942,13 +996,25 @@
             }, 500 + Math.random() * 1000);
         }
         
-        // ===== 进入会议 =====
+        // ===== 工具栏按钮 =====
         function handleEnterMeeting() {
             addSystemMessage('📞 正在进入会议...');
             setTimeout(() => {
                 addSystemMessage('✅ 已加入会议，当前参会人数 12 人');
                 addOtherMessage('欢迎加入会议！', '会议主持人');
             }, 800);
+        }
+        
+        function handleToolbarAction(action) {
+            addSystemMessage(`📌 ${action} - 功能开发中`);
+            setTimeout(() => {
+                const replies = [
+                    `已收到 ${action} 请求`, 
+                    `${action} 功能即将上线`, 
+                    `感谢关注 ${action}`
+                ];
+                addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
+            }, 500 + Math.random() * 800);
         }
         
         document.getElementById('chatTitle').textContent = '🚀 币圈社区 (719)';
