@@ -78,7 +78,7 @@
             flex-shrink: 0;
         }
         
-        /* ===== 通知图标 + 角标 - 调小 ===== */
+        /* ===== 通知图标 + 角标 ===== */
         .notification-wrap {
             position: relative;
             display: inline-flex;
@@ -299,10 +299,10 @@
             margin-bottom: 5px;
         }
         
-        /* ========== 输入框上方工具栏 - 与输入框距离增加约三分之一按钮身位 ========== */
+        /* ========== 输入框上方工具栏 ========== */
         .toolbar {
             background: transparent;
-            padding: 2px 12px 10px 12px;  /* 下边距从0px增加到10px，增加约三分之一按钮身位（按钮高度约30px） */
+            padding: 2px 12px 10px 12px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -335,7 +335,6 @@
             transform: scale(0.95);
             box-shadow: 0 1px 4px rgba(0,0,0,0.06);
         }
-        /* 绿色 - 代币信息 */
         .toolbar-btn.token {
             color: #07c160;
             border-color: #07c160;
@@ -344,7 +343,6 @@
             background: #07c160;
             color: white;
         }
-        /* 橙色 - 经济模式 */
         .toolbar-btn.economy {
             color: #f7931a;
             border-color: #f7931a;
@@ -353,7 +351,6 @@
             background: #f7931a;
             color: white;
         }
-        /* 蓝色 - 进入会议 */
         .toolbar-btn.meeting {
             color: #1a73e8;
             border-color: #1a73e8;
@@ -362,7 +359,6 @@
             background: #1a73e8;
             color: white;
         }
-        /* 粉色 - 私募/空投 */
         .toolbar-btn.airdrop {
             color: #e91e63;
             border-color: #e91e63;
@@ -371,7 +367,6 @@
             background: #e91e63;
             color: white;
         }
-        /* 紫色 - 查阅官网 */
         .toolbar-btn.official {
             color: #9c27b0;
             border-color: #9c27b0;
@@ -379,6 +374,37 @@
         .toolbar-btn.official:hover {
             background: #9c27b0;
             color: white;
+        }
+        
+        /* ===== 会议倒计时 ===== */
+        .countdown-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(26, 115, 232, 0.10);
+            border-radius: 14px;
+            padding: 3px 12px 3px 10px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            border: 1px solid rgba(26, 115, 232, 0.20);
+        }
+        .countdown-wrap .cd-icon {
+            font-size: 14px;
+            line-height: 1;
+        }
+        .countdown-wrap .cd-text {
+            font-size: 12px;
+            font-weight: 500;
+            color: #1a73e8;
+            font-variant-numeric: tabular-nums;
+        }
+        .countdown-wrap .cd-time {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a73e8;
+            font-variant-numeric: tabular-nums;
+            min-width: 44px;
+            text-align: center;
         }
         
         /* ========== 微信底部输入栏 ========== */
@@ -639,6 +665,10 @@
             .toolbar { gap: 6px; padding: 2px 8px 8px 8px; }
             .notification-wrap { font-size: 14px; }
             .notification-wrap .badge { font-size: 8px; min-width: 14px; height: 14px; top: -4px; right: -6px; }
+            .countdown-wrap { padding: 2px 8px 2px 6px; }
+            .countdown-wrap .cd-text { font-size: 10px; }
+            .countdown-wrap .cd-time { font-size: 10px; min-width: 36px; }
+            .countdown-wrap .cd-icon { font-size: 12px; }
         }
         
         @media (min-width: 768px) {
@@ -693,8 +723,14 @@
         </div>
     </div>
     
-    <!-- 输入框上方工具栏 - 下边距已增加 -->
+    <!-- 输入框上方工具栏 - 新增倒计时 -->
     <div class="toolbar">
+        <!-- 会议倒计时 -->
+        <div class="countdown-wrap">
+            <span class="cd-icon">⏰</span>
+            <span class="cd-text">会议倒计时</span>
+            <span class="cd-time" id="countdownDisplay">05:00</span>
+        </div>
         <button class="toolbar-btn token" onclick="handleTokenInfo()">代币信息</button>
         <button class="toolbar-btn economy" onclick="handleToolbarAction('经济模式')">经济模式</button>
         <button class="toolbar-btn meeting" onclick="handleEnterMeeting()">进入会议</button>
@@ -803,6 +839,42 @@
         let isVoiceMode = false;
         let notifCount = 3;
         
+        // ===== 会议倒计时 =====
+        let countdownSeconds = 300; // 5分钟
+        let countdownInterval = null;
+        
+        function updateCountdown() {
+            const display = document.getElementById('countdownDisplay');
+            if (!display) return;
+            const mins = String(Math.floor(countdownSeconds / 60)).padStart(2, '0');
+            const secs = String(countdownSeconds % 60).padStart(2, '0');
+            display.textContent = mins + ':' + secs;
+            
+            if (countdownSeconds <= 0) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+                display.textContent = '00:00';
+                // 自动触发进入会议
+                handleEnterMeeting();
+            }
+        }
+        
+        function startCountdown() {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            countdownSeconds = 300;
+            updateCountdown();
+            countdownInterval = setInterval(() => {
+                countdownSeconds--;
+                updateCountdown();
+                if (countdownSeconds <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                }
+            }, 1000);
+        }
+        
         // ===== 表情包数据 =====
         const emojiList = [
             '😀', '😁', '😂', '🤣', '😃', '😄', '😅',
@@ -857,6 +929,7 @@
                         const emptyState = document.getElementById('emptyState');
                         if (emptyState) emptyState.style.display = 'none';
                         addSystemMessage('🎉 欢迎来到币圈社区！');
+                        startCountdown();
                     }
                 } catch (error) {
                     alert('连接失败：' + error.message);
@@ -1048,13 +1121,43 @@
             }, 500 + Math.random() * 1000);
         }
         
-        // ===== 工具栏按钮 =====
+        // ===== 进入会议 - 唤醒腾讯会议 =====
         function handleEnterMeeting() {
+            // 停止倒计时
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+            const display = document.getElementById('countdownDisplay');
+            if (display) display.textContent = '已开始';
+            
             addSystemMessage('📞 正在进入会议...');
+            
+            // 尝试唤醒腾讯会议 (Tencent Meeting)
+            // 使用 weixin:// 或 tencent:// 协议
+            const meetingSchemes = [
+                'tencent://meeting?',
+                'wemeet://page/inmeeting?',
+                'https://meeting.tencent.com/'
+            ];
+            
+            // 尝试打开腾讯会议
+            const link = document.createElement('a');
+            link.href = 'tencent://meeting?';
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // 备用方案 - 使用微信内置浏览器可能不支持，尝试打开web版
             setTimeout(() => {
-                addSystemMessage('✅ 已加入会议，当前参会人数 12 人');
+                window.open('https://meeting.tencent.com/', '_blank');
+            }, 300);
+            
+            setTimeout(() => {
+                addSystemMessage('✅ 已尝试唤醒腾讯会议，请检查是否已打开');
                 addOtherMessage('欢迎加入会议！', '会议主持人');
-            }, 800);
+            }, 1500);
         }
         
         function handleToolbarAction(action) {
