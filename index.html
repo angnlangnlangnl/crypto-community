@@ -337,6 +337,14 @@
             background: #9c27b0;
             color: white;
         }
+        .toolbar-btn.token {
+            color: #e91e63;
+            border-color: #e91e63;
+        }
+        .toolbar-btn.token:hover {
+            background: #e91e63;
+            color: white;
+        }
         
         /* ========== 微信底部输入栏 ========== */
         .input-area {
@@ -649,6 +657,7 @@
         <button class="toolbar-btn official" onclick="handleToolbarAction('查阅官网')">查阅官网</button>
         <button class="toolbar-btn notice" onclick="handleToolbarAction('官方通知')">官方通知</button>
         <button class="toolbar-btn economy" onclick="handleToolbarAction('经济模式')">经济模式</button>
+        <button class="toolbar-btn token" onclick="handleTokenInfo()">代币信息</button>
     </div>
     
     <!-- 底部输入栏 - 微信布局 -->
@@ -1015,6 +1024,15 @@
                 ];
                 addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
             }, 500 + Math.random() * 800);
+        }
+        
+        function handleTokenInfo() {
+            addSystemMessage('📊 正在加载代币信息...');
+            setTimeout(() => {
+                addSystemMessage('💰 BTC: $67,832 | ETH: $3,521 | SOL: $189.7');
+                addSystemMessage('📈 24h 涨跌: BTC +2.3% | ETH +1.8% | SOL +5.6%');
+                addOtherMessage('当前市场整体偏多，建议关注ETH走势', '币圈助手');
+            }, 800);
         }
         
         document.getElementById('chatTitle').textContent = '🚀 币圈社区 (719)';
