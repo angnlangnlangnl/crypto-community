@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>币圈社区</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -11,55 +11,27 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
             background: #ededed;
             height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        /* 手机壳 */
-        .phone {
-            width: 400px;
-            height: 780px;
-            background: #f5f5f5;
-            border-radius: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            height: 100dvh;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            position: relative;
-            border: 8px solid #1a1a1a;
-        }
-        
-        /* 状态栏 */
-        .status-bar {
-            background: #ededed;
-            padding: 8px 20px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: #333;
         }
         
         /* 头部 */
         .header {
             background: #ededed;
-            padding: 10px 15px;
+            padding: 12px 15px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid #d9d9d9;
+            flex-shrink: 0;
         }
         
         .header-left {
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-        
-        .back-btn {
-            font-size: 20px;
-            cursor: pointer;
-            color: #333;
         }
         
         .chat-title {
@@ -69,38 +41,44 @@
         }
         
         .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
             font-size: 20px;
             cursor: pointer;
             color: #333;
         }
         
-        /* 连接提示 */
+        /* 连接提示条 */
         .connect-banner {
             background: #f7f7f7;
-            padding: 12px 15px;
+            padding: 10px 15px;
             display: flex;
             align-items: center;
             gap: 10px;
             border-bottom: 1px solid #e0e0e0;
+            flex-shrink: 0;
         }
         
         .connect-banner .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
             background: #f7931a;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 18px;
+            flex-shrink: 0;
         }
         
         .connect-banner .info {
             flex: 1;
+            min-width: 0;
         }
         
         .connect-banner .name {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             color: #333;
         }
@@ -108,16 +86,26 @@
         .connect-banner .status {
             font-size: 12px;
             color: #999;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .connect-btn {
-            padding: 8px 16px;
+            padding: 7px 14px;
             background: #07c160;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-size: 13px;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        
+        .connect-btn:disabled {
+            background: #ccc;
+            cursor: default;
         }
         
         /* 消息区域 */
@@ -128,7 +116,8 @@
             background: #ededed;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
+            min-height: 0;
         }
         
         /* 时间分隔 */
@@ -136,14 +125,20 @@
             text-align: center;
             font-size: 12px;
             color: #999;
-            margin: 10px 0;
+            margin: 5px 0;
         }
         
         /* 消息气泡 */
         .msg-wrapper {
             display: flex;
             gap: 10px;
-            max-width: 80%;
+            max-width: 75%;
+            animation: msgIn 0.3s ease;
+        }
+        
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .msg-wrapper.own {
@@ -151,9 +146,13 @@
             flex-direction: row-reverse;
         }
         
+        .msg-wrapper.other {
+            align-self: flex-start;
+        }
+        
         .msg-avatar {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 6px;
             flex-shrink: 0;
             display: flex;
@@ -161,7 +160,7 @@
             justify-content: center;
             font-weight: bold;
             color: white;
-            font-size: 14px;
+            font-size: 13px;
         }
         
         .msg-wrapper.own .msg-avatar {
@@ -175,11 +174,12 @@
         .msg-body {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 3px;
+            min-width: 0;
         }
         
         .msg-sender {
-            font-size: 12px;
+            font-size: 11px;
             color: #999;
         }
         
@@ -189,7 +189,7 @@
             font-size: 15px;
             line-height: 1.4;
             word-wrap: break-word;
-            position: relative;
+            word-break: break-word;
         }
         
         .msg-wrapper.own .msg-bubble {
@@ -202,40 +202,86 @@
             background: white;
             color: #333;
             border-top-left-radius: 2px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.06);
         }
         
         .msg-time {
-            font-size: 11px;
-            color: #999;
+            font-size: 10px;
+            color: #bbb;
             align-self: flex-end;
+        }
+        
+        /* 系统消息 */
+        .system-msg {
+            align-self: center;
+            background: #dadada;
+            padding: 7px 15px;
+            border-radius: 5px;
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+            max-width: 90%;
+        }
+        
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            color: #ccc;
+            margin-top: 40px;
+        }
+        
+        .empty-state .icon {
+            font-size: 50px;
+            margin-bottom: 12px;
+        }
+        
+        .empty-state p {
+            font-size: 14px;
+            margin-bottom: 5px;
         }
         
         /* 输入区域 */
         .input-area {
             background: #f7f7f7;
-            padding: 10px;
+            padding: 10px 12px;
             display: flex;
             align-items: center;
             gap: 8px;
             border-top: 1px solid #e0e0e0;
+            flex-shrink: 0;
+            padding-bottom: max(10px, env(safe-area-inset-bottom));
         }
         
-        .voice-btn, .emoji-btn, .add-btn {
-            font-size: 24px;
+        .icon-btn {
+            font-size: 22px;
             cursor: pointer;
             color: #666;
             flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+            background: none;
+            border: none;
+        }
+        
+        .icon-btn:hover {
+            background: #e0e0e0;
         }
         
         .input-field {
             flex: 1;
-            padding: 10px 15px;
+            padding: 9px 14px;
             background: white;
             border: none;
             border-radius: 6px;
             font-size: 15px;
             outline: none;
             color: #333;
+            min-width: 0;
         }
         
         .input-field::placeholder {
@@ -251,27 +297,12 @@
             cursor: pointer;
             font-size: 14px;
             flex-shrink: 0;
+            white-space: nowrap;
         }
         
         .send-btn:disabled {
             background: #ccc;
             cursor: not-allowed;
-        }
-        
-        /* 空状态 */
-        .empty-state {
-            text-align: center;
-            color: #ccc;
-            margin-top: 60px;
-        }
-        
-        .empty-state .icon {
-            font-size: 60px;
-            margin-bottom: 15px;
-        }
-        
-        .empty-state p {
-            font-size: 14px;
         }
         
         /* 滚动条 */
@@ -282,70 +313,85 @@
             background: #ccc;
             border-radius: 2px;
         }
+        
+        /* 桌面端适配 */
+        @media (min-width: 768px) {
+            body {
+                max-width: 800px;
+                margin: 0 auto;
+                box-shadow: 0 0 30px rgba(0,0,0,0.1);
+            }
+            
+            .msg-wrapper {
+                max-width: 65%;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="phone">
-        <!-- 状态栏 -->
-        <div class="status-bar">
-            <span>9:41</span>
-            <span>📶 🔋 100%</span>
+    <!-- 头部 -->
+    <div class="header">
+        <div class="header-left">
+            <span class="chat-title">🚀 币圈社区</span>
         </div>
-        
-        <!-- 头部 -->
-        <div class="header">
-            <div class="header-left">
-                <span class="back-btn">‹</span>
-                <span class="chat-title">🚀 币圈社区</span>
-            </div>
-            <span class="header-right">⋯</span>
+        <div class="header-right">
+            <span id="onlineCount">👥 0</span>
+            <span>⋯</span>
         </div>
-        
-        <!-- 连接提示 -->
-        <div class="connect-banner" id="connectBanner">
-            <div class="avatar">🦊</div>
-            <div class="info">
-                <div class="name">MetaMask</div>
-                <div class="status" id="walletStatus">未连接</div>
-            </div>
-            <button class="connect-btn" id="connectBtn" onclick="connectWallet()">连接</button>
+    </div>
+    
+    <!-- 连接提示条 -->
+    <div class="connect-banner" id="connectBanner">
+        <div class="avatar">🦊</div>
+        <div class="info">
+            <div class="name">MetaMask 钱包</div>
+            <div class="status" id="walletStatus">未连接</div>
         </div>
-        
-        <!-- 消息区域 -->
-        <div class="messages" id="messages">
-            <div class="time-divider" id="timeDivider"></div>
-            <div class="empty-state" id="emptyState">
-                <div class="icon">💬</div>
-                <p>暂无消息</p>
-                <p>连接钱包后开始聊天</p>
-            </div>
+        <button class="connect-btn" id="connectBtn" onclick="connectWallet()">连接</button>
+    </div>
+    
+    <!-- 消息区域 -->
+    <div class="messages" id="messages">
+        <div class="time-divider" id="timeDivider"></div>
+        <div class="empty-state" id="emptyState">
+            <div class="icon">💬</div>
+            <p>暂无消息</p>
+            <p>连接钱包后开始聊天</p>
         </div>
-        
-        <!-- 输入区域 -->
-        <div class="input-area">
-            <span class="voice-btn">🎤</span>
-            <input type="text" class="input-field" id="msgInput" placeholder="输入消息..." onkeypress="if(event.key==='Enter')sendMessage()">
-            <span class="emoji-btn">😊</span>
-            <span class="add-btn">➕</span>
-            <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>发送</button>
-        </div>
+    </div>
+    
+    <!-- 输入区域 -->
+    <div class="input-area">
+        <button class="icon-btn" onclick="alert('语音功能开发中')">🎤</button>
+        <input type="text" class="input-field" id="msgInput" placeholder="输入消息..." onkeypress="if(event.key==='Enter')sendMessage()">
+        <button class="icon-btn" onclick="addEmoji()">😊</button>
+        <button class="icon-btn" onclick="alert('更多功能开发中')">➕</button>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>发送</button>
     </div>
 
     <script>
         let isConnected = false;
         let userAddress = '';
         let messageCount = 0;
+        let onlineCount = 0;
         
         // 设置时间
         function setTime() {
             const now = new Date();
             const h = now.getHours().toString().padStart(2, '0');
             const m = now.getMinutes().toString().padStart(2, '0');
-            document.querySelector('.status-bar span:first-child').textContent = h + ':' + m;
             document.getElementById('timeDivider').textContent = now.toLocaleDateString('zh-CN') + ' ' + h + ':' + m;
         }
         setTime();
         setInterval(setTime, 30000);
+        
+        // 模拟在线人数
+        function updateOnlineCount() {
+            onlineCount = 100 + Math.floor(Math.random() * 900);
+            document.getElementById('onlineCount').textContent = '👥 ' + onlineCount;
+        }
+        updateOnlineCount();
+        setInterval(updateOnlineCount, 5000);
         
         // 连接钱包
         async function connectWallet() {
@@ -356,16 +402,17 @@
                     userAddress = accounts[0];
                     isConnected = true;
                     
-                    document.getElementById('walletStatus').textContent = '✅ ' + userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+                    document.getElementById('walletStatus').textContent = '✅ ' + userAddress.slice(0, 8) + '...' + userAddress.slice(-6);
                     document.getElementById('walletStatus').style.color = '#07c160';
                     document.getElementById('connectBtn').textContent = '已连接';
                     document.getElementById('connectBtn').style.background = '#ccc';
                     document.getElementById('connectBtn').disabled = true;
                     
-                    // 显示欢迎消息
                     if (messageCount === 0) {
-                        document.getElementById('emptyState').style.display = 'none';
-                        addMessage('system', '欢迎来到币圈社区！🎉', '系统');
+                        const emptyState = document.getElementById('emptyState');
+                        if (emptyState) emptyState.style.display = 'none';
+                        addSystemMessage('🎉 欢迎来到币圈社区！');
+                        addSystemMessage('💡 连接成功，开始聊天吧');
                     }
                 } catch (error) {
                     alert('连接失败：' + error.message);
@@ -381,50 +428,85 @@
             const text = input.value.trim();
             if (!text) return;
             
-            addMessage('own', text, userAddress.slice(0, 6) + '...' + userAddress.slice(-4));
+            addOwnMessage(text, userAddress || '我');
             input.value = '';
             document.getElementById('sendBtn').disabled = true;
             
             // 模拟回复
             setTimeout(() => {
-                const replies = ['收到！', '👍', '同意', '有道理', '关注一下', '好项目！'];
+                const replies = [
+                    '收到！👍', 
+                    '同意', 
+                    '有道理', 
+                    '关注一下', 
+                    '好项目！',
+                    '学习了',
+                    '支持！',
+                    '已关注'
+                ];
                 const reply = replies[Math.floor(Math.random() * replies.length)];
-                addMessage('other', reply, '币圈助手');
-            }, 1000 + Math.random() * 2000);
+                addOtherMessage(reply, '币圈助手');
+            }, 800 + Math.random() * 2000);
         }
         
-        // 添加消息
-        function addMessage(type, text, sender) {
+        // 添加自己的消息
+        function addOwnMessage(text, sender) {
+            messageCount++;
             const messages = document.getElementById('messages');
             const emptyState = document.getElementById('emptyState');
             if (emptyState) emptyState.style.display = 'none';
             
-            messageCount++;
             const wrapper = document.createElement('div');
-            wrapper.className = 'msg-wrapper ' + (type === 'own' ? 'own' : (type === 'system' ? 'system' : 'other'));
-            
-            if (type === 'system') {
-                wrapper.style.alignSelf = 'center';
-                wrapper.style.maxWidth = '90%';
-                wrapper.innerHTML = `
-                    <div style="background:#dadada;padding:8px 15px;border-radius:5px;font-size:13px;color:#666;text-align:center">
-                        ${text}
-                    </div>
-                `;
-            } else {
-                const avatarColor = type === 'own' ? '#07c160' : '#f7931a';
-                const avatarText = type === 'own' ? '我' : '助';
-                wrapper.innerHTML = `
-                    <div class="msg-avatar" style="background:${avatarColor}">${avatarText}</div>
-                    <div class="msg-body">
-                        <span class="msg-sender">${sender}</span>
-                        <div class="msg-bubble">${text}</div>
-                        <span class="msg-time">${new Date().toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'})}</span>
-                    </div>
-                `;
-            }
-            
+            wrapper.className = 'msg-wrapper own';
+            wrapper.innerHTML = `
+                <div class="msg-avatar">我</div>
+                <div class="msg-body">
+                    <span class="msg-sender">${sender}</span>
+                    <div class="msg-bubble">${text}</div>
+                    <span class="msg-time">${getTime()}</span>
+                </div>
+            `;
             messages.appendChild(wrapper);
+            scrollToBottom();
+        }
+        
+        // 添加别人的消息
+        function addOtherMessage(text, sender) {
+            messageCount++;
+            const messages = document.getElementById('messages');
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'msg-wrapper other';
+            wrapper.innerHTML = `
+                <div class="msg-avatar">助</div>
+                <div class="msg-body">
+                    <span class="msg-sender">${sender}</span>
+                    <div class="msg-bubble">${text}</div>
+                    <span class="msg-time">${getTime()}</span>
+                </div>
+            `;
+            messages.appendChild(wrapper);
+            scrollToBottom();
+        }
+        
+        // 添加系统消息
+        function addSystemMessage(text) {
+            const messages = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = 'system-msg';
+            div.textContent = text;
+            messages.appendChild(div);
+            scrollToBottom();
+        }
+        
+        // 获取时间
+        function getTime() {
+            return new Date().toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'});
+        }
+        
+        // 滚动到底部
+        function scrollToBottom() {
+            const messages = document.getElementById('messages');
             messages.scrollTop = messages.scrollHeight;
         }
         
@@ -433,23 +515,13 @@
             document.getElementById('sendBtn').disabled = !this.value.trim();
         });
         
-        // 表情按钮
-        document.querySelector('.emoji-btn').addEventListener('click', function() {
+        // 添加表情
+        function addEmoji() {
             const input = document.getElementById('msgInput');
             input.value += ' 😊';
             input.focus();
             document.getElementById('sendBtn').disabled = false;
-        });
-        
-        // 语音按钮
-        document.querySelector('.voice-btn').addEventListener('click', function() {
-            alert('语音功能开发中...');
-        });
-        
-        // 添加按钮
-        document.querySelector('.add-btn').addEventListener('click', function() {
-            alert('更多功能开发中...');
-        });
+        }
     </script>
 </body>
 </html>
