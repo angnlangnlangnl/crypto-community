@@ -14,7 +14,6 @@ function App() {
   const [messages, setMessages] = useState({});
   const [newMessage, setNewMessage] = useState('');
 
-  // 连接钱包
   const connectWallet = async () => {
     if (window.ethereum) {
       try {
@@ -22,7 +21,6 @@ function App() {
         const accounts = await window.ethereum.request({ method: 'eth_accounts' });
         setAccount(accounts[0]);
         setIsConnected(true);
-        // 自动选择第一个频道
         setSelectedChannel(channels[0]);
       } catch (error) {
         alert('连接失败：' + error.message);
@@ -33,7 +31,6 @@ function App() {
     }
   };
 
-  // 断开钱包
   const disconnectWallet = () => {
     setAccount(null);
     setIsConnected(false);
@@ -41,12 +38,10 @@ function App() {
     setMessages({});
   };
 
-  // 选择频道
   const selectChannel = (channel) => {
     setSelectedChannel(channel);
   };
 
-  // 发送消息
   const sendMessage = () => {
     if (newMessage.trim() && selectedChannel) {
       const channelId = selectedChannel.id;
@@ -65,12 +60,16 @@ function App() {
     }
   };
 
-  // 获取当前频道的消息
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      sendMessage();
+    }
+  };
+
   const currentMessages = selectedChannel ? (messages[selectedChannel.id] || []) : [];
 
   return (
     <div className="app">
-      {/* 头部 */}
       <header className="header">
         <div className="logo">🚀 币圈社区</div>
         <div className="header-right">
@@ -93,7 +92,6 @@ function App() {
 
       {isConnected ? (
         <div className="main-content">
-          {/* 侧边栏 */}
           <aside className="sidebar">
             <h3>📢 频道列表</h3>
             {channels.map(channel => (
@@ -108,17 +106,16 @@ function App() {
             ))}
           </aside>
 
-          {/* 聊天区域 */}
           <div className="chat-area">
             <div className="chat-header">
               <h2># {selectedChannel ? selectedChannel.name : '选择频道'}</h2>
-              <span>{selectedChannel ? selectedChannel.members : 0} 成员在线</span>
+              <span>{selectedChannel ? selectedChannel.members : 0} 成员</span>
             </div>
 
-            <div className="messages">
+            <div className="messages-container">
               {currentMessages.length === 0 ? (
                 <div className="no-messages">
-                  <p style={{fontSize: '48px', marginBottom: '20px'}}>💬</p>
+                  <p style={{fontSize: '48px', marginBottom: '15px'}}>💬</p>
                   <p style={{fontSize: '18px', marginBottom: '10px'}}>暂无消息</p>
                   <p>在下方输入框发送第一条消息吧！</p>
                 </div>
@@ -140,16 +137,22 @@ function App() {
               )}
             </div>
 
-            <div className="message-input">
+            {/* 消息输入框 - 确保始终显示 */}
+            <div className="message-input-bar">
               <input
                 type="text"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                onKeyPress={handleKeyPress}
                 placeholder={`发送消息到 # ${selectedChannel ? selectedChannel.name : '...'}`}
+                className="message-input-field"
               />
-              <button onClick={sendMessage} disabled={!newMessage.trim()}>
-                发送 📤
+              <button 
+                onClick={sendMessage} 
+                disabled={!newMessage.trim()}
+                className="send-button"
+              >
+                发送
               </button>
             </div>
           </div>
