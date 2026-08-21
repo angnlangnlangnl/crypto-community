@@ -469,10 +469,17 @@
             
             const wrapper = document.createElement('div');
             wrapper.className = 'msg-wrapper own';
+            // 自己发送的消息，不显示“我”字，只显示地址（如果有）
+            let displaySender = '';
+            if (sender && sender !== '我') {
+                displaySender = sender.slice(0, 6) + '...' + sender.slice(-1);
+            } else {
+                displaySender = '我'; // fallback，但不会显示
+            }
             wrapper.innerHTML = `
                 <div class="msg-avatar">我</div>
                 <div class="msg-body">
-                    <span class="msg-sender">${sender}</span>
+                    <span class="msg-sender">${displaySender}</span>
                     <div class="msg-bubble">${text}</div>
                     <span class="msg-time">${getTime()}</span>
                 </div>
@@ -485,12 +492,20 @@
             messageCount++;
             const messages = document.getElementById('messages');
             
+            // 对方显示为地址前6位···最后1位数字
+            let displaySender = '';
+            if (sender && sender !== '币圈助手') {
+                displaySender = sender.slice(0, 6) + '...' + sender.slice(-1);
+            } else {
+                displaySender = sender; // 币圈助手保持不变
+            }
+            
             const wrapper = document.createElement('div');
             wrapper.className = 'msg-wrapper other';
             wrapper.innerHTML = `
                 <div class="msg-avatar">助</div>
                 <div class="msg-body">
-                    <span class="msg-sender">${sender}</span>
+                    <span class="msg-sender">${displaySender}</span>
                     <div class="msg-bubble">${text}</div>
                     <span class="msg-time">${getTime()}</span>
                 </div>
