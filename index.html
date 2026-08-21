@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>币圈社区</title>
+    <style>
+        body { margin:0; font-family:Arial; background:#1a1a2e; color:white; }
+        #header { display:flex; justify-content:space-between; padding:15px 20px; background:#16213e; }
+        #connectBtn { padding:10px 20px; background:#f7931a; color:white; border:none; border-radius:25px; cursor:pointer; }
+        #main { display:none; height:calc(100vh - 60px); }
+        #sidebar { width:200px; background:#16213e; padding:15px; }
+        .ch { padding:10px; cursor:pointer; color:#b0b0b0; border-radius:8px; margin-bottom:5px; }
+        .ch:hover { background:#0f3460; color:white; }
+        .ch.active { background:#f7931a; color:white; }
+        #chat { flex:1; display:flex; flex-direction:column; }
+        #messages { flex:1; padding:15px; overflow-y:auto; }
+        #inputBar { display:flex; gap:10px; padding:15px 20px; background:#16213e; }
+        #msgInput { flex:1; padding:12px 18px; background:#0f3460; border:1px solid #2d2d44; border-radius:25px; color:white; }
+        #sendBtn { padding:12px 24px; background:#f7931a; color:white; border:none; border-radius:25px; cursor:pointer; }
+        .msg { padding:10px; background:#16213e; border-radius:8px; margin-bottom:8px; }
+        .msg b { color:#f7931a; font-size:12px; }
+        .msg .t { font-size:10px; color:#666; margin-left:10px; }
+        .msg .x { margin-top:5px; font-size:14px; }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <span style="font-size:20px;font-weight:bold;color:#f7931a">🚀 币圈社区</span>
+        <button id="connectBtn" onclick="connect()">🔗 连接钱包</button>
+    </div>
+
+    <div id="main">
+        <div id="sidebar">
+            <h3>频道列表</h3>
+            <div class="ch active" onclick="sel(this,'综合讨论')"># 综合讨论</div>
+            <div class="ch" onclick="sel(this,'技术分析')"># 技术分析</div>
+            <div class="ch" onclick="sel(this,'项目动态')"># 项目动态</div>
+        </div>
+        <div id="chat">
+            <div style="padding:15px 20px;background:#16213e;border-bottom:1px solid #2d2d44">
+                <h2 id="chTitle"># 综合讨论</h2>
+            </div>
+            <div id="messages">
+                <p style="text-align:center;color:#666;margin-top:50px" id="emptyMsg">暂无消息，在下方输入框发送消息</p>
+            </div>
+            <div id="inputBar">
+                <input type="text" id="msgInput" placeholder="输入消息..." onkeypress="if(event.key==='Enter')send()">
+                <button id="sendBtn" onclick="send()">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let count = 0;
+        
+        async function connect() {
+            if (window.ethereum) {
+                try {
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    document.getElementById('connectBtn').textContent = '✅ ' + accounts[0].slice(0,6) + '...' + accounts[0].slice(-4);
+                    document.getElementById('main').style.display = 'flex';
+                } catch(e) {
+                    alert('连接失败：' + e.message);
+                }
+            } else {
+                alert('请安装MetaMask');
+            }
+        }
+
+        function sel(el, name) {
+            document.querySelectorAll('.ch').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('chTitle').textContent = '# ' + name;
+        }
+
+        function send() {
+            const input = document.getElementById('msgInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            count++;
+            if (count === 1) {
+                document.getElementById('emptyMsg').style.display = 'none';
+            }
+            
+            const div = document.createElement('div');
+            div.className = 'msg';
+            div.innerHTML = '<b>用户' + count + '</b><span class="t">' + new Date().toLocaleTimeString() + '</span><div class="x">' + text + '</div>';
+            document.getElementById('messages').appendChild(div);
+            document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+            input.value = '';
+        }
+    </script>
+</body>
+</html>
