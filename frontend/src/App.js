@@ -69,7 +69,7 @@ function App() {
 
           <div className="chat">
             <div className="chatHeader">
-              <h2># {selectedChannel?.name}</h2>
+              <h2># {selectedChannel ? selectedChannel.name : '选择频道'}</h2>
             </div>
 
             <div className="messages">
@@ -92,7 +92,7 @@ function App() {
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                placeholder={`发送消息到 # ${selectedChannel?.name || '...'}`}
+                placeholder={`发送消息到 # ${selectedChannel ? selectedChannel.name : '...'}`}
               />
               <button onClick={sendMessage} disabled={!newMessage.trim()}>
                 发送
