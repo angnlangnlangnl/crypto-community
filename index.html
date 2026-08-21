@@ -78,7 +78,7 @@
             flex-shrink: 0;
         }
         
-        /* ===== 通知图标 + 角标 ===== */
+        /* ===== 通知图标 + 角标 - 调小 ===== */
         .notification-wrap {
             position: relative;
             display: inline-flex;
@@ -86,24 +86,24 @@
             justify-content: center;
             flex-shrink: 0;
             cursor: pointer;
-            font-size: 20px;
+            font-size: 16px;
             line-height: 1;
         }
         .notification-wrap .badge {
             position: absolute;
-            top: -6px;
-            right: -8px;
+            top: -5px;
+            right: -7px;
             background: #e74c3c;
             color: white;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 600;
-            min-width: 18px;
-            height: 18px;
+            min-width: 16px;
+            height: 16px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0 4px;
+            padding: 0 3px;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             box-shadow: 0 1px 4px rgba(0,0,0,0.15);
         }
@@ -299,10 +299,10 @@
             margin-bottom: 5px;
         }
         
-        /* ========== 输入框上方工具栏 - 悬空白色按钮，向上微调 ========== */
+        /* ========== 输入框上方工具栏 - 与输入框距离增加约三分之一按钮身位 ========== */
         .toolbar {
             background: transparent;
-            padding: 4px 12px 2px 12px;
+            padding: 2px 12px 10px 12px;  /* 下边距从0px增加到10px，增加约三分之一按钮身位（按钮高度约30px） */
             display: flex;
             align-items: center;
             gap: 10px;
@@ -324,7 +324,7 @@
             background: white;
             border: 1px solid #e0e0e0;
             border-radius: 18px;
-            padding: 6px 16px;
+            padding: 5px 14px;
             cursor: pointer;
             white-space: nowrap;
             transition: all 0.2s;
@@ -636,8 +636,9 @@
             .chat-title { font-size: 14px; }
             .back-btn { font-size: 16px; width: 24px; height: 24px; }
             .toolbar-btn { font-size: 11px; padding: 4px 10px; }
-            .toolbar { gap: 6px; padding: 4px 8px 2px 8px; }
-            .notification-wrap .badge { font-size: 9px; min-width: 16px; height: 16px; top: -5px; right: -6px; }
+            .toolbar { gap: 6px; padding: 2px 8px 8px 8px; }
+            .notification-wrap { font-size: 14px; }
+            .notification-wrap .badge { font-size: 8px; min-width: 14px; height: 14px; top: -4px; right: -6px; }
         }
         
         @media (min-width: 768px) {
@@ -664,7 +665,6 @@
         </div>
         <div class="header-right">
             <span class="header-address" id="headerAddress">0x12...34ab</span>
-            <!-- 通知图标 + 红色角标 -->
             <span class="notification-wrap" onclick="handleNotificationClick()">
                 🔔
                 <span class="badge" id="notifBadge">3</span>
@@ -693,7 +693,7 @@
         </div>
     </div>
     
-    <!-- 输入框上方工具栏 -->
+    <!-- 输入框上方工具栏 - 下边距已增加 -->
     <div class="toolbar">
         <button class="toolbar-btn token" onclick="handleTokenInfo()">代币信息</button>
         <button class="toolbar-btn economy" onclick="handleToolbarAction('经济模式')">经济模式</button>
