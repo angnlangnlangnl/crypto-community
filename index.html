@@ -107,7 +107,6 @@
             box-shadow: 0 1px 4px rgba(0,0,0,0.15);
         }
         
-        /* ===== 三横线菜单图标 ===== */
         .menu-icon {
             display: inline-flex;
             flex-direction: column;
@@ -213,43 +212,53 @@
             position: relative;
         }
         
-        /* ===== 会议倒计时 ===== */
-        .countdown-banner {
-            align-self: center;
-            background: rgba(26, 115, 232, 0.12);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            border: 1px solid rgba(26, 115, 232, 0.25);
-            border-radius: 20px;
-            padding: 8px 24px;
+        /* ===== 会议倒计时 - 固定悬浮窗 ===== */
+        .countdown-float {
+            position: fixed;
+            bottom: 80px;
+            right: 16px;
+            background: rgba(26, 115, 232, 0.92);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 16px;
+            padding: 10px 16px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 16px rgba(26, 115, 232, 0.12);
-            margin-bottom: 4px;
-            flex-shrink: 0;
+            gap: 2px;
+            box-shadow: 0 8px 32px rgba(26, 115, 232, 0.35);
+            z-index: 100;
+            min-width: 72px;
             transition: all 0.3s ease;
+            pointer-events: none;
+            user-select: none;
         }
-        .countdown-banner .cd-icon {
-            font-size: 20px;
+        .countdown-float .cd-icon {
+            font-size: 18px;
             line-height: 1;
         }
-        .countdown-banner .cd-label {
-            font-size: 15px;
+        .countdown-float .cd-label {
+            font-size: 10px;
             font-weight: 500;
-            color: #1a73e8;
+            color: rgba(255, 255, 255, 0.85);
+            letter-spacing: 0.3px;
         }
-        .countdown-banner .cd-time {
-            font-size: 18px;
+        .countdown-float .cd-time {
+            font-size: 22px;
             font-weight: 700;
-            color: #1a73e8;
+            color: #ffffff;
             font-variant-numeric: tabular-nums;
-            min-width: 56px;
-            text-align: center;
             letter-spacing: 0.5px;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.15);
         }
-        .countdown-banner .cd-time.ended {
-            color: #e74c3c;
+        .countdown-float .cd-time.ended {
+            color: #ffd6d6;
+        }
+        
+        /* 在聊天消息顶部不再显示倒计时 */
+        .countdown-banner {
+            display: none;
         }
         
         .time-divider {
@@ -703,12 +712,18 @@
             .toolbar { gap: 6px; padding: 2px 8px 8px 8px; }
             .notification-wrap { font-size: 14px; }
             .notification-wrap .badge { font-size: 8px; min-width: 14px; height: 14px; top: -4px; right: -6px; }
-            .countdown-banner { padding: 6px 16px; gap: 6px; }
-            .countdown-banner .cd-icon { font-size: 16px; }
-            .countdown-banner .cd-label { font-size: 13px; }
-            .countdown-banner .cd-time { font-size: 15px; min-width: 44px; }
             .menu-icon { width: 18px; height: 18px; gap: 2.5px; }
             .menu-icon span { width: 18px; height: 2px; }
+            .countdown-float {
+                bottom: 72px;
+                right: 12px;
+                padding: 8px 12px;
+                min-width: 60px;
+                border-radius: 14px;
+            }
+            .countdown-float .cd-icon { font-size: 15px; }
+            .countdown-float .cd-label { font-size: 9px; }
+            .countdown-float .cd-time { font-size: 18px; }
         }
         
         @media (min-width: 768px) {
@@ -722,6 +737,9 @@
             }
             .more-panel, .emoji-panel {
                 border-radius: 20px 20px 0 0;
+            }
+            .countdown-float {
+                right: calc(50% - 400px + 16px);
             }
         }
     </style>
@@ -739,7 +757,6 @@
                 🔔
                 <span class="badge" id="notifBadge">3</span>
             </span>
-            <!-- 三横线菜单图标 -->
             <span class="menu-icon" onclick="alert('菜单功能开发中')">
                 <span></span>
                 <span></span>
@@ -760,17 +777,20 @@
     
     <!-- 消息区域 -->
     <div class="messages" id="messages">
-        <div class="countdown-banner" id="countdownBanner">
-            <span class="cd-icon">⏰</span>
-            <span class="cd-label">会议倒计时</span>
-            <span class="cd-time" id="countdownDisplay">05:00</span>
-        </div>
+        <!-- 原倒计时已移除，改用悬浮窗 -->
         <div class="time-divider" id="timeDivider"></div>
         <div class="empty-state" id="emptyState">
             <div class="icon">💬</div>
             <p>暂无消息</p>
             <p>连接钱包后开始聊天</p>
         </div>
+    </div>
+    
+    <!-- 会议倒计时 - 固定悬浮窗 -->
+    <div class="countdown-float" id="countdownFloat">
+        <span class="cd-icon">⏰</span>
+        <span class="cd-label">会议倒计时</span>
+        <span class="cd-time" id="countdownDisplay">05:00</span>
     </div>
     
     <!-- 输入框上方工具栏 -->
