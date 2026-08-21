@@ -25,12 +25,14 @@
             justify-content: space-between;
             border-bottom: 1px solid #d9d9d9;
             flex-shrink: 0;
+            min-width: 0;
         }
         
         .header-left {
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-shrink: 0;
         }
         
         .back-btn {
@@ -42,21 +44,25 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
         
         .chat-title {
             font-size: 17px;
             font-weight: 600;
             color: #333;
+            white-space: nowrap;
         }
         
         .header-right {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 10px;
             font-size: 20px;
             cursor: pointer;
             color: #333;
+            flex-shrink: 0;
+            min-width: 0;
         }
         
         .header-address {
@@ -68,6 +74,8 @@
             border-radius: 12px;
             font-family: monospace;
             letter-spacing: 0.3px;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         
         .enter-meeting-btn {
@@ -81,6 +89,7 @@
             cursor: pointer;
             transition: all 0.2s;
             white-space: nowrap;
+            flex-shrink: 0;
         }
         .enter-meeting-btn:hover {
             background: #07c160;
@@ -88,6 +97,12 @@
         }
         .enter-meeting-btn:active {
             transform: scale(0.96);
+        }
+        
+        .header-more {
+            flex-shrink: 0;
+            font-size: 20px;
+            line-height: 1;
         }
         
         .connect-banner {
@@ -525,6 +540,9 @@
             .more-item .icon svg { width: 28px; height: 28px; }
             .emoji-grid { gap: 8px 4px; }
             .emoji-item { font-size: 26px; padding: 6px 2px; }
+            .header-address { font-size: 12px; padding: 3px 8px; }
+            .enter-meeting-btn { font-size: 11px; padding: 3px 8px; }
+            .header-right { gap: 6px; }
         }
         
         @media (min-width: 768px) {
@@ -552,13 +570,7 @@
         <div class="header-right">
             <span class="header-address" id="headerAddress">0x12...34ab</span>
             <button class="enter-meeting-btn" onclick="handleEnterMeeting()">进入会议</button>
-            <span style="display:inline-flex; align-items:center; width:24px; height:24px;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="23 7 16 12 23 17 23 7"/>
-                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-                </svg>
-            </span>
-            <span>⋯</span>
+            <span class="header-more">⋯</span>
         </div>
     </div>
     
@@ -615,9 +627,7 @@
     <div class="emoji-overlay" id="emojiOverlay" onclick="if(event.target===this) toggleEmojiPanel()">
         <div class="emoji-panel">
             <div class="panel-title">😊 表情包</div>
-            <div class="emoji-grid" id="emojiGrid">
-                <!-- 由JS动态生成 -->
-            </div>
+            <div class="emoji-grid" id="emojiGrid"></div>
             <button class="emoji-close-btn" onclick="toggleEmojiPanel()">取消</button>
         </div>
     </div>
@@ -664,7 +674,7 @@
                     <div class="icon">🧧</div>
                     <span class="label">代币红包</span>
                 </div>
-                <!-- 收藏 - 新增 -->
+                <!-- 收藏 -->
                 <div class="more-item" onclick="handleMoreAction('收藏')">
                     <div class="icon">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -881,7 +891,6 @@
         function toggleEmojiPanel() {
             const overlay = document.getElementById('emojiOverlay');
             overlay.classList.toggle('active');
-            // 首次打开时渲染表情
             if (overlay.classList.contains('active')) {
                 renderEmojis();
             }
@@ -889,7 +898,7 @@
         
         function renderEmojis() {
             const grid = document.getElementById('emojiGrid');
-            if (grid.children.length > 0) return; // 已渲染
+            if (grid.children.length > 0) return;
             emojiList.forEach(emoji => {
                 const item = document.createElement('div');
                 item.className = 'emoji-item';
@@ -903,15 +912,14 @@
         }
         
         function selectEmoji(emoji) {
-            toggleEmojiPanel(); // 关闭弹窗
-            // 将表情插入输入框
+            toggleEmojiPanel();
             const input = document.getElementById('msgInput');
             input.value += emoji;
             updateSendBtn();
             input.focus();
         }
         
-        // ===== 加号弹窗 (More Panel) =====
+        // ===== 加号弹窗 =====
         function toggleMorePanel() {
             const overlay = document.getElementById('moreOverlay');
             overlay.classList.toggle('active');
@@ -940,7 +948,6 @@
             }, 800);
         }
         
-        // 初始化头部标题
         document.getElementById('chatTitle').textContent = '🚀 币圈社区 (719)';
     </script>
 </body>
