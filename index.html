@@ -538,7 +538,7 @@
             transition: none;
             touch-action: none;
             will-change: transform;
-            width: auto;
+            width: 100%;
             height: auto;
             max-width: 100%;
             max-height: none;
@@ -1622,7 +1622,7 @@
         var zoomHintTimeout = null;
         var isFullscreenImage = false;
         
-        // ✅ 修复：边界约束函数
+        // ✅ 修复：边界约束函数 - 使用负的translateY让图片顶部对齐
         function constrainTransform(img, scale, tx, ty) {
             if (!img) return { tx: 0, ty: 0 };
             
@@ -1639,9 +1639,13 @@
             tx = 0;
             
             if (scaledH > ch) {
+                // 图片高度大于容器高度
+                // 使用center center作为transformOrigin时
+                // translateY范围：-(scaledH-ch)/2 到 (scaledH-ch)/2
                 var maxY = (scaledH - ch) / 2;
                 ty = Math.max(-maxY, Math.min(maxY, ty));
             } else {
+                // 图片高度小于容器高度，上下居中
                 ty = (ch - scaledH) / 2;
             }
             
@@ -1662,6 +1666,8 @@
             img.style.display = 'block';
             img.style.visibility = 'visible';
             img.style.opacity = '1';
+            img.style.width = '100%';
+            img.style.height = 'auto';
             
             showZoomHint();
             
@@ -1707,9 +1713,11 @@
                 
                 var scaledHeight = imgHeight * imageScale;
                 
+                // ✅ 使用负的translateY让图片顶部对齐
                 if (scaledHeight > containerHeight) {
                     // 图片高度超出屏幕，顶部对齐
-                    imageTranslateY = (scaledHeight - containerHeight) / 2;
+                    // 使用center center时，需要向上移动(scaledHeight - containerHeight) / 2
+                    imageTranslateY = -(scaledHeight - containerHeight) / 2;
                 } else {
                     // 图片高度小于屏幕，上下居中
                     imageTranslateY = (containerHeight - scaledHeight) / 2;
@@ -1717,13 +1725,6 @@
                 
                 isImageZoomed = true;
                 img.className = 'zoomed';
-                
-                // ✅ 设置容器尺寸包裹图片
-                if (imageWrap) {
-                    imageWrap.style.width = containerWidth + 'px';
-                    imageWrap.style.height = Math.min(scaledHeight, containerHeight) + 'px';
-                    imageWrap.style.overflow = 'hidden';
-                }
                 
                 img.style.transform = 'translate(0px, ' + imageTranslateY + 'px) scale(' + imageScale + ')';
             }
@@ -1777,7 +1778,7 @@
                 var scaledHeight = imgHeight * imageScale;
                 
                 if (scaledHeight > containerHeight) {
-                    imageTranslateY = (scaledHeight - containerHeight) / 2;
+                    imageTranslateY = -(scaledHeight - containerHeight) / 2;
                 } else {
                     imageTranslateY = (containerHeight - scaledHeight) / 2;
                 }
