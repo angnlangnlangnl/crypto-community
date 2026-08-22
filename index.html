@@ -1622,7 +1622,7 @@
         var zoomHintTimeout = null;
         var isFullscreenImage = false;
         
-        // ✅ 修复：边界约束函数 - 确保图片边缘始终对齐屏幕边缘，不留空白
+        // ✅ 边界约束函数 - 确保图片边缘始终对齐屏幕边缘，不留空白
         function constrainTransform(img, scale, tx, ty) {
             if (!img) return { tx: 0, ty: 0 };
             
@@ -1639,22 +1639,15 @@
             tx = 0;
             
             if (scaledH > ch) {
-                // 图片高度大于容器高度，允许上下拖动
-                // 但图片边缘必须始终对齐屏幕边缘，不能拖出空白
                 var maxY = scaledH - ch;
-                // ty范围：顶部对齐时ty=0，底部对齐时ty=-maxY
-                // 不允许ty>0（顶部不能低于屏幕顶部）
-                // 不允许ty<-maxY（底部不能高于屏幕底部）
                 ty = Math.max(-maxY, Math.min(0, ty));
             } else {
-                // 图片高度小于容器高度，上下居中，不允许拖动
                 ty = (ch - scaledH) / 2;
             }
             
             return { tx: tx, ty: ty };
         }
         
-        // ✅ 初始化时始终横向铺满屏幕
         function initImageZoom(imageWrap, img) {
             currentImageWrap = imageWrap;
             currentImage = img;
@@ -1681,7 +1674,6 @@
             img.addEventListener('touchend', onImageTouchEnd, { passive: false });
             img.addEventListener('mousedown', onImageMouseDown);
             
-            // ✅ 始终横向铺满屏幕
             function applySmartZoom() {
                 var container = imageWrap;
                 var containerWidth = container.clientWidth;
@@ -1694,26 +1686,19 @@
                     return;
                 }
                 
-                // 始终计算左右铺满的缩放比例
                 var scaleToFitWidth = containerWidth / imgWidth;
-                
-                // 限制最大缩放倍数
                 scaleToFitWidth = Math.min(scaleToFitWidth, 8);
-                // 最小缩放倍数为1
                 scaleToFitWidth = Math.max(scaleToFitWidth, 1);
                 
                 imageScale = scaleToFitWidth;
                 imageTranslateX = 0;
                 
-                // 计算缩放后图片高度
                 var scaledHeight = imgHeight * imageScale;
                 
                 if (scaledHeight > containerHeight) {
-                    // 图片高度超出屏幕，顶部对齐
                     imageTranslateY = 0;
                     img.style.transformOrigin = 'top center';
                 } else {
-                    // 图片高度小于屏幕，上下居中
                     imageTranslateY = (containerHeight - scaledHeight) / 2;
                     img.style.transformOrigin = 'center center';
                 }
@@ -1749,7 +1734,6 @@
             }, 3000);
         }
         
-        // ✅ 双击切换：原始大小 ↔ 铺满屏幕
         function onImageDblClick(e) {
             e.stopPropagation();
             var img = currentImage;
@@ -1795,7 +1779,6 @@
             }
         }
         
-        // ✅ 任何时候都允许拖动
         function onImageTouchStart(e) {
             if (e.touches.length === 2) {
                 var touch1 = e.touches[0];
@@ -1811,7 +1794,6 @@
             }
         }
         
-        // ✅ 双指缩放任何时候都有效
         function onImageTouchMove(e) {
             e.preventDefault();
             var img = currentImage;
@@ -1845,7 +1827,6 @@
             }
         }
         
-        // ✅ 触摸结束处理
         function onImageTouchEnd(e) {
             if (e.touches.length === 0) {
                 isDragging = false;
@@ -2586,7 +2567,6 @@
                 var reader = new FileReader();
                 reader.onload = function(ev) {
                     addOwnImageMessage(ev.target.result, userAddress || '我');
-                    addSystemMessage('📷 图片已发送');
                     setTimeout(function() {
                         var replies = ['好图！👍', '不错', '收到', '支持！', '666'];
                         addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
@@ -2610,7 +2590,6 @@
                 if (!file.type.startsWith('video/')) continue;
                 var videoUrl = URL.createObjectURL(file);
                 addOwnVideoMessage(videoUrl, userAddress || '我', file);
-                addSystemMessage('🎬 视频已发送');
                 setTimeout(function() {
                     var replies = ['好视频！🎥', '精彩', '收到', '支持！', '厉害了'];
                     addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
@@ -2643,15 +2622,13 @@
                 input.style.textAlign = 'center';
                 input.style.color = '#333';
                 input.style.userSelect = 'none';
-                voiceBtn.innerHTML = '\n                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n                        <rect x="9" y="2" width="6" height="12" rx="3"/>\n                        <path d="M5 10V12C5 15.866 8.134 19 12 19C15.866 19 19 15.866 19 12V10"/>\n                        <line x1="12" y1="19" x2="12" y2="22"/>\n                        <circle cx="12" cy="12" r="2" fill="#ff4444"/>\n                    </svg>\n                ';
-                voiceBtn.style.background = '#ffe0e0';
-                voiceBtn.style.borderRadius = '50%';
+                voiceBtn.innerHTML = '\n                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n                        <rect x="9" y="2" width="6" height="12" rx="3"/>\n                        <path d="M5 10V12C5 15.866 8.134 19 12 19C15.866 19 19 15.866 19 12V10"/>\n                        <line x1="12" y1="19" x2="12" y2="22"/>\n                    </svg>\n                ';
+                voiceBtn.style.background = 'transparent';
                 input.addEventListener('pointerdown', onPointerDown);
                 input.addEventListener('pointerup', onPointerUp);
                 input.addEventListener('pointerleave', onPointerUp);
                 input.addEventListener('pointercancel', onPointerUp);
                 input.addEventListener('pointermove', onPointerMove);
-                addSystemMessage('🎤 录音模式已开启，按住输入框录音');
             } else {
                 isVoiceMode = false;
                 input.placeholder = '输入消息...';
@@ -2668,7 +2645,6 @@
                 input.removeEventListener('pointercancel', onPointerUp);
                 input.removeEventListener('pointermove', onPointerMove);
                 if (isRecording) stopRecording(false);
-                addSystemMessage('⌨️ 已切换为键盘输入模式');
             }
         }
         
@@ -2731,7 +2707,6 @@
                     if (recordingDuration >= VOICE_CONFIG.maxDuration && isRecording) stopRecording(true);
                 }, 1000);
             } catch (err) {
-                addSystemMessage('❌ 无法访问麦克风: ' + err.message);
                 isRecording = false;
                 document.getElementById('msgInput').classList.remove('recording');
                 document.getElementById('msgInput').value = '';
@@ -2752,14 +2727,11 @@
             input.placeholder = '按住录音，松开发送';
             document.getElementById('cancelTip').classList.remove('show');
             var duration = recordingDuration;
-            if (!send) { addSystemMessage('⏸️ 已取消录音'); audioChunks = []; return; }
-            if (duration < VOICE_CONFIG.minDuration) { addSystemMessage('⏸️ 说话时间太短 (需≥1秒)'); audioChunks = []; return; }
+            if (!send) { audioChunks = []; return; }
+            if (duration < VOICE_CONFIG.minDuration) { audioChunks = []; return; }
             if (audioChunks.length > 0) {
                 var audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                 addVoiceMessage(duration, audioBlob, userAddress || '我');
-                addSystemMessage('🎤 语音消息已发送 (时长 ' + formatDuration(duration) + ')');
-            } else {
-                addSystemMessage('⚠️ 录音数据异常，请重试');
             }
             audioChunks = [];
         }
@@ -2802,7 +2774,6 @@
             if (action === '图片') { handleImageUpload(); return; }
             if (action === '视频') { handleVideoUpload(); return; }
             toggleMorePanel();
-            addSystemMessage('📌 发起「' + action + '」功能 (演示)');
             setTimeout(function() {
                 var replies = ['支持 ' + action + '！', '我也要参与 ' + action, action + ' 功能不错', '已收到 ' + action + ' 请求'];
                 addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
@@ -2815,11 +2786,9 @@
             var current = parseInt(badge.textContent);
             if (current > 0) {
                 badge.textContent = '0';
-                addSystemMessage('🔔 已读所有通知');
             } else {
                 notifCount = 3;
                 badge.textContent = notifCount;
-                addSystemMessage('🔔 有 3 条新通知');
             }
         }
         
