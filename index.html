@@ -477,7 +477,7 @@
             pointer-events: none;
         }
         
-        /* ===== 全屏播放器 - 修复黑色图标 ===== */
+        /* ===== 全屏播放器 ===== */
         .fullscreen-player {
             position: fixed;
             top: 0;
@@ -543,12 +543,10 @@
             display: block;
             background: #000;
             cursor: pointer;
-            /* 隐藏浏览器默认控件 */
             -webkit-media-controls: none !important;
             -webkit-media-controls-panel: none !important;
             -webkit-media-controls-start-playback-button: none !important;
         }
-        /* 隐藏视频默认控件 - 跨浏览器 */
         .fullscreen-player video::-webkit-media-controls {
             display: none !important;
         }
@@ -579,14 +577,12 @@
         .fullscreen-player video::-webkit-media-controls-fullscreen-button {
             display: none !important;
         }
-        /* Firefox */
         .fullscreen-player video::-moz-media-controls {
             display: none !important;
         }
         .fullscreen-player video::-moz-media-controls-panel {
             display: none !important;
         }
-        /* IE/Edge */
         .fullscreen-player video::-ms-media-controls {
             display: none !important;
         }
@@ -1420,6 +1416,9 @@
         let fullscreenVideo = null;
         let isVideoPaused = false;
         
+        // ===== 存储Object URL引用，防止GC =====
+        if (!window._videoBlobUrls) window._videoBlobUrls = {};
+        
         // ===== 会议功能 =====
         function handleEnterMeeting() {
             openModal('meetingModal');
@@ -1489,7 +1488,7 @@ https://meeting.tencent.com/dm/hIbayciQ5BHJ
             document.body.removeChild(textarea);
         }
         
-        // ===== 全屏播放器控制 - 修复黑色图标 =====
+        // ===== 全屏播放器控制 =====
         function openFullscreen(mediaUrl, type) {
             const player = document.getElementById('fullscreenPlayer');
             const content = document.getElementById('fullscreenContent');
@@ -1513,14 +1512,12 @@ https://meeting.tencent.com/dm/hIbayciQ5BHJ
             if (type === 'video') {
                 const video = document.createElement('video');
                 video.src = mediaUrl;
-                // 设置样式 - 添加 poster 消除黑色图标
                 video.style.cssText = 'height:100vh;width:auto;max-width:100vw;object-fit:contain;border:none;outline:none;display:block;background:#000;cursor:pointer;';
                 video.playsInline = true;
                 video.setAttribute('playsinline', '');
                 video.setAttribute('webkit-playsinline', '');
-                video.preload = 'auto'; // 改为 auto 加快加载
+                video.preload = 'auto';
                 video.controls = false;
-                // 使用 poster 显示黑色背景，消除默认播放图标
                 video.poster = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="1" height="1"%3E%3Crect width="1" height="1" fill="black"/%3E%3C/svg%3E';
                 content.appendChild(video);
                 controls.style.display = 'flex';
@@ -1535,16 +1532,13 @@ https://meeting.tencent.com/dm/hIbayciQ5BHJ
                 const progressBar = document.getElementById('fullscreenProgress');
                 const dot = progressBar.querySelector('.progress-dot');
                 
-                // 视频加载完成后更新
                 video.addEventListener('loadedmetadata', function() { 
                     updateFullscreenTime();
-                    // 加载完成后隐藏暂停覆盖层（如果正在播放）
                     if (!video.paused) {
                         if (pauseOverlay) pauseOverlay.classList.remove('show');
                     }
                 });
                 
-                // 可以播放时确保正确显示
                 video.addEventListener('canplay', function() {
                     if (!video.paused) {
                         if (pauseOverlay) pauseOverlay.classList.remove('show');
@@ -1598,7 +1592,6 @@ https://meeting.tencent.com/dm/hIbayciQ5BHJ
                     }
                 };
                 
-                // 自动播放
                 setTimeout(function() {
                     video.play().then(function() {
                         if (pauseOverlay) pauseOverlay.classList.remove('show');
@@ -1835,8 +1828,8 @@ https://meeting.tencent.com/dm/hIbayciQ5BHJ
             };
         }
         
-        // ===== 视频消息 =====
-        function addOwnVideoMessage(videoUrl, sender) {
+        // ===== 视频消息 - 使用Object URL修复变黑问题 =====
+        function addOwnVideoMessage(videoUrl, sender, file) {
             messageCount++;
             const messages = document.getElementById('messages');
             document.getElementById('emptyState').style.display = 'none';
@@ -1844,6 +1837,11 @@ https://meeting.tencent.com/dm/hIbayciQ5BHJ
             wrapper.className = 'msg-wrapper own';
             let displaySender = (sender && sender !== '我') ? sender.slice(0, 6) + '...' + sender.slice(-1) : '我';
             const vidId = 'vid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+            
+            // 存储Object URL引用，防止被GC回收
+            if (videoUrl && videoUrl.startsWith('blob:')) {
+                window._videoBlobUrls[vidId] = { url: videoUrl, file: file };
+            }
             
             const progressSvg = `
                 <div class="video-progress" id="${vidId}_progress">
@@ -1868,7 +1866,7 @@ https://meeting.tencent.com/dm/hIbayciQ5BHJ
                     <span class="msg-sender">${displaySender}</span>
                     <div class="msg-bubble" style="padding:0;background:transparent;border-radius:6px;overflow:hidden;">
                         <div class="video-wrapper" id="${vidId}_wrapper" style="border:none;outline:none;background:#000;">
-                            <video id="${vidId}" src="${videoUrl}" preload="metadata" playsinline webkit-playsinline style="border:none;outline:none;display:block;width:100%;height:auto;background:#000;"></video>
+                            <video id="${vidId}" src="${videoUrl}" preload="metadata" playsinline webkit-playsinline style="border:none;outline:none;display:block;width:100%;height:auto;background:#000;" crossorigin="anonymous"></video>
                             <div class="play-overlay" id="${vidId}_overlay">${progressSvg}</div>
                             <div class="duration-badge" id="${vidId}_badge">00:00</div>
                         </div>
@@ -1906,6 +1904,28 @@ https://meeting.tencent.com/dm/hIbayciQ5BHJ
                 }
                 
                 setTimeout(updateUploadProgress, 500);
+                
+                // 当视频加载失败时，尝试重新加载
+                video.addEventListener('error', function(e) {
+                    console.warn('视频加载错误，尝试重新加载:', e);
+                    // 尝试重新设置src
+                    if (videoUrl && videoUrl.startsWith('blob:')) {
+                        // 检查Object URL是否仍然有效
+                        try {
+                            fetch(videoUrl).then(function(response) {
+                                if (response.ok) {
+                                    video.load();
+                                } else {
+                                    addSystemMessage('⚠️ 视频加载失败，请重新发送');
+                                }
+                            }).catch(function() {
+                                addSystemMessage('⚠️ 视频加载失败，请重新发送');
+                            });
+                        } catch(err) {
+                            addSystemMessage('⚠️ 视频加载失败，请重新发送');
+                        }
+                    }
+                });
                 
                 video.addEventListener('loadedmetadata', function() {
                     const dur = Math.floor(video.duration);
@@ -2155,7 +2175,7 @@ https://meeting.tencent.com/dm/hIbayciQ5BHJ
             toggleMorePanel();
         });
         
-        // ===== 视频上传 =====
+        // ===== 视频上传 - 使用Object URL =====
         function handleVideoUpload() {
             document.getElementById('videoInput').click();
         }
@@ -2165,19 +2185,30 @@ https://meeting.tencent.com/dm/hIbayciQ5BHJ
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 if (!file.type.startsWith('video/')) continue;
-                const reader = new FileReader();
-                reader.onload = function(ev) {
-                    addOwnVideoMessage(ev.target.result, userAddress || '我');
-                    addSystemMessage('🎬 视频已发送');
-                    setTimeout(() => {
-                        const replies = ['好视频！🎥', '精彩', '收到', '支持！', '厉害了'];
-                        addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
-                    }, 500 + Math.random() * 1000);
-                };
-                reader.readAsDataURL(file);
+                
+                // 使用Object URL替代Data URL，防止内存回收导致视频变黑
+                const videoUrl = URL.createObjectURL(file);
+                addOwnVideoMessage(videoUrl, userAddress || '我', file);
+                addSystemMessage('🎬 视频已发送');
+                setTimeout(() => {
+                    const replies = ['好视频！🎥', '精彩', '收到', '支持！', '厉害了'];
+                    addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
+                }, 500 + Math.random() * 1000);
             }
             e.target.value = '';
             toggleMorePanel();
+        });
+        
+        // ===== 页面卸载时清理Object URL =====
+        window.addEventListener('beforeunload', function() {
+            if (window._videoBlobUrls) {
+                Object.values(window._videoBlobUrls).forEach(function(item) {
+                    try {
+                        URL.revokeObjectURL(item.url);
+                    } catch(e) {}
+                });
+                window._videoBlobUrls = {};
+            }
         });
         
         // ===== 语音模式 =====
