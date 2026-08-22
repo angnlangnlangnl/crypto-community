@@ -474,11 +474,12 @@
             padding: 0;
             position: relative;
         }
-        /* 图片 - 优先铺满左右边框，保持原图不变形 */
+        /* 图片 - 优先铺满左右边框，保持原图不变形（手机端适配） */
         .fullscreen-player .media-content img {
             width: 100%;
             height: auto;
             max-height: 100vh;
+            max-width: 100vw;
             object-fit: contain;
             border: none;
             outline: none;
@@ -1352,7 +1353,7 @@
             .fullscreen-player .close-btn { font-size: 24px; top: 12px; right: 16px; }
             .fullscreen-player .pause-overlay svg { width: 48px; height: 48px; }
             .fullscreen-player .media-content video { height: 100vh; width: auto; }
-            .fullscreen-player .media-content img { width: 100%; height: auto; }
+            .fullscreen-player .media-content img { width: 100%; height: auto; max-height: 100vh; }
         }
         
         @media (max-width: 360px) {
@@ -1369,7 +1370,7 @@
             .msg-bubble .video-wrapper { max-width: 280px; max-height: 280px; }
             .msg-bubble .video-wrapper video { max-height: 280px; }
             .fullscreen-player .media-content video { height: 100vh; width: auto; }
-            .fullscreen-player .media-content img { width: 100%; height: auto; }
+            .fullscreen-player .media-content img { width: 100%; height: auto; max-height: 100vh; }
             .fullscreen-player .pause-overlay svg { width: 72px; height: 72px; }
         }
     </style>
@@ -1668,8 +1669,8 @@
             if (type === 'image') {
                 const img = document.createElement('img');
                 img.src = mediaUrl;
-                // 优先铺满左右边框，保持原图不变形
-                img.style.cssText = 'width:100%;height:auto;max-height:100vh;object-fit:contain;border:none;outline:none;display:block;image-orientation:from-image;';
+                // 手机端优先铺满左右边框，保持原图不变形
+                img.style.cssText = 'width:100%;height:auto;max-height:100vh;max-width:100vw;object-fit:contain;border:none;outline:none;display:block;image-orientation:from-image;';
                 content.appendChild(img);
                 player.classList.add('active');
                 document.body.style.overflow = 'hidden';
