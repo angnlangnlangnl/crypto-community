@@ -1675,7 +1675,7 @@
             img.addEventListener('touchend', onImageTouchEnd, { passive: false });
             img.addEventListener('mousedown', onImageMouseDown);
             
-            // ✅ 修复：首次打开时自动铺满左右屏幕
+            // ✅ 修复：使用 requestAnimationFrame 确保容器已渲染
             function applyFullWidthZoom() {
                 var container = imageWrap;
                 var containerWidth = container.clientWidth;
@@ -1683,7 +1683,11 @@
                 var imgWidth = img.naturalWidth || img.width;
                 var imgHeight = img.naturalHeight || img.height;
                 
-                if (imgWidth === 0 || imgHeight === 0) return;
+                if (containerWidth === 0 || imgWidth === 0 || imgHeight === 0) {
+                    // 容器或图片尺寸无效，延迟重试
+                    requestAnimationFrame(applyFullWidthZoom);
+                    return;
+                }
                 
                 var scale = containerWidth / imgWidth;
                 scale = Math.min(scale, 8);
@@ -1703,10 +1707,21 @@
                 img.style.transformOrigin = 'center center';
             }
             
-            img.onload = applyFullWidthZoom;
+            // ✅ 修复：使用 onload 和 requestAnimationFrame 双重保障
+            img.onload = function() {
+                requestAnimationFrame(applyFullWidthZoom);
+            };
             
+            // 如果图片已加载完成
             if (img.complete && img.naturalWidth > 0) {
-                applyFullWidthZoom();
+                requestAnimationFrame(applyFullWidthZoom);
+            } else {
+                // 延迟重试
+                setTimeout(function() {
+                    if (img.complete && img.naturalWidth > 0) {
+                        requestAnimationFrame(applyFullWidthZoom);
+                    }
+                }, 100);
             }
         }
         
@@ -1962,12 +1977,8 @@
                 player.classList.add('active');
                 document.body.style.overflow = 'hidden';
                 
-                img.onload = function() {
-                    initImageZoom(wrap, img);
-                };
-                if (img.complete && img.naturalWidth > 0) {
-                    initImageZoom(wrap, img);
-                }
+                // ✅ 修复：直接调用 initImageZoom，不设置 onload
+                initImageZoom(wrap, img);
                 return;
             }
             
