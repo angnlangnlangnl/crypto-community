@@ -336,7 +336,7 @@
             color: #999;
         }
         
-        /* ===== 图片/视频消息样式 - 无边框 ===== */
+        /* ===== 图片/视频消息样式 ===== */
         .msg-bubble {
             padding: 10px 14px;
             border-radius: 8px;
@@ -358,7 +358,6 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.06);
         }
         
-        /* 图片消息 - 干净无边框，保持原图方向 */
         .msg-bubble .image-wrapper {
             display: block;
             border-radius: 6px;
@@ -373,17 +372,14 @@
             max-height: 220px;
             object-fit: cover;
             cursor: pointer;
-            transition: transform 0.2s;
             border: none;
             outline: none;
-            /* 修复移动端图片旋转问题 */
             image-orientation: from-image;
         }
         .msg-bubble .image-wrapper img:active {
             transform: scale(0.98);
         }
         
-        /* 视频消息 - 干净无边框，静态显示第一帧 */
         .msg-bubble .video-wrapper {
             position: relative;
             border-radius: 6px;
@@ -431,33 +427,32 @@
             border-radius: 12px;
             font-family: monospace;
             pointer-events: none;
-            letter-spacing: 0.5px;
         }
         
-        /* ===== 全屏播放器 - 修复移动端 ===== */
+        /* ===== 全屏播放器 - 图片铺满宽度，视频铺满高度 ===== */
         .fullscreen-player {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.92);
+            background: rgba(0,0,0,0.95);
             z-index: 3000;
             display: none;
             align-items: center;
             justify-content: center;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.25s ease;
             flex-direction: column;
-            cursor: pointer;
+            cursor: default;
         }
         .fullscreen-player.active {
             display: flex;
         }
         .fullscreen-player .close-btn {
             position: absolute;
-            top: 20px;
-            right: 24px;
-            font-size: 32px;
+            top: 16px;
+            right: 20px;
+            font-size: 30px;
             color: rgba(255,255,255,0.8);
             cursor: pointer;
             z-index: 10;
@@ -471,42 +466,35 @@
             color: #fff;
         }
         .fullscreen-player .media-content {
-            max-width: 90%;
-            max-height: 80vh;
-            border-radius: 4px;
-            object-fit: contain;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            border: none;
-            outline: none;
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 100%;
-            height: 100%;
-            padding: 20px;
+            padding: 0;
+            position: relative;
         }
+        /* 图片 - 宽度铺满，高度自适应 */
         .fullscreen-player .media-content img {
-            max-width: 100%;
-            max-height: 80vh;
-            border-radius: 4px;
+            width: 100%;
+            height: auto;
+            max-height: 100vh;
             object-fit: contain;
             border: none;
             outline: none;
             display: block;
-            /* 修复全屏图片旋转问题 */
             image-orientation: from-image;
         }
+        /* 视频 - 高度铺满，宽度自适应 */
         .fullscreen-player .media-content video {
-            max-width: 100%;
-            max-height: 80vh;
-            border-radius: 4px;
+            height: 100vh;
+            width: auto;
+            max-width: 100vw;
             object-fit: contain;
             border: none;
             outline: none;
             display: block;
             background: #000;
-            width: auto;
-            height: auto;
         }
         .fullscreen-player .media-controls {
             position: absolute;
@@ -516,10 +504,11 @@
             display: flex;
             align-items: center;
             gap: 20px;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.55);
             padding: 10px 24px;
             border-radius: 30px;
             backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             z-index: 5;
         }
         .fullscreen-player .media-controls button {
@@ -1292,27 +1281,12 @@
         
         /* 适配小屏 */
         @media (max-width: 420px) {
-            .more-grid {
-                gap: 12px 4px;
-            }
-            .more-item .icon {
-                width: 46px;
-                height: 46px;
-            }
-            .more-item .icon svg {
-                width: 26px;
-                height: 26px;
-            }
-            .more-item .icon .emoji-icon {
-                font-size: 24px;
-            }
-            .emoji-grid {
-                gap: 4px 3px;
-            }
-            .emoji-item {
-                font-size: 24px;
-                padding: 4px 1px;
-            }
+            .more-grid { gap: 12px 4px; }
+            .more-item .icon { width: 46px; height: 46px; }
+            .more-item .icon svg { width: 26px; height: 26px; }
+            .more-item .icon .emoji-icon { font-size: 24px; }
+            .emoji-grid { gap: 4px 3px; }
+            .emoji-item { font-size: 24px; padding: 4px 1px; }
             .header-address { font-size: 11px; padding: 2px 8px; }
             .header-right { gap: 10px; }
             .chat-title { font-size: 14px; }
@@ -1348,44 +1322,31 @@
             .msg-bubble .video-wrapper { max-width: 160px; max-height: 160px; }
             .msg-bubble .video-wrapper video { max-height: 160px; }
             .msg-bubble .video-wrapper .play-overlay { font-size: 32px; }
-            .fullscreen-player .media-controls { padding: 6px 12px; gap: 10px; }
+            .fullscreen-player .media-controls { padding: 6px 12px; gap: 10px; bottom: 20px; }
             .fullscreen-player .media-controls button { font-size: 20px; }
             .fullscreen-player .media-controls .progress-bar { width: 100px; }
             .fullscreen-player .media-controls .time-display { font-size: 11px; min-width: 60px; }
             .fullscreen-player .close-btn { font-size: 24px; top: 12px; right: 16px; }
-            .fullscreen-player .media-content { padding: 10px; }
-            .fullscreen-player .media-content video { max-height: 70vh; }
-            .fullscreen-player .media-content img { max-height: 70vh; }
+            .fullscreen-player .media-content video { height: 100vh; width: auto; }
+            .fullscreen-player .media-content img { width: 100%; height: auto; }
         }
         
         @media (max-width: 360px) {
-            .more-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
+            .more-grid { grid-template-columns: repeat(3, 1fr); }
         }
         
         @media (min-width: 768px) {
-            body {
-                max-width: 800px;
-                margin: 0 auto;
-                box-shadow: 0 0 30px rgba(0,0,0,0.1);
-            }
-            .msg-wrapper {
-                max-width: 65%;
-            }
-            .more-panel, .emoji-panel {
-                border-radius: 20px 20px 0 0;
-            }
-            .countdown-banner {
-                top: 98px;
-            }
+            body { max-width: 800px; margin: 0 auto; box-shadow: 0 0 30px rgba(0,0,0,0.1); }
+            .msg-wrapper { max-width: 65%; }
+            .more-panel, .emoji-panel { border-radius: 20px 20px 0 0; }
+            .countdown-banner { top: 98px; }
             .msg-bubble .image-wrapper { max-width: 280px; max-height: 280px; }
             .msg-bubble .image-wrapper img { max-height: 280px; }
             .msg-bubble .video-wrapper { max-width: 280px; max-height: 280px; }
             .msg-bubble .video-wrapper video { max-height: 280px; }
             .fullscreen-player .media-controls .progress-bar { width: 300px; }
-            .fullscreen-player .media-content video { max-height: 80vh; }
-            .fullscreen-player .media-content img { max-height: 80vh; }
+            .fullscreen-player .media-content video { height: 100vh; width: auto; }
+            .fullscreen-player .media-content img { width: 100%; height: auto; }
         }
     </style>
 </head>
@@ -1560,7 +1521,6 @@
                 </div>
                 <div class="article-body">
                     <p><strong>币圈社区</strong> 采用双通缩经济模型，结合质押挖矿与交易燃烧机制，构建可持续的生态闭环。</p>
-                    
                     <div class="highlight-box">
                         <strong>核心数据</strong><br>
                         • 每笔交易燃烧 2% 代币<br>
@@ -1568,18 +1528,10 @@
                         • 国库储备占比 10%<br>
                         • 团队锁仓 36 个月
                     </div>
-                    
-                    <p><strong>一、通缩机制</strong><br>
-                    每笔链上交易自动燃烧 2% 的 CC 代币，随生态繁荣不断减少流通量，形成天然通缩。预计上线首年燃烧 8000万 CC。</p>
-                    
-                    <p><strong>二、质押激励</strong><br>
-                    用户质押 CC 代币可获取平台分红与治理权。质押池分为 30天/90天/180天 三档，年化收益分别对应 18%、25%、35%。</p>
-                    
-                    <p><strong>三、国库治理</strong><br>
-                    10% 的交易手续费进入社区国库，由 DAO 投票决定资金用途，包括生态建设、市场推广、安全审计等。</p>
-                    
-                    <p><strong>四、经济飞轮</strong><br>
-                    交易燃烧 → 通缩升值 → 吸引质押 → 减少抛压 → 价格支撑 → 更多交易，形成正向循环。</p>
+                    <p><strong>一、通缩机制</strong><br>每笔链上交易自动燃烧 2% 的 CC 代币，随生态繁荣不断减少流通量，形成天然通缩。预计上线首年燃烧 8000万 CC。</p>
+                    <p><strong>二、质押激励</strong><br>用户质押 CC 代币可获取平台分红与治理权。质押池分为 30天/90天/180天 三档，年化收益分别对应 18%、25%、35%。</p>
+                    <p><strong>三、国库治理</strong><br>10% 的交易手续费进入社区国库，由 DAO 投票决定资金用途，包括生态建设、市场推广、安全审计等。</p>
+                    <p><strong>四、经济飞轮</strong><br>交易燃烧 → 通缩升值 → 吸引质押 → 减少抛压 → 价格支撑 → 更多交易，形成正向循环。</p>
                 </div>
             </div>
         </div>
@@ -1598,29 +1550,22 @@
                 </div>
                 <div class="article-body">
                     <p><strong>币圈社区</strong> 正式启动首轮私募与空投计划，回馈早期支持者与社区活跃用户。</p>
-                    
                     <div class="highlight-box">
                         <strong>空投总量</strong><br>
                         • 总计 50,000,000 CC<br>
                         • 占比总发行量 5%<br>
                         • 覆盖 10,000+ 地址
                     </div>
-                    
                     <p><strong>一、私募轮次</strong><br>
                     <strong>种子轮</strong>：已结束，募集 500 ETH，价格 $0.02/CC<br>
                     <strong>战略轮</strong>：进行中，额度 2000 ETH，价格 $0.035/CC<br>
                     <strong>社区轮</strong>：即将开启，额度 1000 ETH，价格 $0.05/CC</p>
-                    
                     <p><strong>二、空投规则</strong><br>
                     • 早期测试网交互用户：500~2000 CC<br>
                     • 社区贡献者（翻译/内容/开发）：1000~5000 CC<br>
                     • 活跃钱包地址（3个月以上）：200~800 CC</p>
-                    
-                    <p><strong>三、领取方式</strong><br>
-                    空投代币将在 TGE（代币生成事件）后 7 天内发放至用户钱包。需完成指定社群任务方可申领。</p>
-                    
-                    <p><strong>四、风险提示</strong><br>
-                    私募代币锁仓 6 个月，空投代币无锁仓。请勿向任何地址发送 ETH 以「激活」空投资格。</p>
+                    <p><strong>三、领取方式</strong><br>空投代币将在 TGE（代币生成事件）后 7 天内发放至用户钱包。需完成指定社群任务方可申领。</p>
+                    <p><strong>四、风险提示</strong><br>私募代币锁仓 6 个月，空投代币无锁仓。请勿向任何地址发送 ETH 以「激活」空投资格。</p>
                 </div>
             </div>
         </div>
@@ -1639,29 +1584,20 @@
                 </div>
                 <div class="article-body">
                     <p><strong>币圈社区</strong> 官方网站正式发布 2.0 升级路线图，涵盖技术架构、生态扩展与治理革新三大维度。</p>
-                    
                     <div class="highlight-box">
                         <strong>升级亮点</strong><br>
                         • 跨链桥 2.0 (支持 5 条公链)<br>
                         • 移动端 App 公测版上线<br>
                         • DAO 治理模块 V2 部署
                     </div>
-                    
-                    <p><strong>一、技术架构升级</strong><br>
-                    底层链升级至 Cosmos SDK v0.50，TPS 提升至 10,000+，兼容 IBC 跨链协议。新增 ZK-Rollup 二层方案，降低 Gas 费用 80%。</p>
-                    
-                    <p><strong>二、生态扩展计划</strong><br>
-                    Q4 2026 将上线 NFT 市场、DEX 聚合器、借贷协议 三大核心应用。已与 12 个头部项目达成战略合作。</p>
-                    
-                    <p><strong>三、DAO 治理革新</strong><br>
-                    引入「声誉权重投票」机制，治理参与度预计提升 300%。国库资金使用将完全上链，实现透明化。</p>
-                    
+                    <p><strong>一、技术架构升级</strong><br>底层链升级至 Cosmos SDK v0.50，TPS 提升至 10,000+，兼容 IBC 跨链协议。新增 ZK-Rollup 二层方案，降低 Gas 费用 80%。</p>
+                    <p><strong>二、生态扩展计划</strong><br>Q4 2026 将上线 NFT 市场、DEX 聚合器、借贷协议 三大核心应用。已与 12 个头部项目达成战略合作。</p>
+                    <p><strong>三、DAO 治理革新</strong><br>引入「声誉权重投票」机制，治理参与度预计提升 300%。国库资金使用将完全上链，实现透明化。</p>
                     <p><strong>四、时间线</strong><br>
                     • 2026.09：测试网升级<br>
                     • 2026.10：主网迁移<br>
                     • 2026.11：生态应用上线<br>
                     • 2026.12：全功能社区上线</p>
-                    
                     <p style="margin-top:8px;color:#1a73e8;">🔗 更多详情请访问：<br><span style="font-family:monospace;font-size:13px;">https://cryptocommunity.io/roadmap</span></p>
                 </div>
             </div>
@@ -1673,9 +1609,7 @@
         <div class="modal-content">
             <button class="modal-close-btn" onclick="closeModal('airdropClaimModal')">✕</button>
             <div class="modal-title">🎁 新用户空投福利</div>
-            <div style="text-align:center; margin-bottom:12px; font-size:14px; color:#666;">
-                检测到您是新用户，已自动为您准备空投奖励！
-            </div>
+            <div style="text-align:center; margin-bottom:12px; font-size:14px; color:#666;">检测到您是新用户，已自动为您准备空投奖励！</div>
             <div class="airdrop-total">
                 <div class="label">🎯 可领取总量</div>
                 <div class="value">1,500 CC</div>
@@ -1781,10 +1715,7 @@
 
     <script>
         // ===== 语音配置 =====
-        const VOICE_CONFIG = {
-            minDuration: 1,
-            maxDuration: 60,
-        };
+        const VOICE_CONFIG = { minDuration: 1, maxDuration: 60 };
         
         let isConnected = false;
         let userAddress = '';
@@ -1804,28 +1735,19 @@
         let currentPlayingId = null;
         let fullscreenVideo = null;
         
-        // ===== 全屏播放器控制 - 修复移动端 =====
+        // ===== 全屏播放器控制 =====
         function openFullscreen(mediaUrl, type) {
             const player = document.getElementById('fullscreenPlayer');
             const content = document.getElementById('fullscreenContent');
             const controls = document.getElementById('fullscreenControls');
             
-            // 清除之前的内容
             content.innerHTML = '';
             controls.style.display = 'none';
             
             if (type === 'image') {
                 const img = document.createElement('img');
                 img.src = mediaUrl;
-                img.style.cssText = 'max-width:100%;max-height:80vh;border-radius:4px;object-fit:contain;border:none;outline:none;display:block;image-orientation:from-image;';
-                // 修复移动端图片旋转 - 使用onload检测图片实际尺寸
-                img.onload = function() {
-                    // 如果图片宽高比异常，调整显示方式
-                    const aspectRatio = img.naturalWidth / img.naturalHeight;
-                    if (aspectRatio > 2.5 || aspectRatio < 0.4) {
-                        img.style.objectFit = 'contain';
-                    }
-                };
+                img.style.cssText = 'width:100%;height:auto;max-height:100vh;object-fit:contain;border:none;outline:none;display:block;image-orientation:from-image;';
                 content.appendChild(img);
                 player.classList.add('active');
                 document.body.style.overflow = 'hidden';
@@ -1835,7 +1757,7 @@
             if (type === 'video') {
                 const video = document.createElement('video');
                 video.src = mediaUrl;
-                video.style.cssText = 'max-width:100%;max-height:80vh;border-radius:4px;object-fit:contain;border:none;outline:none;display:block;background:#000;';
+                video.style.cssText = 'height:100vh;width:auto;max-width:100vw;object-fit:contain;border:none;outline:none;display:block;background:#000;';
                 video.playsInline = true;
                 video.setAttribute('playsinline', '');
                 video.setAttribute('webkit-playsinline', '');
@@ -1847,27 +1769,19 @@
                 document.body.style.overflow = 'hidden';
                 fullscreenVideo = video;
                 
-                // 绑定控制
                 const playBtn = document.getElementById('fullscreenPlayBtn');
                 const timeDisplay = document.getElementById('fullscreenTime');
                 const progressFill = document.getElementById('fullscreenProgressFill');
                 const progressBar = document.getElementById('fullscreenProgress');
                 
-                // 更新时长
-                video.addEventListener('loadedmetadata', function() {
-                    updateFullscreenTime();
-                });
-                
-                // 更新进度
+                video.addEventListener('loadedmetadata', function() { updateFullscreenTime(); });
                 video.addEventListener('timeupdate', function() {
                     updateFullscreenTime();
                     if (video.duration) {
-                        const percent = (video.currentTime / video.duration) * 100;
-                        progressFill.style.width = percent + '%';
+                        progressFill.style.width = ((video.currentTime / video.duration) * 100) + '%';
                     }
                 });
                 
-                // 播放/暂停按钮
                 playBtn.onclick = function(e) {
                     e.stopPropagation();
                     if (video.paused) {
@@ -1879,7 +1793,6 @@
                     }
                 };
                 
-                // 点击视频切换播放/暂停
                 video.onclick = function(e) {
                     e.stopPropagation();
                     if (video.paused) {
@@ -1891,7 +1804,6 @@
                     }
                 };
                 
-                // 进度条点击跳转
                 progressBar.onclick = function(e) {
                     e.stopPropagation();
                     const rect = progressBar.getBoundingClientRect();
@@ -1901,14 +1813,12 @@
                     }
                 };
                 
-                // 结束重置
                 video.onended = function() {
                     playBtn.textContent = '▶️';
                     video.currentTime = 0;
                     progressFill.style.width = '0%';
                 };
                 
-                // 自动播放
                 setTimeout(function() {
                     video.play().then(function() {
                         playBtn.textContent = '⏸️';
@@ -1956,7 +1866,6 @@
             const mins = String(Math.floor(countdownSeconds / 60)).padStart(2, '0');
             const secs = String(countdownSeconds % 60).padStart(2, '0');
             display.textContent = mins + ':' + secs;
-            
             if (countdownSeconds <= 0) {
                 clearInterval(countdownInterval);
                 countdownInterval = null;
@@ -1969,9 +1878,7 @@
         }
         
         function startCountdown() {
-            if (countdownInterval) {
-                clearInterval(countdownInterval);
-            }
+            if (countdownInterval) clearInterval(countdownInterval);
             countdownSeconds = 300;
             const display = document.getElementById('countdownDisplay');
             if (display) display.classList.remove('ended');
@@ -1990,8 +1897,7 @@
             const banner = document.getElementById('connectBanner');
             const countdown = document.getElementById('countdownBanner');
             if (!banner || !countdown) return;
-            const isHidden = banner.classList.contains('hidden');
-            countdown.style.top = isHidden ? '58px' : '98px';
+            countdown.style.top = banner.classList.contains('hidden') ? '58px' : '98px';
         }
         
         // ===== 弹窗控制 =====
@@ -2004,32 +1910,14 @@
             document.body.style.overflow = '';
         }
         
-        // ===== 代币信息 =====
-        function openTokenModal() {
-            openModal('tokenModal');
-        }
+        function openTokenModal() { openModal('tokenModal'); }
+        function openEconomyArticle() { openModal('economyModal'); }
+        function openAirdropArticle() { openModal('airdropModal'); }
+        function openOfficialArticle() { openModal('officialModal'); }
         
-        // ===== 经济模式文章 =====
-        function openEconomyArticle() {
-            openModal('economyModal');
-        }
-        
-        // ===== 私募/空投文章 =====
-        function openAirdropArticle() {
-            openModal('airdropModal');
-        }
-        
-        // ===== 查阅官网文章 =====
-        function openOfficialArticle() {
-            openModal('officialModal');
-        }
-        
-        // ===== 空投领取 =====
         function showAirdropModal() {
             if (!airdropClaimed && !airdropSkipped) {
-                setTimeout(() => {
-                    openModal('airdropClaimModal');
-                }, 600);
+                setTimeout(() => { openModal('airdropClaimModal'); }, 600);
             }
         }
         
@@ -2054,35 +1942,26 @@
         
         // ===== 表情包数据 =====
         const emojiList = [
-            '😀', '😁', '😂', '🤣', '😃', '😄', '😅',
-            '😆', '😉', '😊', '😋', '😎', '😍', '🥰',
-            '😘', '😗', '😙', '😚', '🥲', '😜', '🤪',
-            '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐',
-            '🤨', '😐', '😑', '😶', '😏', '😒', '🙄',
-            '😬', '🤥', '😌', '😔', '😪', '🤤', '😴',
-            '😷', '🤒', '🤕', '🤢', '🤮', '🥴', '😵',
-            '🤯', '🥳', '🥺', '😡', '😠', '🤬', '😈',
-            '💀', '☠️', '💩', '🤡', '👹', '👺', '👻',
-            '💋', '💌', '💘', '💝', '💖', '💗', '💓',
-            '💔', '❤️', '🧡', '💛', '💚', '💙', '💜',
-            '🖤', '🤍', '🤎', '💕', '💞', '💯', '🔥',
-            '⭐', '🌟', '✨', '💫', '🌈', '☀️', '🌙',
-            '☁️', '⛅', '🌊', '🌸', '🌺', '🌻', '🌹',
-            '🍀', '🌿', '☘️', '🍁', '🍂', '🍃', '🍄'
+            '😀','😁','😂','🤣','😃','😄','😅','😆','😉','😊','😋','😎','😍','🥰',
+            '😘','😗','😙','😚','🥲','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐',
+            '🤨','😐','😑','😶','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴',
+            '😷','🤒','🤕','🤢','🤮','🥴','😵','🤯','🥳','🥺','😡','😠','🤬','😈',
+            '💀','☠️','💩','🤡','👹','👺','👻','💋','💌','💘','💝','💖','💗','💓',
+            '💔','❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💕','💞','💯','🔥',
+            '⭐','🌟','✨','💫','🌈','☀️','🌙','☁️','⛅','🌊','🌸','🌺','🌻','🌹',
+            '🍀','🌿','☘️','🍁','🍂','🍃','🍄'
         ];
         
-        // ----- 时间 & 在线人数 -----
         function setTime() {
             const now = new Date();
             document.getElementById('timeDivider').textContent = now.toLocaleDateString('zh-CN') + ' ' + now.toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'});
         }
         setTime();
         setInterval(setTime, 30000);
-        
         function updateOnlineCount() {}
         updateOnlineCount();
         
-        // ----- 钱包连接 -----
+        // ===== 钱包连接 =====
         async function connectWallet() {
             if (window.ethereum) {
                 try {
@@ -2090,20 +1969,13 @@
                     const accounts = await window.ethereum.request({ method: 'eth_accounts' });
                     userAddress = accounts[0];
                     isConnected = true;
-                    
                     document.getElementById('walletStatus').textContent = '✅ ' + userAddress.slice(0, 8) + '...' + userAddress.slice(-6);
                     document.getElementById('walletStatus').style.color = '#07c160';
-                    
-                    const banner = document.getElementById('connectBanner');
-                    banner.classList.add('hidden');
+                    document.getElementById('connectBanner').classList.add('hidden');
                     updateCountdownPosition();
-                    
-                    const shortAddr = userAddress.slice(0, 4) + '...' + userAddress.slice(-4);
-                    document.getElementById('headerAddress').textContent = shortAddr;
-                    
+                    document.getElementById('headerAddress').textContent = userAddress.slice(0, 4) + '...' + userAddress.slice(-4);
                     if (messageCount === 0) {
-                        const emptyState = document.getElementById('emptyState');
-                        if (emptyState) emptyState.style.display = 'none';
+                        document.getElementById('emptyState').style.display = 'none';
                         addSystemMessage('🎉 欢迎来到币圈社区！');
                         startCountdown();
                         showAirdropModal();
@@ -2116,16 +1988,14 @@
             }
         }
         
-        // ----- 消息发送 -----
+        // ===== 消息发送 =====
         function sendMessage() {
             const input = document.getElementById('msgInput');
             const text = input.value.trim();
             if (!text) return;
-            
             addOwnMessage(text, userAddress || '我');
             input.value = '';
             updateSendBtn();
-            
             setTimeout(() => {
                 const replies = ['收到！👍', '同意', '有道理', '关注一下', '好项目！', '学习了', '支持！', '已关注'];
                 addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
@@ -2135,17 +2005,10 @@
         function addOwnMessage(text, sender) {
             messageCount++;
             const messages = document.getElementById('messages');
-            const emptyState = document.getElementById('emptyState');
-            if (emptyState) emptyState.style.display = 'none';
-            
+            document.getElementById('emptyState').style.display = 'none';
             const wrapper = document.createElement('div');
             wrapper.className = 'msg-wrapper own';
-            let displaySender = '';
-            if (sender && sender !== '我') {
-                displaySender = sender.slice(0, 6) + '...' + sender.slice(-1);
-            } else {
-                displaySender = '我';
-            }
+            let displaySender = (sender && sender !== '我') ? sender.slice(0, 6) + '...' + sender.slice(-1) : '我';
             wrapper.innerHTML = `
                 <div class="msg-avatar">我</div>
                 <div class="msg-body">
@@ -2158,21 +2021,14 @@
             scrollToBottom();
         }
         
-        // ===== 图片消息 - 保持原图方向 =====
+        // ===== 图片消息 =====
         function addOwnImageMessage(imageUrl, sender) {
             messageCount++;
             const messages = document.getElementById('messages');
-            const emptyState = document.getElementById('emptyState');
-            if (emptyState) emptyState.style.display = 'none';
-            
+            document.getElementById('emptyState').style.display = 'none';
             const wrapper = document.createElement('div');
             wrapper.className = 'msg-wrapper own';
-            let displaySender = '';
-            if (sender && sender !== '我') {
-                displaySender = sender.slice(0, 6) + '...' + sender.slice(-1);
-            } else {
-                displaySender = '我';
-            }
+            let displaySender = (sender && sender !== '我') ? sender.slice(0, 6) + '...' + sender.slice(-1) : '我';
             const imgId = 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
             wrapper.innerHTML = `
                 <div class="msg-avatar">我</div>
@@ -2188,34 +2044,21 @@
             `;
             messages.appendChild(wrapper);
             scrollToBottom();
-            
-            const img = document.getElementById(imgId);
-            if (img) {
-                img.onclick = function(e) {
-                    e.stopPropagation();
-                    openFullscreen(imageUrl, 'image');
-                };
-            }
+            document.getElementById(imgId).onclick = function(e) {
+                e.stopPropagation();
+                openFullscreen(imageUrl, 'image');
+            };
         }
         
-        // ===== 视频消息 - 静态显示第一帧，点击全屏 =====
+        // ===== 视频消息 =====
         function addOwnVideoMessage(videoUrl, sender) {
             messageCount++;
             const messages = document.getElementById('messages');
-            const emptyState = document.getElementById('emptyState');
-            if (emptyState) emptyState.style.display = 'none';
-            
+            document.getElementById('emptyState').style.display = 'none';
             const wrapper = document.createElement('div');
             wrapper.className = 'msg-wrapper own';
-            let displaySender = '';
-            if (sender && sender !== '我') {
-                displaySender = sender.slice(0, 6) + '...' + sender.slice(-1);
-            } else {
-                displaySender = '我';
-            }
-            
+            let displaySender = (sender && sender !== '我') ? sender.slice(0, 6) + '...' + sender.slice(-1) : '我';
             const vidId = 'vid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
-            
             wrapper.innerHTML = `
                 <div class="msg-avatar">我</div>
                 <div class="msg-body">
@@ -2239,22 +2082,15 @@
             const badge = document.getElementById(vidId + '_badge');
             
             if (video && wrapperDiv) {
-                // 加载元数据获取时长，并确保显示第一帧
                 video.addEventListener('loadedmetadata', function() {
                     const dur = Math.floor(video.duration);
                     const m = Math.floor(dur / 60);
                     const s = dur % 60;
-                    if (badge) {
-                        badge.textContent = m + ':' + String(s).padStart(2, '0');
-                    }
+                    if (badge) badge.textContent = m + ':' + String(s).padStart(2, '0');
                     video.currentTime = 0;
                 });
+                if (video.readyState >= 1) video.currentTime = 0;
                 
-                if (video.readyState >= 1) {
-                    video.currentTime = 0;
-                }
-                
-                // 点击视频切换播放/暂停
                 video.onclick = function(e) {
                     e.stopPropagation();
                     if (video.paused) {
@@ -2266,30 +2102,19 @@
                     }
                 };
                 
-                // 点击包装器打开全屏
                 wrapperDiv.onclick = function(e) {
                     e.stopPropagation();
-                    // 如果点击的是视频本身，由video.onclick处理
                     if (e.target === video) return;
-                    // 直接打开全屏
                     openFullscreen(videoUrl, 'video');
                 };
                 
-                // 双击视频打开全屏
                 video.addEventListener('dblclick', function(e) {
                     e.stopPropagation();
                     openFullscreen(videoUrl, 'video');
                 });
                 
-                // 播放状态控制覆盖层
-                video.addEventListener('play', function() {
-                    if (overlay) overlay.classList.add('hidden');
-                });
-                
-                video.addEventListener('pause', function() {
-                    if (overlay && !video.ended) overlay.classList.remove('hidden');
-                });
-                
+                video.addEventListener('play', function() { if (overlay) overlay.classList.add('hidden'); });
+                video.addEventListener('pause', function() { if (overlay && !video.ended) overlay.classList.remove('hidden'); });
                 video.addEventListener('ended', function() {
                     if (overlay) overlay.classList.remove('hidden');
                     video.currentTime = 0;
@@ -2301,24 +2126,14 @@
         function addVoiceMessage(duration, audioBlob, sender) {
             messageCount++;
             const messages = document.getElementById('messages');
-            const emptyState = document.getElementById('emptyState');
-            if (emptyState) emptyState.style.display = 'none';
-            
+            document.getElementById('emptyState').style.display = 'none';
             const msgId = 'voice_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
             if (!window._voiceData) window._voiceData = {};
             window._voiceData[msgId] = audioBlob;
-            
             const wrapper = document.createElement('div');
             wrapper.className = 'msg-wrapper own';
-            let displaySender = '';
-            if (sender && sender !== '我') {
-                displaySender = sender.slice(0, 6) + '...' + sender.slice(-1);
-            } else {
-                displaySender = '我';
-            }
-            
+            let displaySender = (sender && sender !== '我') ? sender.slice(0, 6) + '...' + sender.slice(-1) : '我';
             const durationStr = formatDuration(duration);
-            
             wrapper.innerHTML = `
                 <div class="msg-avatar">我</div>
                 <div class="msg-body">
@@ -2338,7 +2153,6 @@
             `;
             messages.appendChild(wrapper);
             scrollToBottom();
-            
             setTimeout(() => {
                 const replies = ['收到语音！👍', '已收到', '好的', '明白了', '支持！', '嗯嗯'];
                 addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
@@ -2383,50 +2197,36 @@
             const s = Math.floor(seconds);
             const m = Math.floor(s / 60);
             const secs = s % 60;
-            if (m > 0) {
-                return m + ':' + String(secs).padStart(2, '0');
-            }
-            return '0:' + String(secs).padStart(2, '0');
+            return m > 0 ? m + ':' + String(secs).padStart(2, '0') : '0:' + String(secs).padStart(2, '0');
         }
         
         function playVoiceMessage(msgId) {
             const data = window._voiceData;
-            if (!data || !data[msgId]) {
-                addSystemMessage('⚠️ 语音文件不存在');
-                return;
-            }
-            
+            if (!data || !data[msgId]) { addSystemMessage('⚠️ 语音文件不存在'); return; }
             if (currentPlayingId === msgId && currentAudio && !currentAudio.paused) {
                 currentAudio.pause();
                 updateSpeakerIcon(msgId, 'idle');
                 currentPlayingId = null;
                 return;
             }
-            
             if (currentAudio) {
                 currentAudio.pause();
                 currentAudio = null;
-                if (currentPlayingId) {
-                    updateSpeakerIcon(currentPlayingId, 'idle');
-                }
+                if (currentPlayingId) updateSpeakerIcon(currentPlayingId, 'idle');
                 currentPlayingId = null;
             }
-            
             const audioBlob = data[msgId];
             const url = URL.createObjectURL(audioBlob);
             const audio = new Audio(url);
             currentAudio = audio;
             currentPlayingId = msgId;
-            
             updateSpeakerIcon(msgId, 'playing');
-            
             audio.onended = function() {
                 updateSpeakerIcon(msgId, 'idle');
                 currentAudio = null;
                 currentPlayingId = null;
                 URL.revokeObjectURL(url);
             };
-            
             audio.onerror = function() {
                 updateSpeakerIcon(msgId, 'idle');
                 currentAudio = null;
@@ -2434,7 +2234,6 @@
                 URL.revokeObjectURL(url);
                 addSystemMessage('⚠️ 语音播放失败');
             };
-            
             audio.play().catch(function(err) {
                 updateSpeakerIcon(msgId, 'idle');
                 currentAudio = null;
@@ -2447,14 +2246,7 @@
         function addOtherMessage(text, sender) {
             messageCount++;
             const messages = document.getElementById('messages');
-            
-            let displaySender = '';
-            if (sender && sender !== '币圈助手') {
-                displaySender = sender.slice(0, 6) + '...' + sender.slice(-1);
-            } else {
-                displaySender = sender;
-            }
-            
+            let displaySender = (sender && sender !== '币圈助手') ? sender.slice(0, 6) + '...' + sender.slice(-1) : sender;
             const wrapper = document.createElement('div');
             wrapper.className = 'msg-wrapper other';
             wrapper.innerHTML = `
@@ -2490,24 +2282,17 @@
         function updateSendBtn() {
             const input = document.getElementById('msgInput');
             const sendBtn = document.getElementById('sendBtn');
-            if (input.value.trim()) {
-                sendBtn.classList.add('show');
-            } else {
-                sendBtn.classList.remove('show');
-            }
+            input.value.trim() ? sendBtn.classList.add('show') : sendBtn.classList.remove('show');
         }
         document.getElementById('msgInput').addEventListener('input', updateSendBtn);
         
-        // ===== 图片上传功能 =====
+        // ===== 图片上传 =====
         function handleImageUpload() {
-            const input = document.getElementById('imageInput');
-            input.click();
+            document.getElementById('imageInput').click();
         }
-        
         document.getElementById('imageInput').addEventListener('change', function(e) {
             const files = e.target.files;
             if (!files || files.length === 0) return;
-            
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 if (!file.type.startsWith('image/')) continue;
@@ -2526,16 +2311,13 @@
             toggleMorePanel();
         });
         
-        // ===== 视频上传功能 =====
+        // ===== 视频上传 =====
         function handleVideoUpload() {
-            const input = document.getElementById('videoInput');
-            input.click();
+            document.getElementById('videoInput').click();
         }
-        
         document.getElementById('videoInput').addEventListener('change', function(e) {
             const files = e.target.files;
             if (!files || files.length === 0) return;
-            
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 if (!file.type.startsWith('video/')) continue;
@@ -2558,7 +2340,6 @@
         function toggleVoiceMode() {
             const input = document.getElementById('msgInput');
             const voiceBtn = document.getElementById('voiceBtn');
-            
             if (!isVoiceMode) {
                 isVoiceMode = true;
                 input.placeholder = '按住录音，松开发送';
@@ -2577,13 +2358,11 @@
                 `;
                 voiceBtn.style.background = '#ffe0e0';
                 voiceBtn.style.borderRadius = '50%';
-                
                 input.addEventListener('pointerdown', onPointerDown);
                 input.addEventListener('pointerup', onPointerUp);
                 input.addEventListener('pointerleave', onPointerUp);
                 input.addEventListener('pointercancel', onPointerUp);
                 input.addEventListener('pointermove', onPointerMove);
-                
                 addSystemMessage('🎤 录音模式已开启，按住输入框录音');
             } else {
                 isVoiceMode = false;
@@ -2601,16 +2380,12 @@
                     </svg>
                 `;
                 voiceBtn.style.background = 'transparent';
-                
                 input.removeEventListener('pointerdown', onPointerDown);
                 input.removeEventListener('pointerup', onPointerUp);
                 input.removeEventListener('pointerleave', onPointerUp);
                 input.removeEventListener('pointercancel', onPointerUp);
                 input.removeEventListener('pointermove', onPointerMove);
-                
-                if (isRecording) {
-                    stopRecording(false);
-                }
+                if (isRecording) stopRecording(false);
                 addSystemMessage('⌨️ 已切换为键盘输入模式');
             }
         }
@@ -2639,123 +2414,62 @@
                 const input = document.getElementById('msgInput');
                 input.classList.remove('cancel-mode');
                 const secs = recordingDuration;
-                if (secs < 60) {
-                    input.value = '🎙️ 录音中 ' + secs + 's';
-                } else {
-                    const m = Math.floor(secs / 60);
-                    const s = secs % 60;
-                    input.value = '🎙️ 录音中 ' + m + ':' + String(s).padStart(2, '0');
-                }
+                input.value = secs < 60 ? '🎙️ 录音中 ' + secs + 's' : '🎙️ 录音中 ' + Math.floor(secs/60) + ':' + String(secs%60).padStart(2,'0');
             }
         }
         
         function onPointerUp(e) {
-            if (isRecording) {
-                stopRecording(!isCancelMode);
-            }
+            if (isRecording) stopRecording(!isCancelMode);
             isCancelMode = false;
             document.getElementById('cancelTip').classList.remove('show');
-            const input = document.getElementById('msgInput');
-            input.classList.remove('cancel-mode');
+            document.getElementById('msgInput').classList.remove('cancel-mode');
         }
         
         async function startRecording() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    audio: {
-                        echoCancellation: true,
-                        noiseSuppression: true,
-                        autoGainControl: true
-                    } 
-                });
-                
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
                 isRecording = true;
                 audioChunks = [];
                 recordingDuration = 0;
-                
                 const input = document.getElementById('msgInput');
                 input.classList.add('recording');
                 input.value = '🎙️ 录音中 0s';
-                
-                mediaRecorder = new MediaRecorder(stream, {
-                    mimeType: 'audio/webm;codecs=opus'
-                });
-                
-                mediaRecorder.ondataavailable = function(event) {
-                    if (event.data.size > 0) {
-                        audioChunks.push(event.data);
-                    }
-                };
-                
-                mediaRecorder.onstop = function() {
-                    stream.getTracks().forEach(track => track.stop());
-                };
-                
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
+                mediaRecorder.ondataavailable = function(event) { if (event.data.size > 0) audioChunks.push(event.data); };
+                mediaRecorder.onstop = function() { stream.getTracks().forEach(track => track.stop()); };
                 mediaRecorder.start(100);
-                
                 recordingTimer = setInterval(() => {
                     recordingDuration++;
                     const input = document.getElementById('msgInput');
                     if (input && isRecording) {
-                        if (recordingDuration < 60) {
-                            input.value = '🎙️ 录音中 ' + recordingDuration + 's';
-                        } else {
-                            const m = Math.floor(recordingDuration / 60);
-                            const s = recordingDuration % 60;
-                            input.value = '🎙️ 录音中 ' + m + ':' + String(s).padStart(2, '0');
-                        }
+                        input.value = recordingDuration < 60 ? '🎙️ 录音中 ' + recordingDuration + 's' : '🎙️ 录音中 ' + Math.floor(recordingDuration/60) + ':' + String(recordingDuration%60).padStart(2,'0');
                     }
-                    if (recordingDuration >= VOICE_CONFIG.maxDuration && isRecording) {
-                        stopRecording(true);
-                    }
+                    if (recordingDuration >= VOICE_CONFIG.maxDuration && isRecording) stopRecording(true);
                 }, 1000);
-                
             } catch (err) {
                 addSystemMessage('❌ 无法访问麦克风: ' + err.message);
                 isRecording = false;
-                const input = document.getElementById('msgInput');
-                input.classList.remove('recording');
-                input.value = '';
-                input.placeholder = '按住录音，松开发送';
+                document.getElementById('msgInput').classList.remove('recording');
+                document.getElementById('msgInput').value = '';
+                document.getElementById('msgInput').placeholder = '按住录音，松开发送';
             }
         }
         
         function stopRecording(send) {
             if (!isRecording) return;
             isRecording = false;
-            
-            if (recordingTimer) {
-                clearInterval(recordingTimer);
-                recordingTimer = null;
-            }
-            
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-            }
-            
+            if (recordingTimer) { clearInterval(recordingTimer); recordingTimer = null; }
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
             const input = document.getElementById('msgInput');
             input.classList.remove('recording', 'cancel-mode');
             input.style.background = '#f0f0f0';
             input.style.color = '#333';
             input.value = '';
             input.placeholder = '按住录音，松开发送';
-            
             document.getElementById('cancelTip').classList.remove('show');
-            
             const duration = recordingDuration;
-            
-            if (!send) {
-                addSystemMessage('⏸️ 已取消录音');
-                audioChunks = [];
-                return;
-            }
-            
-            if (duration < VOICE_CONFIG.minDuration) {
-                addSystemMessage('⏸️ 说话时间太短 (需≥1秒)');
-                audioChunks = [];
-                return;
-            }
-            
+            if (!send) { addSystemMessage('⏸️ 已取消录音'); audioChunks = []; return; }
+            if (duration < VOICE_CONFIG.minDuration) { addSystemMessage('⏸️ 说话时间太短 (需≥1秒)'); audioChunks = []; return; }
             if (audioChunks.length > 0) {
                 const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                 addVoiceMessage(duration, audioBlob, userAddress || '我');
@@ -2770,9 +2484,7 @@
         function toggleEmojiPanel() {
             const overlay = document.getElementById('emojiOverlay');
             overlay.classList.toggle('active');
-            if (overlay.classList.contains('active')) {
-                renderEmojis();
-            }
+            if (overlay.classList.contains('active')) renderEmojis();
         }
         
         function renderEmojis() {
@@ -2782,10 +2494,7 @@
                 const item = document.createElement('div');
                 item.className = 'emoji-item';
                 item.textContent = emoji;
-                item.onclick = function(e) {
-                    e.stopPropagation();
-                    selectEmoji(emoji);
-                };
+                item.onclick = function(e) { e.stopPropagation(); selectEmoji(emoji); };
                 grid.appendChild(item);
             });
         }
@@ -2800,57 +2509,33 @@
         
         // ===== 加号弹窗 =====
         function toggleMorePanel() {
-            const overlay = document.getElementById('moreOverlay');
-            overlay.classList.toggle('active');
+            document.getElementById('moreOverlay').classList.toggle('active');
         }
         
         function handleMoreAction(action) {
-            if (action === '图片') {
-                handleImageUpload();
-                return;
-            }
-            if (action === '视频') {
-                handleVideoUpload();
-                return;
-            }
+            if (action === '图片') { handleImageUpload(); return; }
+            if (action === '视频') { handleVideoUpload(); return; }
             toggleMorePanel();
             addSystemMessage(`📌 发起「${action}」功能 (演示)`);
             setTimeout(() => {
-                const replies = [
-                    `支持 ${action}！`, 
-                    `我也要参与 ${action}`, 
-                    `${action} 功能不错`, 
-                    `已收到 ${action} 请求`
-                ];
+                const replies = [`支持 ${action}！`, `我也要参与 ${action}`, `${action} 功能不错`, `已收到 ${action} 请求`];
                 addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
             }, 500 + Math.random() * 1000);
         }
         
         // ===== 进入会议 =====
         function handleEnterMeeting() {
-            if (countdownInterval) {
-                clearInterval(countdownInterval);
-                countdownInterval = null;
-            }
+            if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
             const display = document.getElementById('countdownDisplay');
-            if (display) {
-                display.textContent = '已开始';
-                display.classList.add('ended');
-            }
-            
+            if (display) { display.textContent = '已开始'; display.classList.add('ended'); }
             addSystemMessage('📞 正在进入会议...');
-            
             const link = document.createElement('a');
             link.href = 'tencent://meeting?';
             link.style.display = 'none';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
-            setTimeout(() => {
-                window.open('https://meeting.tencent.com/', '_blank');
-            }, 300);
-            
+            setTimeout(() => { window.open('https://meeting.tencent.com/', '_blank'); }, 300);
             setTimeout(() => {
                 addSystemMessage('✅ 已尝试唤醒腾讯会议，请检查是否已打开');
                 addOtherMessage('欢迎加入会议！', '会议主持人');
