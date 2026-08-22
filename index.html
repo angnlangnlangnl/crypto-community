@@ -1622,7 +1622,7 @@
         var zoomHintTimeout = null;
         var isFullscreenImage = false;
         
-        // ✅ 修复：边界约束函数 - 确保图片边缘始终对齐屏幕边缘，不留空白
+        // ✅ 修复：边界约束函数 - 使用统一transformOrigin避免边界计算错误
         function constrainTransform(img, scale, tx, ty) {
             if (!img) return { tx: 0, ty: 0 };
             
@@ -1642,18 +1642,16 @@
                 // 图片高度大于容器高度，允许上下拖动
                 var maxY = scaledH - ch;
                 // ty范围：0（顶部对齐）到 -maxY（底部对齐）
-                // 不允许ty>0（顶部不能低于屏幕顶部，否则顶部出现空白）
-                // 不允许ty<-maxY（底部不能高于屏幕底部，否则底部出现空白）
                 ty = Math.max(-maxY, Math.min(0, ty));
             } else {
-                // 图片高度小于容器高度，上下居中，不允许拖动
+                // 图片高度小于容器高度，上下居中
                 ty = (ch - scaledH) / 2;
             }
             
             return { tx: tx, ty: ty };
         }
         
-        // ✅ 初始化时始终横向铺满屏幕
+        // ✅ 初始化时始终横向铺满屏幕，使用统一transformOrigin
         function initImageZoom(imageWrap, img) {
             currentImageWrap = imageWrap;
             currentImage = img;
@@ -1663,6 +1661,8 @@
             isImageZoomed = false;
             isFullscreenImage = true;
             img.className = '';
+            // ✅ 统一使用 center center 作为 transformOrigin
+            img.style.transformOrigin = 'center center';
             
             showZoomHint();
             
@@ -1703,11 +1703,14 @@
                 var scaledHeight = imgHeight * imageScale;
                 
                 if (scaledHeight > containerHeight) {
-                    imageTranslateY = 0;
-                    img.style.transformOrigin = 'top center';
+                    // 图片高度超出屏幕，顶部对齐
+                    // 使用 center center 作为 transformOrigin
+                    // translateY = (scaledHeight - containerHeight) / 2
+                    // 这样图片顶部对齐容器顶部
+                    imageTranslateY = (scaledHeight - containerHeight) / 2;
                 } else {
+                    // 图片高度小于屏幕，上下居中
                     imageTranslateY = (containerHeight - scaledHeight) / 2;
-                    img.style.transformOrigin = 'center center';
                 }
                 
                 isImageZoomed = true;
@@ -1766,15 +1769,14 @@
                 var scaledHeight = imgHeight * imageScale;
                 
                 if (scaledHeight > containerHeight) {
-                    imageTranslateY = 0;
-                    img.style.transformOrigin = 'top center';
+                    imageTranslateY = (scaledHeight - containerHeight) / 2;
                 } else {
                     imageTranslateY = (containerHeight - scaledHeight) / 2;
-                    img.style.transformOrigin = 'center center';
                 }
                 
                 isImageZoomed = true;
                 img.className = 'zoomed';
+                img.style.transformOrigin = 'center center';
                 img.style.transform = 'translate(0px, ' + imageTranslateY + 'px) scale(' + imageScale + ')';
             } else {
                 imageScale = 1;
@@ -1782,8 +1784,8 @@
                 imageTranslateY = 0;
                 isImageZoomed = false;
                 img.className = '';
-                img.style.transform = 'translate(0px, 0px) scale(1)';
                 img.style.transformOrigin = 'center center';
+                img.style.transform = 'translate(0px, 0px) scale(1)';
             }
         }
         
@@ -1885,8 +1887,8 @@
                 imageTranslateY = 0;
                 isImageZoomed = false;
                 currentImage.className = '';
-                currentImage.style.transform = 'translate(0px, 0px) scale(1)';
                 currentImage.style.transformOrigin = 'center center';
+                currentImage.style.transform = 'translate(0px, 0px) scale(1)';
             }
             isDragging = false;
             lastTouchDistance = 0;
