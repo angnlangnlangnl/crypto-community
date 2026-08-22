@@ -358,7 +358,7 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.06);
         }
         
-        /* 图片消息 - 干净无边框 */
+        /* 图片消息 - 干净无边框，保持原图方向 */
         .msg-bubble .image-wrapper {
             display: block;
             border-radius: 6px;
@@ -376,6 +376,8 @@
             transition: transform 0.2s;
             border: none;
             outline: none;
+            /* 修复移动端图片旋转问题 */
+            image-orientation: from-image;
         }
         .msg-bubble .image-wrapper img:active {
             transform: scale(0.98);
@@ -481,18 +483,21 @@
             justify-content: center;
             width: 100%;
             height: 100%;
+            padding: 20px;
         }
         .fullscreen-player .media-content img {
-            max-width: 90%;
+            max-width: 100%;
             max-height: 80vh;
             border-radius: 4px;
             object-fit: contain;
             border: none;
             outline: none;
             display: block;
+            /* 修复全屏图片旋转问题 */
+            image-orientation: from-image;
         }
         .fullscreen-player .media-content video {
-            max-width: 90%;
+            max-width: 100%;
             max-height: 80vh;
             border-radius: 4px;
             object-fit: contain;
@@ -1348,6 +1353,7 @@
             .fullscreen-player .media-controls .progress-bar { width: 100px; }
             .fullscreen-player .media-controls .time-display { font-size: 11px; min-width: 60px; }
             .fullscreen-player .close-btn { font-size: 24px; top: 12px; right: 16px; }
+            .fullscreen-player .media-content { padding: 10px; }
             .fullscreen-player .media-content video { max-height: 70vh; }
             .fullscreen-player .media-content img { max-height: 70vh; }
         }
@@ -1479,7 +1485,7 @@
     <input type="file" class="file-input-hidden" id="imageInput" accept="image/*" multiple>
     <input type="file" class="file-input-hidden" id="videoInput" accept="video/*">
 
-    <!-- ===== 全屏播放器 - 修复移动端 ===== -->
+    <!-- ===== 全屏播放器 ===== -->
     <div class="fullscreen-player" id="fullscreenPlayer" onclick="closeFullscreen()">
         <button class="close-btn" id="fullscreenClose" onclick="event.stopPropagation();closeFullscreen();">✕</button>
         <div class="media-content" id="fullscreenContent" onclick="event.stopPropagation();"></div>
@@ -1797,23 +1803,9 @@
         let currentAudio = null;
         let currentPlayingId = null;
         let fullscreenVideo = null;
-        let fullscreenInterval = null;
-        let isFullscreen = false;
         
         // ===== 全屏播放器控制 - 修复移动端 =====
         function openFullscreen(mediaUrl, type) {
-            // 先尝试进入浏览器原生全屏（移动端兼容）
-            const docEl = document.documentElement;
-            try {
-                if (docEl.requestFullscreen) {
-                    docEl.requestFullscreen().catch(() => {});
-                } else if (docEl.webkitRequestFullscreen) {
-                    docEl.webkitRequestFullscreen();
-                } else if (docEl.msRequestFullscreen) {
-                    docEl.msRequestFullscreen();
-                }
-            } catch(e) {}
-            
             const player = document.getElementById('fullscreenPlayer');
             const content = document.getElementById('fullscreenContent');
             const controls = document.getElementById('fullscreenControls');
@@ -1821,12 +1813,19 @@
             // 清除之前的内容
             content.innerHTML = '';
             controls.style.display = 'none';
-            isFullscreen = false;
             
             if (type === 'image') {
                 const img = document.createElement('img');
                 img.src = mediaUrl;
-                img.style.cssText = 'max-width:90%;max-height:80vh;border-radius:4px;object-fit:contain;border:none;outline:none;display:block;';
+                img.style.cssText = 'max-width:100%;max-height:80vh;border-radius:4px;object-fit:contain;border:none;outline:none;display:block;image-orientation:from-image;';
+                // 修复移动端图片旋转 - 使用onload检测图片实际尺寸
+                img.onload = function() {
+                    // 如果图片宽高比异常，调整显示方式
+                    const aspectRatio = img.naturalWidth / img.naturalHeight;
+                    if (aspectRatio > 2.5 || aspectRatio < 0.4) {
+                        img.style.objectFit = 'contain';
+                    }
+                };
                 content.appendChild(img);
                 player.classList.add('active');
                 document.body.style.overflow = 'hidden';
@@ -1836,7 +1835,7 @@
             if (type === 'video') {
                 const video = document.createElement('video');
                 video.src = mediaUrl;
-                video.style.cssText = 'max-width:90%;max-height:80vh;border-radius:4px;object-fit:contain;border:none;outline:none;display:block;background:#000;';
+                video.style.cssText = 'max-width:100%;max-height:80vh;border-radius:4px;object-fit:contain;border:none;outline:none;display:block;background:#000;';
                 video.playsInline = true;
                 video.setAttribute('playsinline', '');
                 video.setAttribute('webkit-playsinline', '');
@@ -1846,7 +1845,6 @@
                 controls.style.display = 'flex';
                 player.classList.add('active');
                 document.body.style.overflow = 'hidden';
-                isFullscreen = true;
                 fullscreenVideo = video;
                 
                 // 绑定控制
@@ -1910,7 +1908,7 @@
                     progressFill.style.width = '0%';
                 };
                 
-                // 自动播放（移动端需要用户手势触发，但全屏点击后可以）
+                // 自动播放
                 setTimeout(function() {
                     video.play().then(function() {
                         playBtn.textContent = '⏸️';
@@ -1946,21 +1944,6 @@
                 try { fullscreenVideo.pause(); } catch(e) {}
                 fullscreenVideo = null;
             }
-            if (fullscreenInterval) {
-                clearInterval(fullscreenInterval);
-                fullscreenInterval = null;
-            }
-            isFullscreen = false;
-            // 退出浏览器全屏
-            try {
-                if (document.fullscreenElement) {
-                    document.exitFullscreen().catch(() => {});
-                } else if (document.webkitFullscreenElement) {
-                    document.webkitExitFullscreen();
-                } else if (document.msFullscreenElement) {
-                    document.msExitFullscreen();
-                }
-            } catch(e) {}
         }
         
         // ===== 会议倒计时 =====
@@ -2175,7 +2158,7 @@
             scrollToBottom();
         }
         
-        // ===== 图片消息 - 点击全屏 =====
+        // ===== 图片消息 - 保持原图方向 =====
         function addOwnImageMessage(imageUrl, sender) {
             messageCount++;
             const messages = document.getElementById('messages');
@@ -2197,7 +2180,7 @@
                     <span class="msg-sender">${displaySender}</span>
                     <div class="msg-bubble" style="padding:0;background:transparent;border-radius:6px;overflow:hidden;">
                         <div class="image-wrapper" style="border:none;outline:none;">
-                            <img id="${imgId}" src="${imageUrl}" alt="图片" style="border:none;outline:none;display:block;width:100%;height:auto;">
+                            <img id="${imgId}" src="${imageUrl}" alt="图片" style="border:none;outline:none;display:block;width:100%;height:auto;image-orientation:from-image;">
                         </div>
                     </div>
                     <span class="msg-time">${getTime()}</span>
@@ -2256,7 +2239,7 @@
             const badge = document.getElementById(vidId + '_badge');
             
             if (video && wrapperDiv) {
-                // 加载元数据获取时长
+                // 加载元数据获取时长，并确保显示第一帧
                 video.addEventListener('loadedmetadata', function() {
                     const dur = Math.floor(video.duration);
                     const m = Math.floor(dur / 60);
@@ -2264,16 +2247,14 @@
                     if (badge) {
                         badge.textContent = m + ':' + String(s).padStart(2, '0');
                     }
-                    // 设置视频当前时间为0，确保显示第一帧
                     video.currentTime = 0;
                 });
                 
-                // 如果视频已加载但还没显示第一帧，强制刷新
                 if (video.readyState >= 1) {
                     video.currentTime = 0;
                 }
                 
-                // 点击视频切换播放/暂停（在消息气泡内）
+                // 点击视频切换播放/暂停
                 video.onclick = function(e) {
                     e.stopPropagation();
                     if (video.paused) {
@@ -2290,10 +2271,17 @@
                     e.stopPropagation();
                     // 如果点击的是视频本身，由video.onclick处理
                     if (e.target === video) return;
+                    // 直接打开全屏
                     openFullscreen(videoUrl, 'video');
                 };
                 
-                // 播放时隐藏覆盖层
+                // 双击视频打开全屏
+                video.addEventListener('dblclick', function(e) {
+                    e.stopPropagation();
+                    openFullscreen(videoUrl, 'video');
+                });
+                
+                // 播放状态控制覆盖层
                 video.addEventListener('play', function() {
                     if (overlay) overlay.classList.add('hidden');
                 });
