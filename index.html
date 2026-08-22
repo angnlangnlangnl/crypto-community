@@ -1464,8 +1464,9 @@
         let airdropClaimed = false;
         let airdropSkipped = false;
         let isRecording = false;
+        let recognitionInstance = null;
         let recordingTimer = null;
-        let recognition = null;
+        let voiceResultText = '';
         
         // ===== 会议倒计时 =====
         let countdownSeconds = 300;
@@ -1733,7 +1734,7 @@
         }
         document.getElementById('msgInput').addEventListener('input', updateSendBtn);
         
-        // ===== 语音模式 - 按住说话 =====
+        // ===== 语音模式 - 修复版 =====
         function toggleVoiceMode() {
             const input = document.getElementById('msgInput');
             const voiceBtn = document.getElementById('voiceBtn');
@@ -1758,16 +1759,11 @@
                 voiceBtn.style.background = '#ffe0e0';
                 voiceBtn.style.borderRadius = '50%';
                 
-                // 绑定事件 - 使用更可靠的事件绑定方式
-                input.addEventListener('pointerdown', startVoiceRecording);
-                input.addEventListener('pointerup', stopVoiceRecording);
-                input.addEventListener('pointerleave', stopVoiceRecording);
-                input.addEventListener('pointercancel', stopVoiceRecording);
-                
-                // 兼容触摸事件
-                input.addEventListener('touchstart', startVoiceRecording, {passive: true});
-                input.addEventListener('touchend', stopVoiceRecording, {passive: true});
-                input.addEventListener('touchcancel', stopVoiceRecording, {passive: true});
+                // 绑定事件
+                input.addEventListener('pointerdown', onPointerDown);
+                input.addEventListener('pointerup', onPointerUp);
+                input.addEventListener('pointerleave', onPointerUp);
+                input.addEventListener('pointercancel', onPointerUp);
                 
                 addSystemMessage('🎤 语音模式已开启，按住输入框说话');
             } else {
@@ -1789,169 +1785,143 @@
                 voiceBtn.style.background = 'transparent';
                 
                 // 移除事件
-                input.removeEventListener('pointerdown', startVoiceRecording);
-                input.removeEventListener('pointerup', stopVoiceRecording);
-                input.removeEventListener('pointerleave', stopVoiceRecording);
-                input.removeEventListener('pointercancel', stopVoiceRecording);
-                input.removeEventListener('touchstart', startVoiceRecording);
-                input.removeEventListener('touchend', stopVoiceRecording);
-                input.removeEventListener('touchcancel', stopVoiceRecording);
+                input.removeEventListener('pointerdown', onPointerDown);
+                input.removeEventListener('pointerup', onPointerUp);
+                input.removeEventListener('pointerleave', onPointerUp);
+                input.removeEventListener('pointercancel', onPointerUp);
                 
                 if (isRecording) {
-                    stopVoiceRecording();
+                    stopRecording();
                 }
                 addSystemMessage('⌨️ 已切换为键盘输入模式');
             }
         }
         
-        function startVoiceRecording(e) {
-            if (!isVoiceMode) return;
+        function onPointerDown(e) {
             e.preventDefault();
-            
-            // 检查浏览器是否支持语音识别
+            if (!isVoiceMode || isRecording) return;
+            startRecording();
+        }
+        
+        function onPointerUp(e) {
+            if (isRecording) {
+                stopRecording();
+            }
+        }
+        
+        function startRecording() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                addSystemMessage('❌ 您的浏览器不支持语音识别，请使用Chrome浏览器');
+                addSystemMessage('❌ 您的浏览器不支持语音识别');
                 return;
             }
             
-            if (isRecording) return;
-            
             isRecording = true;
+            voiceResultText = '';
             const input = document.getElementById('msgInput');
             input.classList.add('recording');
             input.value = '🎙️ 录音中...';
             
-            // 创建语音识别实例
-            recognition = new SpeechRecognition();
-            recognition.lang = 'zh-CN';
-            recognition.continuous = false;
-            recognition.interimResults = true;
-            recognition.maxAlternatives = 1;
+            // 创建识别实例
+            recognitionInstance = new SpeechRecognition();
+            recognitionInstance.lang = 'zh-CN';
+            recognitionInstance.continuous = false;
+            recognitionInstance.interimResults = true;
+            recognitionInstance.maxAlternatives = 1;
             
-            let finalTranscript = '';
-            let interimTranscript = '';
+            let hasResult = false;
             
-            recognition.onresult = function(event) {
-                interimTranscript = '';
+            recognitionInstance.onresult = function(event) {
+                let final = '';
+                let interim = '';
                 for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const transcript = event.results[i][0].transcript;
                     if (event.results[i].isFinal) {
-                        finalTranscript += transcript;
+                        final += event.results[i][0].transcript;
                     } else {
-                        interimTranscript += transcript;
+                        interim += event.results[i][0].transcript;
                     }
                 }
-                const displayText = finalTranscript + interimTranscript;
-                if (displayText.trim()) {
-                    input.value = displayText;
+                const text = final || interim;
+                if (text.trim()) {
+                    hasResult = true;
+                    voiceResultText = text;
+                    input.value = text;
                     input.classList.remove('recording');
                     input.classList.add('recognition-done');
+                    // 识别到最终结果后自动停止
+                    if (final) {
+                        setTimeout(() => {
+                            if (isRecording) stopRecording();
+                        }, 300);
+                    }
                 }
             };
             
-            recognition.onerror = function(event) {
+            recognitionInstance.onerror = function(event) {
                 if (event.error === 'not-allowed') {
                     addSystemMessage('❌ 请允许浏览器使用麦克风权限');
-                } else if (event.error === 'aborted') {
-                    // 用户主动停止，不提示
-                } else if (event.error !== 'no-speech') {
+                } else if (event.error === 'no-speech') {
+                    // 无语音输入，静默处理
+                } else if (event.error !== 'aborted') {
                     addSystemMessage('⚠️ 语音识别错误: ' + event.error);
                 }
-                // 如果出错且还在录音状态，自动停止
                 if (isRecording) {
-                    stopVoiceRecording();
+                    setTimeout(() => stopRecording(), 300);
                 }
             };
             
-            recognition.onend = function() {
-                // 如果还有最终结果没有处理，在stop中处理
+            recognitionInstance.onend = function() {
                 if (isRecording) {
-                    // 如果识别结束但还在录音状态，说明没有更多结果了
-                    if (finalTranscript.trim() || interimTranscript.trim()) {
-                        const text = finalTranscript + interimTranscript;
-                        if (text.trim()) {
-                            input.value = text.trim();
-                            input.classList.remove('recording');
-                            input.classList.add('recognition-done');
-                        }
-                    }
-                    // 自动停止录音
                     setTimeout(() => {
-                        if (isRecording) {
-                            stopVoiceRecording();
-                        }
+                        if (isRecording) stopRecording();
                     }, 300);
                 }
             };
             
-            // 录音计时动画
-            let dotCount = 0;
-            if (recordingTimer) clearInterval(recordingTimer);
-            recordingTimer = setInterval(() => {
-                if (!isRecording) {
-                    clearInterval(recordingTimer);
-                    recordingTimer = null;
-                    return;
-                }
-                dotCount = (dotCount + 1) % 4;
-                const dots = '.'.repeat(dotCount);
-                if (!input.value || input.value.startsWith('🎙️')) {
-                    input.value = `🎙️ 录音中${dots}`;
-                }
-            }, 300);
-            
             // 启动识别
             try {
-                recognition.start();
+                recognitionInstance.start();
             } catch (err) {
-                addSystemMessage('⚠️ 语音识别启动失败: ' + err.message);
-                stopVoiceRecording();
+                addSystemMessage('⚠️ 语音识别启动失败');
+                stopRecording();
             }
             
-            // 设置超时保护（15秒自动停止）
+            // 超时保护（10秒）
             setTimeout(() => {
-                if (isRecording) {
-                    stopVoiceRecording();
-                }
-            }, 15000);
+                if (isRecording) stopRecording();
+            }, 10000);
         }
         
-        function stopVoiceRecording() {
+        function stopRecording() {
             if (!isRecording) return;
             isRecording = false;
             
-            if (recordingTimer) {
-                clearInterval(recordingTimer);
-                recordingTimer = null;
+            // 停止识别
+            if (recognitionInstance) {
+                try {
+                    recognitionInstance.stop();
+                } catch(e) {}
+                recognitionInstance = null;
             }
             
             const input = document.getElementById('msgInput');
-            const text = input.value.trim();
-            
-            // 停止语音识别
-            if (recognition) {
-                try {
-                    recognition.stop();
-                } catch(e) {}
-                recognition = null;
-            }
-            
-            // 恢复输入框样式
             input.classList.remove('recording', 'recognition-done');
             input.style.background = '#f0f0f0';
             input.style.color = '#333';
             input.style.textAlign = 'center';
             
-            // 处理识别结果
+            const text = input.value.trim();
             const cleanText = text
                 .replace(/^🎙️ 录音中[\.]*\s*/, '')
                 .replace(/^🎙️ 录音中/, '')
                 .trim();
             
-            if (cleanText && cleanText.length > 0 && !cleanText.startsWith('🎙️')) {
-                // 有有效语音内容，发送消息
-                addOwnMessage(cleanText, userAddress || '我');
+            // 优先使用识别结果，否则使用输入框内容
+            const finalText = voiceResultText || cleanText;
+            
+            if (finalText && finalText.length > 0 && !finalText.startsWith('🎙️')) {
+                // 发送语音消息
+                addOwnMessage(finalText, userAddress || '我');
                 input.value = '';
                 addSystemMessage('🎤 语音消息已发送');
                 
@@ -1962,13 +1932,10 @@
                 }, 600 + Math.random() * 1500);
             } else {
                 input.value = '';
-                if (text && !text.startsWith('🎙️')) {
-                    // 有内容但不是有效语音
-                }
-                // 不显示"未检测到语音"提示，避免干扰
+                // 静默处理
             }
-            input.style.textAlign = 'center';
             input.placeholder = '按住说话，松开发送';
+            voiceResultText = '';
         }
         
         // ===== 表情包弹窗 =====
