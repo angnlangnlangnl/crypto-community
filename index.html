@@ -475,7 +475,7 @@
             pointer-events: none;
         }
         
-        /* ===== 全屏播放器 - 修复图片不溢出 ===== */
+        /* ===== 全屏播放器 - 只允许上下拖动 ===== */
         .fullscreen-player {
             position: fixed;
             top: 0;
@@ -523,7 +523,7 @@
             position: relative;
             overflow: hidden;
         }
-        /* 图片 - 不溢出屏幕，任何时都可缩放 */
+        /* 图片 - 只允许上下拖动 */
         .fullscreen-player .media-content .image-wrap {
             display: flex;
             align-items: center;
@@ -1721,7 +1721,7 @@
         // ===== 存储Object URL引用，防止GC =====
         if (!window._videoBlobUrls) window._videoBlobUrls = {};
         
-        // ===== 全屏图片缩放控制 - 修复边界约束 =====
+        // ===== 全屏图片缩放控制 - 只允许上下拖动 =====
         var imageScale = 1;
         var imageTranslateX = 0;
         var imageTranslateY = 0;
@@ -1737,30 +1737,29 @@
         var zoomHintTimeout = null;
         var isFullscreenImage = false;
         
-        // 边界约束函数 - 确保图片不溢出屏幕
+        // 边界约束函数 - 只限制上下方向（Y轴）
         function constrainTransform(img, scale, tx, ty) {
-            if (!img) return { tx: tx, ty: ty };
+            if (!img) return { tx: 0, ty: ty };
             
             var container = img.parentElement;
-            if (!container) return { tx: tx, ty: ty };
+            if (!container) return { tx: 0, ty: ty };
             
-            var cw = container.clientWidth;
             var ch = container.clientHeight;
             
             // 获取图片原始尺寸
             var imgW = img.naturalWidth || img.width || 1;
             var imgH = img.naturalHeight || img.height || 1;
             
-            // 计算缩放后的实际尺寸
-            var scaledW = imgW * scale;
+            // 计算缩放后的实际高度
             var scaledH = imgH * scale;
             
-            // 计算最大偏移量（确保图片不超出边界）
-            var maxX = Math.max(0, (scaledW - cw) / 2);
+            // 计算最大Y偏移量（确保图片上下不超出边界）
             var maxY = Math.max(0, (scaledH - ch) / 2);
             
-            // 约束偏移量
-            tx = Math.max(-maxX, Math.min(maxX, tx));
+            // X方向始终居中（不允许左右拖动）
+            tx = 0;
+            
+            // 约束Y偏移量
             ty = Math.max(-maxY, Math.min(maxY, ty));
             
             return { tx: tx, ty: ty };
@@ -1874,8 +1873,8 @@
                     var newScale = imageScale * scaleDelta;
                     newScale = Math.max(1, Math.min(newScale, 8));
                     imageScale = newScale;
-                    // 应用边界约束
-                    var constrained = constrainTransform(img, imageScale, imageTranslateX, imageTranslateY);
+                    // 应用边界约束 - X始终为0，只限制Y
+                    var constrained = constrainTransform(img, imageScale, 0, imageTranslateY);
                     imageTranslateX = constrained.tx;
                     imageTranslateY = constrained.ty;
                     img.style.transform = 'translate(' + imageTranslateX + 'px, ' + imageTranslateY + 'px) scale(' + imageScale + ')';
@@ -1885,10 +1884,10 @@
             } else if (e.touches.length === 1 && isDragging) {
                 var dx = e.touches[0].clientX - dragStartX;
                 var dy = e.touches[0].clientY - dragStartY;
-                var newTx = dragStartTranslateX + dx;
+                // 只允许上下拖动，X方向固定为0
                 var newTy = dragStartTranslateY + dy;
-                // 应用边界约束
-                var constrained = constrainTransform(img, imageScale, newTx, newTy);
+                // 应用边界约束 - X始终为0
+                var constrained = constrainTransform(img, imageScale, 0, newTy);
                 imageTranslateX = constrained.tx;
                 imageTranslateY = constrained.ty;
                 img.style.transform = 'translate(' + imageTranslateX + 'px, ' + imageTranslateY + 'px) scale(' + imageScale + ')';
@@ -1918,12 +1917,10 @@
             if (!isDragging || !isImageZoomed) return;
             var img = currentImage;
             if (!img) return;
-            var dx = e.clientX - dragStartX;
             var dy = e.clientY - dragStartY;
-            var newTx = dragStartTranslateX + dx;
             var newTy = dragStartTranslateY + dy;
-            // 应用边界约束
-            var constrained = constrainTransform(img, imageScale, newTx, newTy);
+            // 只允许上下拖动，X固定为0
+            var constrained = constrainTransform(img, imageScale, 0, newTy);
             imageTranslateX = constrained.tx;
             imageTranslateY = constrained.ty;
             img.style.transform = 'translate(' + imageTranslateX + 'px, ' + imageTranslateY + 'px) scale(' + imageScale + ')';
