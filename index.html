@@ -1622,7 +1622,7 @@
         var zoomHintTimeout = null;
         var isFullscreenImage = false;
         
-        // ✅ 边界约束函数 - 根据图片高度决定拖动范围
+        // ✅ 修复：边界约束函数 - 确保图片边缘始终对齐屏幕边缘，不留空白
         function constrainTransform(img, scale, tx, ty) {
             if (!img) return { tx: 0, ty: 0 };
             
@@ -1638,11 +1638,13 @@
             
             tx = 0;
             
-            var maxY = 0;
             if (scaledH > ch) {
                 // 图片高度大于容器高度，允许上下拖动
-                maxY = scaledH - ch;
-                // ty范围从 -maxY 到 0（顶部对齐时ty=0，底部对齐时ty=-maxY）
+                // 但图片边缘必须始终对齐屏幕边缘，不能拖出空白
+                var maxY = scaledH - ch;
+                // ty范围：顶部对齐时ty=0，底部对齐时ty=-maxY
+                // 不允许ty>0（顶部不能低于屏幕顶部）
+                // 不允许ty<-maxY（底部不能高于屏幕底部）
                 ty = Math.max(-maxY, Math.min(0, ty));
             } else {
                 // 图片高度小于容器高度，上下居中，不允许拖动
