@@ -1721,7 +1721,7 @@
         // ===== 存储Object URL引用，防止GC =====
         if (!window._videoBlobUrls) window._videoBlobUrls = {};
         
-        // ===== 全屏图片缩放控制 - 只允许上下拖动 =====
+        // ===== 全屏图片缩放控制 - 修复版 =====
         var imageScale = 1;
         var imageTranslateX = 0;
         var imageTranslateY = 0;
@@ -1842,29 +1842,33 @@
             }
         }
         
+        // ✅ 修复：移除 isImageZoomed 检查，允许任何时候双指缩放
         function onImageTouchStart(e) {
-            if (!isImageZoomed) return;
             if (e.touches.length === 2) {
                 var touch1 = e.touches[0];
                 var touch2 = e.touches[1];
                 lastTouchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
                 isDragging = false;
             } else if (e.touches.length === 1) {
-                isDragging = true;
-                dragStartX = e.touches[0].clientX;
-                dragStartY = e.touches[0].clientY;
-                dragStartTranslateX = imageTranslateX;
-                dragStartTranslateY = imageTranslateY;
+                // 只有放大后才允许单指拖动
+                if (isImageZoomed) {
+                    isDragging = true;
+                    dragStartX = e.touches[0].clientX;
+                    dragStartY = e.touches[0].clientY;
+                    dragStartTranslateX = imageTranslateX;
+                    dragStartTranslateY = imageTranslateY;
+                }
             }
         }
         
+        // ✅ 修复：移除 isImageZoomed 检查，双指缩放任何时候都有效
         function onImageTouchMove(e) {
-            if (!isImageZoomed) return;
             e.preventDefault();
             var img = currentImage;
             if (!img) return;
             
             if (e.touches.length === 2) {
+                // 双指缩放 - 任何时候都有效
                 var touch1 = e.touches[0];
                 var touch2 = e.touches[1];
                 var currentDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
@@ -1872,21 +1876,20 @@
                     var scaleDelta = currentDistance / lastTouchDistance;
                     var newScale = imageScale * scaleDelta;
                     newScale = Math.max(1, Math.min(newScale, 8));
-                    imageScale = newScale;
-                    // 应用边界约束 - X始终为0，只限制Y
-                    var constrained = constrainTransform(img, imageScale, 0, imageTranslateY);
+                    
+                    // 应用边界约束
+                    var constrained = constrainTransform(img, newScale, 0, imageTranslateY);
                     imageTranslateX = constrained.tx;
                     imageTranslateY = constrained.ty;
+                    imageScale = newScale;
                     img.style.transform = 'translate(' + imageTranslateX + 'px, ' + imageTranslateY + 'px) scale(' + imageScale + ')';
                 }
                 lastTouchDistance = currentDistance;
                 isDragging = false;
-            } else if (e.touches.length === 1 && isDragging) {
-                var dx = e.touches[0].clientX - dragStartX;
+            } else if (e.touches.length === 1 && isDragging && isImageZoomed) {
+                // 单指拖动 - 只允许上下（仅放大后）
                 var dy = e.touches[0].clientY - dragStartY;
-                // 只允许上下拖动，X方向固定为0
                 var newTy = dragStartTranslateY + dy;
-                // 应用边界约束 - X始终为0
                 var constrained = constrainTransform(img, imageScale, 0, newTy);
                 imageTranslateX = constrained.tx;
                 imageTranslateY = constrained.ty;
@@ -1894,9 +1897,14 @@
             }
         }
         
+        // ✅ 修复：添加触摸结束处理
         function onImageTouchEnd(e) {
-            isDragging = false;
-            lastTouchDistance = 0;
+            if (e.touches.length === 0) {
+                isDragging = false;
+                lastTouchDistance = 0;
+                // 更新缩放状态
+                isImageZoomed = imageScale > 1;
+            }
         }
         
         function onImageMouseDown(e) {
