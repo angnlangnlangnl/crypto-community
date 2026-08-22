@@ -1035,14 +1035,268 @@
             background: #d5d5d5;
         }
         
+        /* ========== 表情包弹窗 - 修复错乱 ========== */
+        .emoji-overlay {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 999;
+            animation: fadeIn 0.2s ease;
+        }
+        .emoji-overlay.active {
+            display: flex;
+        }
+        .emoji-panel {
+            background: #f7f7f7;
+            width: 100%;
+            max-width: 800px;
+            border-radius: 16px 16px 0 0;
+            padding: 20px 15px 30px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            max-height: 55vh;
+            overflow-y: auto;
+        }
+        .emoji-overlay.active .emoji-panel {
+            transform: translateY(0);
+        }
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px 4px;
+            margin-bottom: 16px;
+            justify-items: center;
+            align-items: center;
+        }
+        .emoji-item {
+            font-size: 30px;
+            text-align: center;
+            cursor: pointer;
+            padding: 4px 2px;
+            border-radius: 10px;
+            transition: background 0.15s;
+            width: 100%;
+            line-height: 1.3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+        }
+        .emoji-item:active {
+            background: rgba(0,0,0,0.08);
+            transform: scale(0.92);
+        }
+        .emoji-close-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #e8e8e8;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+        }
+        .emoji-close-btn:active {
+            background: #d0d0d0;
+        }
+        .emoji-panel .panel-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
+        /* ========== 加号弹窗 (More Panel) - 修复错乱 ========== */
+        .more-overlay {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease;
+        }
+        .more-overlay.active {
+            display: flex;
+        }
+        .more-panel {
+            background: #f7f7f7;
+            width: 100%;
+            max-width: 800px;
+            border-radius: 16px 16px 0 0;
+            padding: 20px 15px 30px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .more-overlay.active .more-panel {
+            transform: translateY(0);
+        }
+        .more-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px 6px;
+            margin-bottom: 20px;
+            justify-items: center;
+            align-items: center;
+        }
+        .more-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 6px 0;
+            border-radius: 12px;
+            transition: background 0.15s;
+            width: 100%;
+        }
+        .more-item:active {
+            background: rgba(0,0,0,0.05);
+        }
+        .more-item .icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            flex-shrink: 0;
+        }
+        .more-item .icon svg {
+            width: 28px;
+            height: 28px;
+            stroke: #333;
+            display: block;
+        }
+        .more-item .icon .emoji-icon {
+            font-size: 26px;
+            line-height: 1;
+        }
+        .more-item .label {
+            font-size: 11px;
+            color: #555;
+            text-align: center;
+        }
+        .more-close-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #e8e8e8;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+        .more-close-btn:active {
+            background: #d0d0d0;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* ===== 语音消息气泡 - 喇叭样式 ===== */
+        .voice-msg-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px 6px 10px;
+            border-radius: 8px;
+            background: #f0f0f0;
+            min-width: 70px;
+            max-width: 200px;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        .msg-wrapper.own .voice-msg-wrapper {
+            background: #95ec69;
+        }
+        .voice-msg-wrapper .voice-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+        }
+        .voice-msg-wrapper .voice-icon svg {
+            width: 20px;
+            height: 20px;
+            display: block;
+        }
+        .voice-msg-wrapper .voice-icon .wave1 {
+            animation: wave 1s ease-in-out infinite;
+        }
+        .voice-msg-wrapper .voice-icon .wave2 {
+            animation: wave 1.5s ease-in-out infinite;
+        }
+        @keyframes wave {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+        .voice-msg-wrapper .duration {
+            font-size: 11px;
+            color: #888;
+            flex-shrink: 0;
+            font-variant-numeric: tabular-nums;
+            min-width: 28px;
+            text-align: left;
+        }
+        .msg-wrapper.own .voice-msg-wrapper .duration {
+            color: #444;
+        }
+        
+        /* ===== 取消提示浮窗 ===== */
+        .cancel-tip {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 0, 0, 0.85);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            z-index: 500;
+            display: none;
+            animation: fadeIn 0.2s ease;
+            box-shadow: 0 4px 20px rgba(255,0,0,0.3);
+            white-space: nowrap;
+        }
+        .cancel-tip.show {
+            display: block;
+        }
+        
         /* 适配小屏 */
         @media (max-width: 420px) {
-            .more-grid { gap: 12px 4px; }
-            .more-item .icon { width: 46px; height: 46px; }
-            .more-item .icon svg { width: 26px; height: 26px; }
-            .more-item .icon .emoji-icon { font-size: 24px; }
-            .emoji-grid { gap: 4px 3px; }
-            .emoji-item { font-size: 24px; padding: 4px 1px; }
+            .more-grid { gap: 8px 4px; }
+            .more-item .icon { width: 44px; height: 44px; }
+            .more-item .icon svg { width: 24px; height: 24px; }
+            .more-item .icon .emoji-icon { font-size: 22px; }
+            .emoji-grid { gap: 4px 2px; }
+            .emoji-item { font-size: 24px; padding: 3px 1px; min-height: 34px; }
             .header-address { font-size: 11px; padding: 2px 8px; }
             .header-right { gap: 10px; }
             .chat-title { font-size: 14px; }
@@ -1355,7 +1609,7 @@
         </div>
     </div>
 
-    <!-- 表情包弹窗 -->
+    <!-- ===== 表情包弹窗 - 修复错乱 ===== -->
     <div class="emoji-overlay" id="emojiOverlay" onclick="if(event.target===this) toggleEmojiPanel()">
         <div class="emoji-panel">
             <div class="panel-title">😊 表情包</div>
@@ -1364,28 +1618,56 @@
         </div>
     </div>
 
-    <!-- 加号弹窗 -->
+    <!-- ===== 加号弹窗 - 修复错乱 ===== -->
     <div class="more-overlay" id="moreOverlay" onclick="if(event.target===this) toggleMorePanel()">
         <div class="more-panel">
             <div class="more-grid">
                 <div class="more-item" onclick="handleMoreAction('图片')">
-                    <div class="icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="M22 15l-5-5-6 6"/></svg></div>
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="20" height="20" rx="2" ry="2"/>
+                            <circle cx="9" cy="9" r="2"/>
+                            <path d="M22 15l-5-5-6 6"/>
+                        </svg>
+                    </div>
                     <span class="label">图片</span>
                 </div>
                 <div class="more-item" onclick="handleMoreAction('视频')">
-                    <div class="icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="3" ry="3"/><polygon points="9 7 17 12 9 17 9 7"/></svg></div>
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="4" width="20" height="16" rx="3" ry="3"/>
+                            <polygon points="9 7 17 12 9 17 9 7"/>
+                        </svg>
+                    </div>
                     <span class="label">视频</span>
                 </div>
                 <div class="more-item" onclick="handleMoreAction('转账')">
-                    <div class="icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="18" cy="14" r="1.5" fill="currentColor"/><polyline points="14 3 12 6 10 3"/></svg></div>
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="5" width="20" height="14" rx="2"/>
+                            <line x1="2" y1="10" x2="22" y2="10"/>
+                            <circle cx="18" cy="14" r="1.5" fill="currentColor"/>
+                            <polyline points="14 3 12 6 10 3"/>
+                        </svg>
+                    </div>
                     <span class="label">转账</span>
                 </div>
                 <div class="more-item" onclick="handleMoreAction('代币红包')">
-                    <div class="icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="3" ry="3" fill="#e74c3c" stroke="#c0392b" stroke-width="1.5"/><circle cx="12" cy="13" r="4" fill="#f1c40f" stroke="#f39c12" stroke-width="1.5"/><text x="12" y="15" text-anchor="middle" font-size="8" fill="#e74c3c" font-weight="bold" font-family="sans-serif">CC</text></svg></div>
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="6" width="18" height="14" rx="3" ry="3" fill="#e74c3c" stroke="#c0392b" stroke-width="1.5"/>
+                            <circle cx="12" cy="13" r="4" fill="#f1c40f" stroke="#f39c12" stroke-width="1.5"/>
+                            <text x="12" y="15" text-anchor="middle" font-size="8" fill="#e74c3c" font-weight="bold" font-family="sans-serif">CC</text>
+                        </svg>
+                    </div>
                     <span class="label">代币红包</span>
                 </div>
                 <div class="more-item" onclick="handleMoreAction('收藏')">
-                    <div class="icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                        </svg>
+                    </div>
                     <span class="label">收藏</span>
                 </div>
             </div>
@@ -1394,28 +1676,6 @@
     </div>
 
     <script>
-        // ===== 语音配置 =====
-        const VOICE_CONFIG = { minDuration: 1, maxDuration: 60 };
-        
-        let isConnected = false;
-        let userAddress = '';
-        let messageCount = 0;
-        let isVoiceMode = false;
-        let notifCount = 3;
-        let airdropClaimed = false;
-        let airdropSkipped = false;
-        let isRecording = false;
-        let mediaRecorder = null;
-        let audioChunks = [];
-        let recordingTimer = null;
-        let recordingDuration = 0;
-        let isCancelMode = false;
-        let pointerStartY = 0;
-        let currentAudio = null;
-        let currentPlayingId = null;
-        let fullscreenVideo = null;
-        let isVideoPaused = false;
-        
         // ===== 存储Object URL引用，防止GC =====
         if (!window._videoBlobUrls) window._videoBlobUrls = {};
         
@@ -1828,7 +2088,7 @@ https://meeting.tencent.com/dm/hIbayciQ5BHJ
             };
         }
         
-        // ===== 视频消息 - 使用Object URL修复变黑问题 =====
+        // ===== 视频消息 =====
         function addOwnVideoMessage(videoUrl, sender, file) {
             messageCount++;
             const messages = document.getElementById('messages');
@@ -1838,7 +2098,6 @@ https://meeting.tencent.com/dm/hIbayciQ5BHJ
             let displaySender = (sender && sender !== '我') ? sender.slice(0, 6) + '...' + sender.slice(-1) : '我';
             const vidId = 'vid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
             
-            // 存储Object URL引用，防止被GC回收
             if (videoUrl && videoUrl.startsWith('blob:')) {
                 window._videoBlobUrls[vidId] = { url: videoUrl, file: file };
             }
@@ -1905,12 +2164,9 @@ https://meeting.tencent.com/dm/hIbayciQ5BHJ
                 
                 setTimeout(updateUploadProgress, 500);
                 
-                // 当视频加载失败时，尝试重新加载
                 video.addEventListener('error', function(e) {
                     console.warn('视频加载错误，尝试重新加载:', e);
-                    // 尝试重新设置src
                     if (videoUrl && videoUrl.startsWith('blob:')) {
-                        // 检查Object URL是否仍然有效
                         try {
                             fetch(videoUrl).then(function(response) {
                                 if (response.ok) {
@@ -2175,7 +2431,7 @@ https://meeting.tencent.com/dm/hIbayciQ5BHJ
             toggleMorePanel();
         });
         
-        // ===== 视频上传 - 使用Object URL =====
+        // ===== 视频上传 =====
         function handleVideoUpload() {
             document.getElementById('videoInput').click();
         }
@@ -2185,8 +2441,6 @@ https://meeting.tencent.com/dm/hIbayciQ5BHJ
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 if (!file.type.startsWith('video/')) continue;
-                
-                // 使用Object URL替代Data URL，防止内存回收导致视频变黑
                 const videoUrl = URL.createObjectURL(file);
                 addOwnVideoMessage(videoUrl, userAddress || '我', file);
                 addSystemMessage('🎬 视频已发送');
@@ -2199,7 +2453,6 @@ https://meeting.tencent.com/dm/hIbayciQ5BHJ
             toggleMorePanel();
         });
         
-        // ===== 页面卸载时清理Object URL =====
         window.addEventListener('beforeunload', function() {
             if (window._videoBlobUrls) {
                 Object.values(window._videoBlobUrls).forEach(function(item) {
@@ -2359,7 +2612,9 @@ https://meeting.tencent.com/dm/hIbayciQ5BHJ
         function toggleEmojiPanel() {
             const overlay = document.getElementById('emojiOverlay');
             overlay.classList.toggle('active');
-            if (overlay.classList.contains('active')) renderEmojis();
+            if (overlay.classList.contains('active')) {
+                renderEmojis();
+            }
         }
         
         function renderEmojis() {
@@ -2369,7 +2624,10 @@ https://meeting.tencent.com/dm/hIbayciQ5BHJ
                 const item = document.createElement('div');
                 item.className = 'emoji-item';
                 item.textContent = emoji;
-                item.onclick = function(e) { e.stopPropagation(); selectEmoji(emoji); };
+                item.onclick = function(e) {
+                    e.stopPropagation();
+                    selectEmoji(emoji);
+                };
                 grid.appendChild(item);
             });
         }
