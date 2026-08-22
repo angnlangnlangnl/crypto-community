@@ -538,7 +538,7 @@
             transition: none;
             touch-action: none;
             will-change: transform;
-            width: 100%;
+            width: auto;
             height: auto;
             max-width: 100%;
             max-height: none;
@@ -1465,7 +1465,7 @@
     <!-- 底部输入栏 -->
     <div class="input-area">
         <button class="icon-btn" onclick="toggleVoiceMode()" id="voiceBtn">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#07c160" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="9" y="2" width="6" height="12" rx="3"/>
                 <path d="M5 10V12C5 15.866 8.134 19 12 19C15.866 19 19 15.866 19 12V10"/>
                 <line x1="12" y1="19" x2="12" y2="22"/>
@@ -1622,7 +1622,7 @@
         var zoomHintTimeout = null;
         var isFullscreenImage = false;
         
-        // ✅ 修复：边界约束函数 - 使用负的translateY让图片顶部对齐
+        // ✅ 修复：边界约束函数 - 确保图片边缘始终对齐屏幕边缘，不留空白
         function constrainTransform(img, scale, tx, ty) {
             if (!img) return { tx: 0, ty: 0 };
             
@@ -1639,20 +1639,22 @@
             tx = 0;
             
             if (scaledH > ch) {
-                // 图片高度大于容器高度
-                // 使用center center作为transformOrigin时
-                // translateY范围：-(scaledH-ch)/2 到 (scaledH-ch)/2
-                var maxY = (scaledH - ch) / 2;
-                ty = Math.max(-maxY, Math.min(maxY, ty));
+                // 图片高度大于容器高度，允许上下拖动
+                // 但图片边缘必须始终对齐屏幕边缘，不能拖出空白
+                var maxY = scaledH - ch;
+                // ty范围：顶部对齐时ty=0，底部对齐时ty=-maxY
+                // 不允许ty>0（顶部不能低于屏幕顶部）
+                // 不允许ty<-maxY（底部不能高于屏幕底部）
+                ty = Math.max(-maxY, Math.min(0, ty));
             } else {
-                // 图片高度小于容器高度，上下居中
+                // 图片高度小于容器高度，上下居中，不允许拖动
                 ty = (ch - scaledH) / 2;
             }
             
             return { tx: tx, ty: ty };
         }
         
-        // ✅ 修复：初始化图片，确保图片可见
+        // ✅ 初始化时始终横向铺满屏幕
         function initImageZoom(imageWrap, img) {
             currentImageWrap = imageWrap;
             currentImage = img;
@@ -1662,12 +1664,6 @@
             isImageZoomed = false;
             isFullscreenImage = true;
             img.className = '';
-            img.style.transformOrigin = 'center center';
-            img.style.display = 'block';
-            img.style.visibility = 'visible';
-            img.style.opacity = '1';
-            img.style.width = '100%';
-            img.style.height = 'auto';
             
             showZoomHint();
             
@@ -1685,7 +1681,7 @@
             img.addEventListener('touchend', onImageTouchEnd, { passive: false });
             img.addEventListener('mousedown', onImageMouseDown);
             
-            // ✅ 修复：应用智能缩放，确保图片可见
+            // ✅ 始终横向铺满屏幕
             function applySmartZoom() {
                 var container = imageWrap;
                 var containerWidth = container.clientWidth;
@@ -1693,34 +1689,33 @@
                 var imgWidth = img.naturalWidth || img.width;
                 var imgHeight = img.naturalHeight || img.height;
                 
-                if (containerWidth === 0 || containerHeight === 0) {
+                if (containerWidth === 0 || imgWidth === 0 || imgHeight === 0) {
                     requestAnimationFrame(applySmartZoom);
                     return;
                 }
                 
-                if (imgWidth === 0 || imgHeight === 0) {
-                    requestAnimationFrame(applySmartZoom);
-                    return;
-                }
-                
-                // 计算横向铺满的缩放比例
+                // 始终计算左右铺满的缩放比例
                 var scaleToFitWidth = containerWidth / imgWidth;
+                
+                // 限制最大缩放倍数
                 scaleToFitWidth = Math.min(scaleToFitWidth, 8);
+                // 最小缩放倍数为1
                 scaleToFitWidth = Math.max(scaleToFitWidth, 1);
                 
                 imageScale = scaleToFitWidth;
                 imageTranslateX = 0;
                 
+                // 计算缩放后图片高度
                 var scaledHeight = imgHeight * imageScale;
                 
-                // ✅ 使用负的translateY让图片顶部对齐
                 if (scaledHeight > containerHeight) {
                     // 图片高度超出屏幕，顶部对齐
-                    // 使用center center时，需要向上移动(scaledHeight - containerHeight) / 2
-                    imageTranslateY = -(scaledHeight - containerHeight) / 2;
+                    imageTranslateY = 0;
+                    img.style.transformOrigin = 'top center';
                 } else {
                     // 图片高度小于屏幕，上下居中
                     imageTranslateY = (containerHeight - scaledHeight) / 2;
+                    img.style.transformOrigin = 'center center';
                 }
                 
                 isImageZoomed = true;
@@ -1754,6 +1749,7 @@
             }, 3000);
         }
         
+        // ✅ 双击切换：原始大小 ↔ 铺满屏幕
         function onImageDblClick(e) {
             e.stopPropagation();
             var img = currentImage;
@@ -1778,14 +1774,15 @@
                 var scaledHeight = imgHeight * imageScale;
                 
                 if (scaledHeight > containerHeight) {
-                    imageTranslateY = -(scaledHeight - containerHeight) / 2;
+                    imageTranslateY = 0;
+                    img.style.transformOrigin = 'top center';
                 } else {
                     imageTranslateY = (containerHeight - scaledHeight) / 2;
+                    img.style.transformOrigin = 'center center';
                 }
                 
                 isImageZoomed = true;
                 img.className = 'zoomed';
-                img.style.transformOrigin = 'center center';
                 img.style.transform = 'translate(0px, ' + imageTranslateY + 'px) scale(' + imageScale + ')';
             } else {
                 imageScale = 1;
@@ -1793,11 +1790,12 @@
                 imageTranslateY = 0;
                 isImageZoomed = false;
                 img.className = '';
-                img.style.transformOrigin = 'center center';
                 img.style.transform = 'translate(0px, 0px) scale(1)';
+                img.style.transformOrigin = 'center center';
             }
         }
         
+        // ✅ 任何时候都允许拖动
         function onImageTouchStart(e) {
             if (e.touches.length === 2) {
                 var touch1 = e.touches[0];
@@ -1813,6 +1811,7 @@
             }
         }
         
+        // ✅ 双指缩放任何时候都有效
         function onImageTouchMove(e) {
             e.preventDefault();
             var img = currentImage;
@@ -1846,6 +1845,7 @@
             }
         }
         
+        // ✅ 触摸结束处理
         function onImageTouchEnd(e) {
             if (e.touches.length === 0) {
                 isDragging = false;
@@ -1893,8 +1893,8 @@
                 imageTranslateY = 0;
                 isImageZoomed = false;
                 currentImage.className = '';
-                currentImage.style.transformOrigin = 'center center';
                 currentImage.style.transform = 'translate(0px, 0px) scale(1)';
+                currentImage.style.transformOrigin = 'center center';
             }
             isDragging = false;
             lastTouchDistance = 0;
@@ -1989,7 +1989,7 @@
                 wrap.className = 'image-wrap';
                 var img = document.createElement('img');
                 img.src = mediaUrl;
-                img.style.cssText = 'display:block;border:none;outline:none;image-orientation:from-image;width:100%;height:auto;max-width:100%;max-height:none;';
+                img.style.cssText = 'display:block;border:none;outline:none;image-orientation:from-image;max-width:100%;max-height:none;width:auto;height:auto;';
                 wrap.appendChild(img);
                 content.appendChild(wrap);
                 player.classList.add('active');
@@ -2454,7 +2454,7 @@
             wrapper.className = 'msg-wrapper own';
             var displaySender = (sender && sender !== '我') ? sender.slice(0, 6) + '...' + sender.slice(-1) : '我';
             var durationStr = formatDuration(duration);
-            wrapper.innerHTML = '\n                <div class="msg-avatar">我</div>\n                <div class="msg-body">\n                    <span class="msg-sender">' + displaySender + '</span>\n                    <div class="msg-bubble" style="padding: 4px 0;">\n                        <div class="voice-msg-wrapper" data-msgid="' + msgId + '" onclick="playVoiceMessage(\'' + msgId + '\')">\n                            <span class="voice-icon" id="voiceIcon_' + msgId + '">\n                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#07c160" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">\n                                    <path d="M11 5L6 9H2v6h4l5 4V5z"/>\n                                </svg>\n                            </span>\n                            <span class="duration">' + durationStr + '</span>\n                        </div>\n                    </div>\n                    <span class="msg-time">' + getTime() + '</span>\n                </div>\n            ';
+            wrapper.innerHTML = '\n                <div class="msg-avatar">我</div>\n                <div class="msg-body">\n                    <span class="msg-sender">' + displaySender + '</span>\n                    <div class="msg-bubble" style="padding: 4px 0;">\n                        <div class="voice-msg-wrapper" data-msgid="' + msgId + '" onclick="playVoiceMessage(\'' + msgId + '\')">\n                            <span class="voice-icon" id="voiceIcon_' + msgId + '">\n                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">\n                                    <path d="M11 5L6 9H2v6h4l5 4V5z"/>\n                                </svg>\n                            </span>\n                            <span class="duration">' + durationStr + '</span>\n                        </div>\n                    </div>\n                    <span class="msg-time">' + getTime() + '</span>\n                </div>\n            ';
             messages.appendChild(wrapper);
             scrollToBottom();
             setTimeout(function() {
@@ -2464,7 +2464,7 @@
         }
         
         function getSpeakerSVG(state, color) {
-            var strokeColor = color || '#07c160';
+            var strokeColor = color || (state === 'playing' ? '#07c160' : '#333');
             if (state === 'playing') {
                 return '\n                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="' + strokeColor + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">\n                        <path d="M11 5L6 9H2v6h4l5 4V5z"/>\n                        <path d="M15.54 8.46a5 5 0 010 7.07" class="wave1"/>\n                        <path d="M19.07 4.93a10 10 0 010 14.14" class="wave2"/>\n                    </svg>\n                ';
             } else {
@@ -2475,7 +2475,7 @@
         function updateSpeakerIcon(msgId, state) {
             var iconContainer = document.getElementById('voiceIcon_' + msgId);
             if (!iconContainer) return;
-            var color = '#07c160';
+            var color = state === 'playing' ? '#07c160' : '#333';
             iconContainer.innerHTML = getSpeakerSVG(state, color);
             if (state === 'playing') {
                 iconContainer.querySelectorAll('.wave1, .wave2').forEach(function(el) {
@@ -2586,6 +2586,7 @@
                 var reader = new FileReader();
                 reader.onload = function(ev) {
                     addOwnImageMessage(ev.target.result, userAddress || '我');
+                    addSystemMessage('📷 图片已发送');
                     setTimeout(function() {
                         var replies = ['好图！👍', '不错', '收到', '支持！', '666'];
                         addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
@@ -2609,6 +2610,7 @@
                 if (!file.type.startsWith('video/')) continue;
                 var videoUrl = URL.createObjectURL(file);
                 addOwnVideoMessage(videoUrl, userAddress || '我', file);
+                addSystemMessage('🎬 视频已发送');
                 setTimeout(function() {
                     var replies = ['好视频！🎥', '精彩', '收到', '支持！', '厉害了'];
                     addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
@@ -2641,8 +2643,9 @@
                 input.style.textAlign = 'center';
                 input.style.color = '#333';
                 input.style.userSelect = 'none';
-                voiceBtn.innerHTML = '\n                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#07c160" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n                        <rect x="9" y="2" width="6" height="12" rx="3"/>\n                        <path d="M5 10V12C5 15.866 8.134 19 12 19C15.866 19 19 15.866 19 12V10"/>\n                        <line x1="12" y1="19" x2="12" y2="22"/>\n                        <circle cx="12" cy="12" r="2" fill="#07c160"/>\n                    </svg>\n                ';
-                voiceBtn.style.background = 'transparent';
+                voiceBtn.innerHTML = '\n                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n                        <rect x="9" y="2" width="6" height="12" rx="3"/>\n                        <path d="M5 10V12C5 15.866 8.134 19 12 19C15.866 19 19 15.866 19 12V10"/>\n                        <line x1="12" y1="19" x2="12" y2="22"/>\n                        <circle cx="12" cy="12" r="2" fill="#ff4444"/>\n                    </svg>\n                ';
+                voiceBtn.style.background = '#ffe0e0';
+                voiceBtn.style.borderRadius = '50%';
                 input.addEventListener('pointerdown', onPointerDown);
                 input.addEventListener('pointerup', onPointerUp);
                 input.addEventListener('pointerleave', onPointerUp);
@@ -2657,7 +2660,7 @@
                 input.style.textAlign = 'left';
                 input.style.color = '#333';
                 input.style.userSelect = 'auto';
-                voiceBtn.innerHTML = '\n                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#07c160" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">\n                        <rect x="9" y="2" width="6" height="12" rx="3"/>\n                        <path d="M5 10V12C5 15.866 8.134 19 12 19C15.866 19 19 15.866 19 12V10"/>\n                        <line x1="12" y1="19" x2="12" y2="22"/>\n                    </svg>\n                ';
+                voiceBtn.innerHTML = '\n                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">\n                        <rect x="9" y="2" width="6" height="12" rx="3"/>\n                        <path d="M5 10V12C5 15.866 8.134 19 12 19C15.866 19 19 15.866 19 12V10"/>\n                        <line x1="12" y1="19" x2="12" y2="22"/>\n                    </svg>\n                ';
                 voiceBtn.style.background = 'transparent';
                 input.removeEventListener('pointerdown', onPointerDown);
                 input.removeEventListener('pointerup', onPointerUp);
@@ -2754,6 +2757,7 @@
             if (audioChunks.length > 0) {
                 var audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                 addVoiceMessage(duration, audioBlob, userAddress || '我');
+                addSystemMessage('🎤 语音消息已发送 (时长 ' + formatDuration(duration) + ')');
             } else {
                 addSystemMessage('⚠️ 录音数据异常，请重试');
             }
