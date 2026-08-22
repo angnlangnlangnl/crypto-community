@@ -521,7 +521,7 @@
         }
         .fullscreen-player .media-content .image-wrap {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             width: 100%;
             height: 100%;
@@ -534,14 +534,14 @@
             border: none;
             outline: none;
             image-orientation: from-image;
-            transform-origin: center center;
+            transform-origin: top center;
             transition: none;
             touch-action: none;
             will-change: transform;
             width: auto;
             height: auto;
             max-width: 100%;
-            max-height: 100%;
+            max-height: none;
             object-fit: contain;
         }
         .fullscreen-player .media-content .image-wrap img.zoomed {
@@ -1508,7 +1508,7 @@
                 <div class="progress-dot"></div>
             </div>
         </div>
-        <div class="zoom-hint" id="zoomHint">双击缩放 · 双指缩放</div>
+        <div class="zoom-hint" id="zoomHint">拖动查看 · 双指缩放</div>
     </div>
 
     <!-- ===== 会议信息弹窗 ===== -->
@@ -1621,8 +1621,9 @@
         var currentImage = null;
         var zoomHintTimeout = null;
         var isFullscreenImage = false;
+        var isLongImage = false;
         
-        // ✅ 修复：边界约束函数 - 确保图片上下边缘始终对齐屏幕边缘
+        // ✅ 修复：边界约束函数 - 超长图顶部对齐，底部可拖动查看
         function constrainTransform(img, scale, tx, ty) {
             if (!img) return { tx: 0, ty: 0 };
             
@@ -1643,12 +1644,18 @@
                 maxY = (scaledH - ch) / 2;
             }
             
-            ty = Math.max(-maxY, Math.min(maxY, ty));
+            // ✅ 修复：超长图允许向上拖动更多，顶部对齐边框
+            if (isLongImage && scaledH > ch) {
+                // 超长图：顶部对齐时 ty = -maxY，底部对齐时 ty = maxY
+                ty = Math.max(-maxY, Math.min(maxY, ty));
+            } else {
+                ty = Math.max(-maxY, Math.min(maxY, ty));
+            }
             
             return { tx: tx, ty: ty };
         }
         
-        // ✅ 修复：初始化时自动铺满左右屏幕
+        // ✅ 修复：初始化时检测超长图，顶部对齐边框
         function initImageZoom(imageWrap, img) {
             currentImageWrap = imageWrap;
             currentImage = img;
@@ -1657,6 +1664,7 @@
             imageTranslateY = 0;
             isImageZoomed = false;
             isFullscreenImage = true;
+            isLongImage = false;
             img.className = '';
             
             showZoomHint();
@@ -1684,7 +1692,6 @@
                 var imgHeight = img.naturalHeight || img.height;
                 
                 if (containerWidth === 0 || imgWidth === 0 || imgHeight === 0) {
-                    // 容器或图片尺寸无效，延迟重试
                     requestAnimationFrame(applyFullWidthZoom);
                     return;
                 }
@@ -1694,29 +1701,37 @@
                 scale = Math.max(scale, 1);
                 
                 imageScale = scale;
+                
+                // ✅ 修复：检测超长图（高度远大于宽度）
+                var scaledH = imgHeight * scale;
+                if (scaledH > containerHeight * 1.5) {
+                    isLongImage = true;
+                    // 超长图：顶部对齐边框
+                    imageTranslateY = -(scaledH - containerHeight) / 2;
+                } else {
+                    isLongImage = false;
+                    imageTranslateY = 0;
+                }
+                
                 imageTranslateX = 0;
-                imageTranslateY = 0;
                 isImageZoomed = true;
                 img.className = 'zoomed';
                 
-                var constrained = constrainTransform(img, imageScale, 0, 0);
+                var constrained = constrainTransform(img, imageScale, 0, imageTranslateY);
                 imageTranslateX = constrained.tx;
                 imageTranslateY = constrained.ty;
                 
                 img.style.transform = 'translate(' + imageTranslateX + 'px, ' + imageTranslateY + 'px) scale(' + imageScale + ')';
-                img.style.transformOrigin = 'center center';
+                img.style.transformOrigin = 'top center';
             }
             
-            // ✅ 修复：使用 onload 和 requestAnimationFrame 双重保障
             img.onload = function() {
                 requestAnimationFrame(applyFullWidthZoom);
             };
             
-            // 如果图片已加载完成
             if (img.complete && img.naturalWidth > 0) {
                 requestAnimationFrame(applyFullWidthZoom);
             } else {
-                // 延迟重试
                 setTimeout(function() {
                     if (img.complete && img.naturalWidth > 0) {
                         requestAnimationFrame(applyFullWidthZoom);
@@ -1744,6 +1759,7 @@
             if (!isImageZoomed) {
                 var container = img.parentElement;
                 var containerWidth = container.clientWidth;
+                var containerHeight = container.clientHeight;
                 var imgWidth = img.naturalWidth || img.width;
                 var imgHeight = img.naturalHeight || img.height;
                 
@@ -1754,22 +1770,33 @@
                 scale = Math.max(scale, 1);
                 
                 imageScale = scale;
+                
+                // ✅ 修复：检测超长图
+                var scaledH = imgHeight * scale;
+                if (scaledH > containerHeight * 1.5) {
+                    isLongImage = true;
+                    imageTranslateY = -(scaledH - containerHeight) / 2;
+                } else {
+                    isLongImage = false;
+                    imageTranslateY = 0;
+                }
+                
                 imageTranslateX = 0;
-                imageTranslateY = 0;
                 isImageZoomed = true;
                 img.className = 'zoomed';
                 
-                var constrained = constrainTransform(img, imageScale, 0, 0);
+                var constrained = constrainTransform(img, imageScale, 0, imageTranslateY);
                 imageTranslateX = constrained.tx;
                 imageTranslateY = constrained.ty;
                 
                 img.style.transform = 'translate(' + imageTranslateX + 'px, ' + imageTranslateY + 'px) scale(' + imageScale + ')';
-                img.style.transformOrigin = 'center center';
+                img.style.transformOrigin = 'top center';
             } else {
                 imageScale = 1;
                 imageTranslateX = 0;
                 imageTranslateY = 0;
                 isImageZoomed = false;
+                isLongImage = false;
                 img.className = '';
                 img.style.transform = 'translate(0px, 0px) scale(1)';
             }
@@ -1875,6 +1902,7 @@
                 imageTranslateX = 0;
                 imageTranslateY = 0;
                 isImageZoomed = false;
+                isLongImage = false;
                 currentImage.className = '';
                 currentImage.style.transform = 'translate(0px, 0px) scale(1)';
             }
@@ -1971,13 +1999,12 @@
                 wrap.className = 'image-wrap';
                 var img = document.createElement('img');
                 img.src = mediaUrl;
-                img.style.cssText = 'display:block;border:none;outline:none;image-orientation:from-image;max-width:100%;max-height:100%;width:auto;height:auto;';
+                img.style.cssText = 'display:block;border:none;outline:none;image-orientation:from-image;max-width:100%;max-height:none;width:auto;height:auto;';
                 wrap.appendChild(img);
                 content.appendChild(wrap);
                 player.classList.add('active');
                 document.body.style.overflow = 'hidden';
                 
-                // ✅ 修复：直接调用 initImageZoom，不设置 onload
                 initImageZoom(wrap, img);
                 return;
             }
