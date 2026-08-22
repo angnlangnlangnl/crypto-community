@@ -521,7 +521,7 @@
         }
         .fullscreen-player .media-content .image-wrap {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             width: 100%;
             height: 100%;
@@ -534,14 +534,14 @@
             border: none;
             outline: none;
             image-orientation: from-image;
-            transform-origin: center center;
+            transform-origin: top center;
             transition: none;
             touch-action: none;
             will-change: transform;
             width: auto;
             height: auto;
             max-width: 100%;
-            max-height: 100%;
+            max-height: none;
             object-fit: contain;
         }
         .fullscreen-player .media-content .image-wrap img.zoomed {
@@ -1622,7 +1622,7 @@
         var zoomHintTimeout = null;
         var isFullscreenImage = false;
         
-        // ✅ 修复：边界约束函数 - 顶部对齐，左右铺满，底部可拖动
+        // ✅ 边界约束函数 - 顶部对齐，左右铺满，底部可拖动
         function constrainTransform(img, scale, tx, ty) {
             if (!img) return { tx: 0, ty: 0 };
             
@@ -1643,13 +1643,13 @@
                 maxY = scaledH - ch;
             }
             
-            // ✅ 修复：ty范围从 -maxY 到 0（顶部对齐时ty=0，底部对齐时ty=-maxY）
+            // ty范围从 -maxY 到 0（顶部对齐时ty=0，底部对齐时ty=-maxY）
             ty = Math.max(-maxY, Math.min(0, ty));
             
             return { tx: tx, ty: ty };
         }
         
-        // ✅ 修复：初始化时检测图片是否超出屏幕，优先顶部和左右铺满
+        // ✅ 初始化时始终横向铺满屏幕
         function initImageZoom(imageWrap, img) {
             currentImageWrap = imageWrap;
             currentImage = img;
@@ -1676,7 +1676,7 @@
             img.addEventListener('touchend', onImageTouchEnd, { passive: false });
             img.addEventListener('mousedown', onImageMouseDown);
             
-            // ✅ 修复：检测图片是否超出屏幕，优先顶部和左右铺满
+            // ✅ 始终横向铺满屏幕
             function applySmartZoom() {
                 var container = imageWrap;
                 var containerWidth = container.clientWidth;
@@ -1689,31 +1689,23 @@
                     return;
                 }
                 
-                // 计算左右铺满的缩放比例
+                // ✅ 始终计算左右铺满的缩放比例
                 var scaleToFitWidth = containerWidth / imgWidth;
                 
-                // 计算缩放后图片高度
-                var scaledHeight = imgHeight * scaleToFitWidth;
+                // 限制最大缩放倍数
+                scaleToFitWidth = Math.min(scaleToFitWidth, 8);
+                // 最小缩放倍数为1
+                scaleToFitWidth = Math.max(scaleToFitWidth, 1);
                 
-                // ✅ 修复：如果缩放后高度超出屏幕，使用左右铺满，顶部对齐
-                if (scaledHeight > containerHeight) {
-                    imageScale = scaleToFitWidth;
-                    imageTranslateX = 0;
-                    imageTranslateY = 0; // 顶部对齐
-                    isImageZoomed = true;
-                    img.className = 'zoomed';
-                    
-                    img.style.transform = 'translate(0px, 0px) scale(' + imageScale + ')';
-                    img.style.transformOrigin = 'top center';
-                } else {
-                    // 图片不超出屏幕，保持原始大小居中
-                    imageScale = 1;
-                    imageTranslateX = 0;
-                    imageTranslateY = 0;
-                    isImageZoomed = false;
-                    img.className = '';
-                    img.style.transform = 'translate(0px, 0px) scale(1)';
-                }
+                // ✅ 始终使用左右铺满，顶部对齐
+                imageScale = scaleToFitWidth;
+                imageTranslateX = 0;
+                imageTranslateY = 0;
+                isImageZoomed = true;
+                img.className = 'zoomed';
+                
+                img.style.transform = 'translate(0px, 0px) scale(' + imageScale + ')';
+                img.style.transformOrigin = 'top center';
             }
             
             img.onload = function() {
@@ -1741,7 +1733,7 @@
             }, 3000);
         }
         
-        // ✅ 双击切换：铺满屏幕 ↔ 原始大小
+        // ✅ 双击切换：原始大小 ↔ 铺满屏幕
         function onImageDblClick(e) {
             e.stopPropagation();
             var img = currentImage;
@@ -1750,7 +1742,6 @@
             if (!isImageZoomed) {
                 var container = img.parentElement;
                 var containerWidth = container.clientWidth;
-                var containerHeight = container.clientHeight;
                 var imgWidth = img.naturalWidth || img.width;
                 var imgHeight = img.naturalHeight || img.height;
                 
@@ -1973,7 +1964,7 @@
                 wrap.className = 'image-wrap';
                 var img = document.createElement('img');
                 img.src = mediaUrl;
-                img.style.cssText = 'display:block;border:none;outline:none;image-orientation:from-image;max-width:100%;max-height:100%;width:auto;height:auto;';
+                img.style.cssText = 'display:block;border:none;outline:none;image-orientation:from-image;max-width:100%;max-height:none;width:auto;height:auto;';
                 wrap.appendChild(img);
                 content.appendChild(wrap);
                 player.classList.add('active');
