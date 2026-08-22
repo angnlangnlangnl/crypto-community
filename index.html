@@ -429,7 +429,7 @@
             pointer-events: none;
         }
         
-        /* ===== 全屏播放器 - 图片铺满宽度，视频铺满高度 ===== */
+        /* ===== 全屏播放器 ===== */
         .fullscreen-player {
             position: fixed;
             top: 0;
@@ -474,7 +474,7 @@
             padding: 0;
             position: relative;
         }
-        /* 图片 - 宽度铺满，高度自适应 */
+        /* 图片 - 保持原始比例，左右铺满 */
         .fullscreen-player .media-content img {
             width: 100%;
             height: auto;
@@ -485,7 +485,7 @@
             display: block;
             image-orientation: from-image;
         }
-        /* 视频 - 高度铺满，宽度自适应 */
+        /* 视频 - 高度铺满 */
         .fullscreen-player .media-content video {
             height: 100vh;
             width: auto;
@@ -495,46 +495,42 @@
             outline: none;
             display: block;
             background: #000;
+            cursor: pointer;
         }
+        /* 全屏播放控制 - 进度条拉长到两端，时间居中 */
         .fullscreen-player .media-controls {
             position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
+            bottom: 50px;
+            left: 0;
+            right: 0;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 20px;
-            background: rgba(0,0,0,0.55);
-            padding: 10px 24px;
-            border-radius: 30px;
+            gap: 10px;
+            background: rgba(0,0,0,0.4);
+            padding: 12px 20px 16px;
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             z-index: 5;
         }
-        .fullscreen-player .media-controls button {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 28px;
-            cursor: pointer;
-            padding: 0;
-            line-height: 1;
-            transition: transform 0.2s;
-        }
-        .fullscreen-player .media-controls button:active {
-            transform: scale(0.85);
+        .fullscreen-player .media-controls .top-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            position: relative;
         }
         .fullscreen-player .media-controls .time-display {
-            color: rgba(255,255,255,0.8);
-            font-size: 14px;
+            color: rgba(255,255,255,0.85);
+            font-size: 13px;
             font-family: monospace;
-            min-width: 80px;
             text-align: center;
+            letter-spacing: 1px;
         }
         .fullscreen-player .media-controls .progress-bar {
-            width: 200px;
+            width: 100%;
             height: 4px;
-            background: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.25);
             border-radius: 2px;
             cursor: pointer;
             position: relative;
@@ -544,7 +540,24 @@
             background: #07c160;
             border-radius: 2px;
             width: 0%;
-            transition: width 0.1s;
+            transition: width 0.1s ease;
+        }
+        /* 暂停状态 - 中间显示半透明白色暂停图标 */
+        .fullscreen-player .pause-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 72px;
+            color: rgba(255, 255, 255, 0.25);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            line-height: 1;
+            z-index: 2;
+        }
+        .fullscreen-player .pause-overlay.show {
+            opacity: 1;
         }
         
         .msg-time {
@@ -1322,11 +1335,10 @@
             .msg-bubble .video-wrapper { max-width: 160px; max-height: 160px; }
             .msg-bubble .video-wrapper video { max-height: 160px; }
             .msg-bubble .video-wrapper .play-overlay { font-size: 32px; }
-            .fullscreen-player .media-controls { padding: 6px 12px; gap: 10px; bottom: 20px; }
-            .fullscreen-player .media-controls button { font-size: 20px; }
-            .fullscreen-player .media-controls .progress-bar { width: 100px; }
-            .fullscreen-player .media-controls .time-display { font-size: 11px; min-width: 60px; }
+            .fullscreen-player .media-controls { padding: 8px 12px 12px; bottom: 30px; }
+            .fullscreen-player .media-controls .time-display { font-size: 11px; }
             .fullscreen-player .close-btn { font-size: 24px; top: 12px; right: 16px; }
+            .fullscreen-player .pause-overlay { font-size: 48px; }
             .fullscreen-player .media-content video { height: 100vh; width: auto; }
             .fullscreen-player .media-content img { width: 100%; height: auto; }
         }
@@ -1344,7 +1356,6 @@
             .msg-bubble .image-wrapper img { max-height: 280px; }
             .msg-bubble .video-wrapper { max-width: 280px; max-height: 280px; }
             .msg-bubble .video-wrapper video { max-height: 280px; }
-            .fullscreen-player .media-controls .progress-bar { width: 300px; }
             .fullscreen-player .media-content video { height: 100vh; width: auto; }
             .fullscreen-player .media-content img { width: 100%; height: auto; }
         }
@@ -1447,12 +1458,14 @@
     <input type="file" class="file-input-hidden" id="videoInput" accept="video/*">
 
     <!-- ===== 全屏播放器 ===== -->
-    <div class="fullscreen-player" id="fullscreenPlayer" onclick="closeFullscreen()">
+    <div class="fullscreen-player" id="fullscreenPlayer">
         <button class="close-btn" id="fullscreenClose" onclick="event.stopPropagation();closeFullscreen();">✕</button>
         <div class="media-content" id="fullscreenContent" onclick="event.stopPropagation();"></div>
-        <div class="media-controls" id="fullscreenControls" style="display:none;" onclick="event.stopPropagation();">
-            <button id="fullscreenPlayBtn">▶️</button>
-            <span class="time-display" id="fullscreenTime">00:00 / 00:00</span>
+        <div class="pause-overlay" id="pauseOverlay">⏸</div>
+        <div class="media-controls" id="fullscreenControls" style="display:none;">
+            <div class="top-row">
+                <span class="time-display" id="fullscreenTime">00:00 / 00:00</span>
+            </div>
             <div class="progress-bar" id="fullscreenProgress">
                 <div class="progress-fill" id="fullscreenProgressFill"></div>
             </div>
@@ -1468,38 +1481,14 @@
             <button class="modal-close-btn" onclick="closeModal('tokenModal')">✕</button>
             <div class="modal-title">🪙 代币发行信息</div>
             <div class="token-grid">
-                <div class="token-item">
-                    <span class="label">代币名称</span>
-                    <span class="value highlight">CryptoCommunity (CC)</span>
-                </div>
-                <div class="token-item">
-                    <span class="label">代币符号</span>
-                    <span class="value">$CC</span>
-                </div>
-                <div class="token-item">
-                    <span class="label">发行总量</span>
-                    <span class="value">1,000,000,000 CC</span>
-                </div>
-                <div class="token-item">
-                    <span class="label">初始流通</span>
-                    <span class="value">150,000,000 CC</span>
-                </div>
-                <div class="token-item">
-                    <span class="label">发行链</span>
-                    <span class="value">Ethereum (ERC-20)</span>
-                </div>
-                <div class="token-item">
-                    <span class="label">发行日期</span>
-                    <span class="value">2026-09-01</span>
-                </div>
-                <div class="token-item token-full">
-                    <span class="label">代币描述</span>
-                    <div class="token-desc">币圈社区治理代币，用于社区投票、生态激励、交易手续费折扣及DAO治理。总量恒定，永不增发。</div>
-                </div>
-                <div class="token-item token-full">
-                    <span class="label">合约地址</span>
-                    <div class="value" style="font-size:12px;font-family:monospace;word-break:break-all;color:#1a73e8;">0xCC1234567890abcdef1234567890abcdef12345678</div>
-                </div>
+                <div class="token-item"><span class="label">代币名称</span><span class="value highlight">CryptoCommunity (CC)</span></div>
+                <div class="token-item"><span class="label">代币符号</span><span class="value">$CC</span></div>
+                <div class="token-item"><span class="label">发行总量</span><span class="value">1,000,000,000 CC</span></div>
+                <div class="token-item"><span class="label">初始流通</span><span class="value">150,000,000 CC</span></div>
+                <div class="token-item"><span class="label">发行链</span><span class="value">Ethereum (ERC-20)</span></div>
+                <div class="token-item"><span class="label">发行日期</span><span class="value">2026-09-01</span></div>
+                <div class="token-item token-full"><span class="label">代币描述</span><div class="token-desc">币圈社区治理代币，用于社区投票、生态激励、交易手续费折扣及DAO治理。总量恒定，永不增发。</div></div>
+                <div class="token-item token-full"><span class="label">合约地址</span><div class="value" style="font-size:12px;font-family:monospace;word-break:break-all;color:#1a73e8;">0xCC1234567890abcdef1234567890abcdef12345678</div></div>
             </div>
             <div class="token-actions">
                 <button class="btn-primary" onclick="closeModal('tokenModal');addSystemMessage('✅ 已复制合约地址')">复制合约地址</button>
@@ -1514,20 +1503,10 @@
             <button class="modal-close-btn" onclick="closeModal('economyModal')">✕</button>
             <div class="article-content">
                 <div class="article-title">📈 经济模式：代币通缩与质押激励</div>
-                <div class="article-meta">
-                    <span>📅 2026-08-22</span>
-                    <span>🏷️ 经济模型</span>
-                    <span>⏱️ 5 min read</span>
-                </div>
+                <div class="article-meta"><span>📅 2026-08-22</span><span>🏷️ 经济模型</span><span>⏱️ 5 min read</span></div>
                 <div class="article-body">
                     <p><strong>币圈社区</strong> 采用双通缩经济模型，结合质押挖矿与交易燃烧机制，构建可持续的生态闭环。</p>
-                    <div class="highlight-box">
-                        <strong>核心数据</strong><br>
-                        • 每笔交易燃烧 2% 代币<br>
-                        • 质押年化收益 18%~35%<br>
-                        • 国库储备占比 10%<br>
-                        • 团队锁仓 36 个月
-                    </div>
+                    <div class="highlight-box"><strong>核心数据</strong><br>• 每笔交易燃烧 2% 代币<br>• 质押年化收益 18%~35%<br>• 国库储备占比 10%<br>• 团队锁仓 36 个月</div>
                     <p><strong>一、通缩机制</strong><br>每笔链上交易自动燃烧 2% 的 CC 代币，随生态繁荣不断减少流通量，形成天然通缩。预计上线首年燃烧 8000万 CC。</p>
                     <p><strong>二、质押激励</strong><br>用户质押 CC 代币可获取平台分红与治理权。质押池分为 30天/90天/180天 三档，年化收益分别对应 18%、25%、35%。</p>
                     <p><strong>三、国库治理</strong><br>10% 的交易手续费进入社区国库，由 DAO 投票决定资金用途，包括生态建设、市场推广、安全审计等。</p>
@@ -1543,27 +1522,12 @@
             <button class="modal-close-btn" onclick="closeModal('airdropModal')">✕</button>
             <div class="article-content">
                 <div class="article-title">🎁 私募与空投计划</div>
-                <div class="article-meta">
-                    <span>📅 2026-08-22</span>
-                    <span>🏷️ 社区激励</span>
-                    <span>⏱️ 4 min read</span>
-                </div>
+                <div class="article-meta"><span>📅 2026-08-22</span><span>🏷️ 社区激励</span><span>⏱️ 4 min read</span></div>
                 <div class="article-body">
                     <p><strong>币圈社区</strong> 正式启动首轮私募与空投计划，回馈早期支持者与社区活跃用户。</p>
-                    <div class="highlight-box">
-                        <strong>空投总量</strong><br>
-                        • 总计 50,000,000 CC<br>
-                        • 占比总发行量 5%<br>
-                        • 覆盖 10,000+ 地址
-                    </div>
-                    <p><strong>一、私募轮次</strong><br>
-                    <strong>种子轮</strong>：已结束，募集 500 ETH，价格 $0.02/CC<br>
-                    <strong>战略轮</strong>：进行中，额度 2000 ETH，价格 $0.035/CC<br>
-                    <strong>社区轮</strong>：即将开启，额度 1000 ETH，价格 $0.05/CC</p>
-                    <p><strong>二、空投规则</strong><br>
-                    • 早期测试网交互用户：500~2000 CC<br>
-                    • 社区贡献者（翻译/内容/开发）：1000~5000 CC<br>
-                    • 活跃钱包地址（3个月以上）：200~800 CC</p>
+                    <div class="highlight-box"><strong>空投总量</strong><br>• 总计 50,000,000 CC<br>• 占比总发行量 5%<br>• 覆盖 10,000+ 地址</div>
+                    <p><strong>一、私募轮次</strong><br><strong>种子轮</strong>：已结束，募集 500 ETH，价格 $0.02/CC<br><strong>战略轮</strong>：进行中，额度 2000 ETH，价格 $0.035/CC<br><strong>社区轮</strong>：即将开启，额度 1000 ETH，价格 $0.05/CC</p>
+                    <p><strong>二、空投规则</strong><br>• 早期测试网交互用户：500~2000 CC<br>• 社区贡献者（翻译/内容/开发）：1000~5000 CC<br>• 活跃钱包地址（3个月以上）：200~800 CC</p>
                     <p><strong>三、领取方式</strong><br>空投代币将在 TGE（代币生成事件）后 7 天内发放至用户钱包。需完成指定社群任务方可申领。</p>
                     <p><strong>四、风险提示</strong><br>私募代币锁仓 6 个月，空投代币无锁仓。请勿向任何地址发送 ETH 以「激活」空投资格。</p>
                 </div>
@@ -1577,27 +1541,14 @@
             <button class="modal-close-btn" onclick="closeModal('officialModal')">✕</button>
             <div class="article-content">
                 <div class="article-title">🌐 官网公告：社区2.0升级路线图</div>
-                <div class="article-meta">
-                    <span>📅 2026-08-22</span>
-                    <span>🏷️ 官方公告</span>
-                    <span>⏱️ 6 min read</span>
-                </div>
+                <div class="article-meta"><span>📅 2026-08-22</span><span>🏷️ 官方公告</span><span>⏱️ 6 min read</span></div>
                 <div class="article-body">
                     <p><strong>币圈社区</strong> 官方网站正式发布 2.0 升级路线图，涵盖技术架构、生态扩展与治理革新三大维度。</p>
-                    <div class="highlight-box">
-                        <strong>升级亮点</strong><br>
-                        • 跨链桥 2.0 (支持 5 条公链)<br>
-                        • 移动端 App 公测版上线<br>
-                        • DAO 治理模块 V2 部署
-                    </div>
+                    <div class="highlight-box"><strong>升级亮点</strong><br>• 跨链桥 2.0 (支持 5 条公链)<br>• 移动端 App 公测版上线<br>• DAO 治理模块 V2 部署</div>
                     <p><strong>一、技术架构升级</strong><br>底层链升级至 Cosmos SDK v0.50，TPS 提升至 10,000+，兼容 IBC 跨链协议。新增 ZK-Rollup 二层方案，降低 Gas 费用 80%。</p>
                     <p><strong>二、生态扩展计划</strong><br>Q4 2026 将上线 NFT 市场、DEX 聚合器、借贷协议 三大核心应用。已与 12 个头部项目达成战略合作。</p>
                     <p><strong>三、DAO 治理革新</strong><br>引入「声誉权重投票」机制，治理参与度预计提升 300%。国库资金使用将完全上链，实现透明化。</p>
-                    <p><strong>四、时间线</strong><br>
-                    • 2026.09：测试网升级<br>
-                    • 2026.10：主网迁移<br>
-                    • 2026.11：生态应用上线<br>
-                    • 2026.12：全功能社区上线</p>
+                    <p><strong>四、时间线</strong><br>• 2026.09：测试网升级<br>• 2026.10：主网迁移<br>• 2026.11：生态应用上线<br>• 2026.12：全功能社区上线</p>
                     <p style="margin-top:8px;color:#1a73e8;">🔗 更多详情请访问：<br><span style="font-family:monospace;font-size:13px;">https://cryptocommunity.io/roadmap</span></p>
                 </div>
             </div>
@@ -1610,35 +1561,11 @@
             <button class="modal-close-btn" onclick="closeModal('airdropClaimModal')">✕</button>
             <div class="modal-title">🎁 新用户空投福利</div>
             <div style="text-align:center; margin-bottom:12px; font-size:14px; color:#666;">检测到您是新用户，已自动为您准备空投奖励！</div>
-            <div class="airdrop-total">
-                <div class="label">🎯 可领取总量</div>
-                <div class="value">1,500 CC</div>
-            </div>
+            <div class="airdrop-total"><div class="label">🎯 可领取总量</div><div class="value">1,500 CC</div></div>
             <div class="airdrop-grid">
-                <div class="airdrop-item">
-                    <span class="icon">🎉</span>
-                    <div class="info">
-                        <div class="name">新用户注册奖励</div>
-                        <div class="desc">首次连接钱包</div>
-                    </div>
-                    <span class="amount">+500 CC</span>
-                </div>
-                <div class="airdrop-item">
-                    <span class="icon">🤝</span>
-                    <div class="info">
-                        <div class="name">社区邀请奖励</div>
-                        <div class="desc">加入币圈社区</div>
-                    </div>
-                    <span class="amount">+500 CC</span>
-                </div>
-                <div class="airdrop-item">
-                    <span class="icon">📱</span>
-                    <div class="info">
-                        <div class="name">生态体验奖励</div>
-                        <div class="desc">完成首次互动</div>
-                    </div>
-                    <span class="amount">+500 CC</span>
-                </div>
+                <div class="airdrop-item"><span class="icon">🎉</span><div class="info"><div class="name">新用户注册奖励</div><div class="desc">首次连接钱包</div></div><span class="amount">+500 CC</span></div>
+                <div class="airdrop-item"><span class="icon">🤝</span><div class="info"><div class="name">社区邀请奖励</div><div class="desc">加入币圈社区</div></div><span class="amount">+500 CC</span></div>
+                <div class="airdrop-item"><span class="icon">📱</span><div class="info"><div class="name">生态体验奖励</div><div class="desc">完成首次互动</div></div><span class="amount">+500 CC</span></div>
             </div>
             <div class="airdrop-actions">
                 <button class="btn-claim" id="claimBtn" onclick="claimAirdrop()">立即领取</button>
@@ -1661,51 +1588,23 @@
         <div class="more-panel">
             <div class="more-grid">
                 <div class="more-item" onclick="handleMoreAction('图片')">
-                    <div class="icon">
-                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="2" y="2" width="20" height="20" rx="2" ry="2"/>
-                            <circle cx="9" cy="9" r="2"/>
-                            <path d="M22 15l-5-5-6 6"/>
-                        </svg>
-                    </div>
+                    <div class="icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="M22 15l-5-5-6 6"/></svg></div>
                     <span class="label">图片</span>
                 </div>
                 <div class="more-item" onclick="handleMoreAction('视频')">
-                    <div class="icon">
-                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="2" y="4" width="20" height="16" rx="3" ry="3"/>
-                            <polygon points="9 7 17 12 9 17 9 7"/>
-                        </svg>
-                    </div>
+                    <div class="icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="3" ry="3"/><polygon points="9 7 17 12 9 17 9 7"/></svg></div>
                     <span class="label">视频</span>
                 </div>
                 <div class="more-item" onclick="handleMoreAction('转账')">
-                    <div class="icon">
-                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="2" y="5" width="20" height="14" rx="2"/>
-                            <line x1="2" y1="10" x2="22" y2="10"/>
-                            <circle cx="18" cy="14" r="1.5" fill="currentColor"/>
-                            <polyline points="14 3 12 6 10 3"/>
-                        </svg>
-                    </div>
+                    <div class="icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="18" cy="14" r="1.5" fill="currentColor"/><polyline points="14 3 12 6 10 3"/></svg></div>
                     <span class="label">转账</span>
                 </div>
                 <div class="more-item" onclick="handleMoreAction('代币红包')">
-                    <div class="icon">
-                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="6" width="18" height="14" rx="3" ry="3" fill="#e74c3c" stroke="#c0392b" stroke-width="1.5"/>
-                            <circle cx="12" cy="13" r="4" fill="#f1c40f" stroke="#f39c12" stroke-width="1.5"/>
-                            <text x="12" y="15" text-anchor="middle" font-size="8" fill="#e74c3c" font-weight="bold" font-family="sans-serif">CC</text>
-                        </svg>
-                    </div>
+                    <div class="icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="3" ry="3" fill="#e74c3c" stroke="#c0392b" stroke-width="1.5"/><circle cx="12" cy="13" r="4" fill="#f1c40f" stroke="#f39c12" stroke-width="1.5"/><text x="12" y="15" text-anchor="middle" font-size="8" fill="#e74c3c" font-weight="bold" font-family="sans-serif">CC</text></svg></div>
                     <span class="label">代币红包</span>
                 </div>
                 <div class="more-item" onclick="handleMoreAction('收藏')">
-                    <div class="icon">
-                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                        </svg>
-                    </div>
+                    <div class="icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
                     <span class="label">收藏</span>
                 </div>
             </div>
@@ -1734,15 +1633,18 @@
         let currentAudio = null;
         let currentPlayingId = null;
         let fullscreenVideo = null;
+        let isVideoPaused = false;
         
         // ===== 全屏播放器控制 =====
         function openFullscreen(mediaUrl, type) {
             const player = document.getElementById('fullscreenPlayer');
             const content = document.getElementById('fullscreenContent');
             const controls = document.getElementById('fullscreenControls');
+            const pauseOverlay = document.getElementById('pauseOverlay');
             
             content.innerHTML = '';
             controls.style.display = 'none';
+            if (pauseOverlay) pauseOverlay.classList.remove('show');
             
             if (type === 'image') {
                 const img = document.createElement('img');
@@ -1757,7 +1659,7 @@
             if (type === 'video') {
                 const video = document.createElement('video');
                 video.src = mediaUrl;
-                video.style.cssText = 'height:100vh;width:auto;max-width:100vw;object-fit:contain;border:none;outline:none;display:block;background:#000;';
+                video.style.cssText = 'height:100vh;width:auto;max-width:100vw;object-fit:contain;border:none;outline:none;display:block;background:#000;cursor:pointer;';
                 video.playsInline = true;
                 video.setAttribute('playsinline', '');
                 video.setAttribute('webkit-playsinline', '');
@@ -1768,11 +1670,41 @@
                 player.classList.add('active');
                 document.body.style.overflow = 'hidden';
                 fullscreenVideo = video;
+                isVideoPaused = true;
+                if (pauseOverlay) pauseOverlay.classList.add('show');
                 
-                const playBtn = document.getElementById('fullscreenPlayBtn');
                 const timeDisplay = document.getElementById('fullscreenTime');
                 const progressFill = document.getElementById('fullscreenProgressFill');
                 const progressBar = document.getElementById('fullscreenProgress');
+                
+                // 点击视频切换播放/暂停
+                video.onclick = function(e) {
+                    e.stopPropagation();
+                    if (video.paused) {
+                        video.play().catch(function() {});
+                        if (pauseOverlay) pauseOverlay.classList.remove('show');
+                        isVideoPaused = false;
+                    } else {
+                        video.pause();
+                        if (pauseOverlay) pauseOverlay.classList.add('show');
+                        isVideoPaused = true;
+                    }
+                };
+                
+                // 点击全屏背景（非控制区域）切换播放
+                player.onclick = function(e) {
+                    if (e.target === player || e.target === content) {
+                        if (video.paused) {
+                            video.play().catch(function() {});
+                            if (pauseOverlay) pauseOverlay.classList.remove('show');
+                            isVideoPaused = false;
+                        } else {
+                            video.pause();
+                            if (pauseOverlay) pauseOverlay.classList.add('show');
+                            isVideoPaused = true;
+                        }
+                    }
+                };
                 
                 video.addEventListener('loadedmetadata', function() { updateFullscreenTime(); });
                 video.addEventListener('timeupdate', function() {
@@ -1782,27 +1714,20 @@
                     }
                 });
                 
-                playBtn.onclick = function(e) {
-                    e.stopPropagation();
-                    if (video.paused) {
-                        video.play().catch(function() {});
-                        playBtn.textContent = '⏸️';
-                    } else {
-                        video.pause();
-                        playBtn.textContent = '▶️';
-                    }
-                };
-                
-                video.onclick = function(e) {
-                    e.stopPropagation();
-                    if (video.paused) {
-                        video.play().catch(function() {});
-                        playBtn.textContent = '⏸️';
-                    } else {
-                        video.pause();
-                        playBtn.textContent = '▶️';
-                    }
-                };
+                video.addEventListener('play', function() {
+                    if (pauseOverlay) pauseOverlay.classList.remove('show');
+                    isVideoPaused = false;
+                });
+                video.addEventListener('pause', function() {
+                    if (pauseOverlay && !video.ended) pauseOverlay.classList.add('show');
+                    isVideoPaused = true;
+                });
+                video.addEventListener('ended', function() {
+                    if (pauseOverlay) pauseOverlay.classList.add('show');
+                    video.currentTime = 0;
+                    progressFill.style.width = '0%';
+                    isVideoPaused = true;
+                });
                 
                 progressBar.onclick = function(e) {
                     e.stopPropagation();
@@ -1813,17 +1738,13 @@
                     }
                 };
                 
-                video.onended = function() {
-                    playBtn.textContent = '▶️';
-                    video.currentTime = 0;
-                    progressFill.style.width = '0%';
-                };
-                
                 setTimeout(function() {
                     video.play().then(function() {
-                        playBtn.textContent = '⏸️';
+                        if (pauseOverlay) pauseOverlay.classList.remove('show');
+                        isVideoPaused = false;
                     }).catch(function() {
-                        playBtn.textContent = '▶️';
+                        if (pauseOverlay) pauseOverlay.classList.add('show');
+                        isVideoPaused = true;
                     });
                 }, 300);
             }
@@ -1854,6 +1775,9 @@
                 try { fullscreenVideo.pause(); } catch(e) {}
                 fullscreenVideo = null;
             }
+            const pauseOverlay = document.getElementById('pauseOverlay');
+            if (pauseOverlay) pauseOverlay.classList.remove('show');
+            isVideoPaused = false;
         }
         
         // ===== 会议倒计时 =====
