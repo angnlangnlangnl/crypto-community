@@ -1511,7 +1511,6 @@
         <div class="zoom-hint" id="zoomHint">双击缩放 · 双指缩放</div>
     </div>
 
-    <!-- 弹窗内容保持不变... -->
     <!-- ===== 会议信息弹窗 ===== -->
     <div class="modal-overlay meeting-modal" id="meetingModal">
         <div class="modal-content">
@@ -1534,7 +1533,74 @@
         </div>
     </div>
 
-    <!-- 其他弹窗内容保持不变... -->
+    <!-- ===== 取消提示浮窗 ===== -->
+    <div class="cancel-tip" id="cancelTip">⬆ 松开取消发送</div>
+
+    <!-- ===== 表情包弹窗 ===== -->
+    <div class="emoji-overlay" id="emojiOverlay" onclick="if(event.target===this) toggleEmojiPanel()">
+        <div class="emoji-panel">
+            <div class="panel-title">😊 表情包</div>
+            <div class="emoji-grid" id="emojiGrid"></div>
+            <button class="emoji-close-btn" onclick="toggleEmojiPanel()">取消</button>
+        </div>
+    </div>
+
+    <!-- ===== 加号弹窗 ===== -->
+    <div class="more-overlay" id="moreOverlay" onclick="if(event.target===this) toggleMorePanel()">
+        <div class="more-panel">
+            <div class="more-grid">
+                <div class="more-item" onclick="handleMoreAction('图片')">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="20" height="20" rx="2" ry="2"/>
+                            <circle cx="9" cy="9" r="2"/>
+                            <path d="M22 15l-5-5-6 6"/>
+                        </svg>
+                    </div>
+                    <span class="label">图片</span>
+                </div>
+                <div class="more-item" onclick="handleMoreAction('视频')">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="4" width="20" height="16" rx="3" ry="3"/>
+                            <polygon points="9 7 17 12 9 17 9 7"/>
+                        </svg>
+                    </div>
+                    <span class="label">视频</span>
+                </div>
+                <div class="more-item" onclick="handleMoreAction('转账')">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="5" width="20" height="14" rx="2"/>
+                            <line x1="2" y1="10" x2="22" y2="10"/>
+                            <circle cx="18" cy="14" r="1.5" fill="currentColor"/>
+                            <polyline points="14 3 12 6 10 3"/>
+                        </svg>
+                    </div>
+                    <span class="label">转账</span>
+                </div>
+                <div class="more-item" onclick="handleMoreAction('代币红包')">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="6" width="18" height="14" rx="3" ry="3" fill="#e74c3c" stroke="#c0392b" stroke-width="1.5"/>
+                            <circle cx="12" cy="13" r="4" fill="#f1c40f" stroke="#f39c12" stroke-width="1.5"/>
+                            <text x="12" y="15" text-anchor="middle" font-size="8" fill="#e74c3c" font-weight="bold" font-family="sans-serif">CC</text>
+                        </svg>
+                    </div>
+                    <span class="label">代币红包</span>
+                </div>
+                <div class="more-item" onclick="handleMoreAction('收藏')">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                        </svg>
+                    </div>
+                    <span class="label">收藏</span>
+                </div>
+            </div>
+            <button class="more-close-btn" onclick="toggleMorePanel()">取消</button>
+        </div>
+    </div>
 
     <script>
         // ===== 存储Object URL引用，防止GC =====
