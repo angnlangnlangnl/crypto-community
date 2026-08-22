@@ -865,7 +865,7 @@
         }
         
         .input-field.recording {
-            background: #ff6b6b !important;
+            background: #07c160 !important;
             color: white !important;
             animation: pulse 0.5s ease-in-out infinite alternate;
         }
@@ -1465,7 +1465,7 @@
     <!-- 底部输入栏 -->
     <div class="input-area">
         <button class="icon-btn" onclick="toggleVoiceMode()" id="voiceBtn">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#07c160" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="9" y="2" width="6" height="12" rx="3"/>
                 <path d="M5 10V12C5 15.866 8.134 19 12 19C15.866 19 19 15.866 19 12V10"/>
                 <line x1="12" y1="19" x2="12" y2="22"/>
@@ -1622,24 +1622,39 @@
         var zoomHintTimeout = null;
         var isFullscreenImage = false;
         
+        // ✅ 修复：边界约束函数 - 确保图片边缘始终对齐屏幕边缘，不留空白
         function constrainTransform(img, scale, tx, ty) {
             if (!img) return { tx: 0, ty: 0 };
+            
             var container = img.parentElement;
             if (!container) return { tx: 0, ty: 0 };
+            
             var ch = container.clientHeight;
+            
             var imgW = img.naturalWidth || img.width || 1;
             var imgH = img.naturalHeight || img.height || 1;
+            
             var scaledH = imgH * scale;
+            
             tx = 0;
+            
             if (scaledH > ch) {
+                // 图片高度大于容器高度，允许上下拖动
+                // 但图片边缘必须始终对齐屏幕边缘，不能拖出空白
                 var maxY = scaledH - ch;
+                // ty范围：顶部对齐时ty=0，底部对齐时ty=-maxY
+                // 不允许ty>0（顶部不能低于屏幕顶部）
+                // 不允许ty<-maxY（底部不能高于屏幕底部）
                 ty = Math.max(-maxY, Math.min(0, ty));
             } else {
+                // 图片高度小于容器高度，上下居中，不允许拖动
                 ty = (ch - scaledH) / 2;
             }
+            
             return { tx: tx, ty: ty };
         }
         
+        // ✅ 初始化时始终横向铺满屏幕
         function initImageZoom(imageWrap, img) {
             currentImageWrap = imageWrap;
             currentImage = img;
@@ -1649,7 +1664,9 @@
             isImageZoomed = false;
             isFullscreenImage = true;
             img.className = '';
+            
             showZoomHint();
+            
             img.removeEventListener('dblclick', onImageDblClick);
             img.removeEventListener('touchstart', onImageTouchStart);
             img.removeEventListener('touchmove', onImageTouchMove);
@@ -1657,41 +1674,60 @@
             img.removeEventListener('mousedown', onImageMouseDown);
             document.removeEventListener('mousemove', onImageMouseMove);
             document.removeEventListener('mouseup', onImageMouseUp);
+            
             img.addEventListener('dblclick', onImageDblClick);
             img.addEventListener('touchstart', onImageTouchStart, { passive: false });
             img.addEventListener('touchmove', onImageTouchMove, { passive: false });
             img.addEventListener('touchend', onImageTouchEnd, { passive: false });
             img.addEventListener('mousedown', onImageMouseDown);
+            
+            // ✅ 始终横向铺满屏幕
             function applySmartZoom() {
                 var container = imageWrap;
                 var containerWidth = container.clientWidth;
                 var containerHeight = container.clientHeight;
                 var imgWidth = img.naturalWidth || img.width;
                 var imgHeight = img.naturalHeight || img.height;
+                
                 if (containerWidth === 0 || imgWidth === 0 || imgHeight === 0) {
                     requestAnimationFrame(applySmartZoom);
                     return;
                 }
+                
+                // 始终计算左右铺满的缩放比例
                 var scaleToFitWidth = containerWidth / imgWidth;
+                
+                // 限制最大缩放倍数
                 scaleToFitWidth = Math.min(scaleToFitWidth, 8);
+                // 最小缩放倍数为1
                 scaleToFitWidth = Math.max(scaleToFitWidth, 1);
+                
                 imageScale = scaleToFitWidth;
                 imageTranslateX = 0;
+                
+                // 计算缩放后图片高度
                 var scaledHeight = imgHeight * imageScale;
+                
                 if (scaledHeight > containerHeight) {
+                    // 图片高度超出屏幕，顶部对齐
                     imageTranslateY = 0;
                     img.style.transformOrigin = 'top center';
                 } else {
+                    // 图片高度小于屏幕，上下居中
                     imageTranslateY = (containerHeight - scaledHeight) / 2;
                     img.style.transformOrigin = 'center center';
                 }
+                
                 isImageZoomed = true;
                 img.className = 'zoomed';
+                
                 img.style.transform = 'translate(0px, ' + imageTranslateY + 'px) scale(' + imageScale + ')';
             }
+            
             img.onload = function() {
                 requestAnimationFrame(applySmartZoom);
             };
+            
             if (img.complete && img.naturalWidth > 0) {
                 requestAnimationFrame(applySmartZoom);
             } else {
@@ -1713,23 +1749,30 @@
             }, 3000);
         }
         
+        // ✅ 双击切换：原始大小 ↔ 铺满屏幕
         function onImageDblClick(e) {
             e.stopPropagation();
             var img = currentImage;
             if (!img) return;
+            
             if (!isImageZoomed) {
                 var container = img.parentElement;
                 var containerWidth = container.clientWidth;
                 var containerHeight = container.clientHeight;
                 var imgWidth = img.naturalWidth || img.width;
                 var imgHeight = img.naturalHeight || img.height;
+                
                 if (imgWidth === 0 || imgHeight === 0) return;
+                
                 var scale = containerWidth / imgWidth;
                 scale = Math.min(scale, 8);
                 scale = Math.max(scale, 1);
+                
                 imageScale = scale;
                 imageTranslateX = 0;
+                
                 var scaledHeight = imgHeight * imageScale;
+                
                 if (scaledHeight > containerHeight) {
                     imageTranslateY = 0;
                     img.style.transformOrigin = 'top center';
@@ -1737,6 +1780,7 @@
                     imageTranslateY = (containerHeight - scaledHeight) / 2;
                     img.style.transformOrigin = 'center center';
                 }
+                
                 isImageZoomed = true;
                 img.className = 'zoomed';
                 img.style.transform = 'translate(0px, ' + imageTranslateY + 'px) scale(' + imageScale + ')';
@@ -1751,6 +1795,7 @@
             }
         }
         
+        // ✅ 任何时候都允许拖动
         function onImageTouchStart(e) {
             if (e.touches.length === 2) {
                 var touch1 = e.touches[0];
@@ -1766,10 +1811,12 @@
             }
         }
         
+        // ✅ 双指缩放任何时候都有效
         function onImageTouchMove(e) {
             e.preventDefault();
             var img = currentImage;
             if (!img) return;
+            
             if (e.touches.length === 2) {
                 var touch1 = e.touches[0];
                 var touch2 = e.touches[1];
@@ -1778,6 +1825,7 @@
                     var scaleDelta = currentDistance / lastTouchDistance;
                     var newScale = imageScale * scaleDelta;
                     newScale = Math.max(1, Math.min(newScale, 8));
+                    
                     var constrained = constrainTransform(img, newScale, 0, imageTranslateY);
                     imageTranslateX = constrained.tx;
                     imageTranslateY = constrained.ty;
@@ -1789,6 +1837,7 @@
             } else if (e.touches.length === 1 && isDragging) {
                 var dy = e.touches[0].clientY - dragStartY;
                 var newTy = dragStartTranslateY + dy;
+                
                 var constrained = constrainTransform(img, imageScale, 0, newTy);
                 imageTranslateX = constrained.tx;
                 imageTranslateY = constrained.ty;
@@ -1796,6 +1845,7 @@
             }
         }
         
+        // ✅ 触摸结束处理
         function onImageTouchEnd(e) {
             if (e.touches.length === 0) {
                 isDragging = false;
@@ -1812,6 +1862,7 @@
             dragStartTranslateX = imageTranslateX;
             dragStartTranslateY = imageTranslateY;
             e.preventDefault();
+            
             document.addEventListener('mousemove', onImageMouseMove);
             document.addEventListener('mouseup', onImageMouseUp);
         }
@@ -1822,6 +1873,7 @@
             if (!img) return;
             var dy = e.clientY - dragStartY;
             var newTy = dragStartTranslateY + dy;
+            
             var constrained = constrainTransform(img, imageScale, 0, newTy);
             imageTranslateX = constrained.tx;
             imageTranslateY = constrained.ty;
@@ -1858,7 +1910,10 @@
         }
         
         // ===== 会议功能 =====
-        function handleEnterMeeting() { openModal('meetingModal'); }
+        function handleEnterMeeting() {
+            openModal('meetingModal');
+        }
+        
         function joinMeeting() {
             var link = document.createElement('a');
             link.href = 'https://meeting.tencent.com/dm/hIbayciQ5BHJ';
@@ -1867,23 +1922,36 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            
             var appLink = document.createElement('a');
             appLink.href = 'tencent://meeting?code=945379565';
             appLink.style.display = 'none';
             document.body.appendChild(appLink);
             appLink.click();
             document.body.removeChild(appLink);
+            
             closeModal('meetingModal');
+            addSystemMessage('📞 正在尝试加入会议...');
+            setTimeout(function() {
+                addSystemMessage('✅ 已打开腾讯会议，请确认加入');
+            }, 1500);
         }
+        
         function copyMeetingInfo() {
             var info = '悟 邀请您参加腾讯会议\n会议主题：悟的快速会议\n会议时间：2026/08/22 15:30-16:30 (GMT+08:00) 中国标准时间 - 北京\n\n点击链接直接加入会议：\nhttps://meeting.tencent.com/dm/hIbayciQ5BHJ\n\n#腾讯会议：945-379-565\n\n复制该信息，打开手机腾讯会议即可参与';
+            
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(info).then(function() {}).catch(function() { fallbackCopy(info); });
+                navigator.clipboard.writeText(info).then(function() {
+                    addSystemMessage('✅ 会议信息已复制到剪贴板');
+                }).catch(function() {
+                    fallbackCopy(info);
+                });
             } else {
                 fallbackCopy(info);
             }
             closeModal('meetingModal');
         }
+        
         function fallbackCopy(text) {
             var textarea = document.createElement('textarea');
             textarea.value = text;
@@ -1892,7 +1960,12 @@
             textarea.style.top = '-9999px';
             document.body.appendChild(textarea);
             textarea.select();
-            try { document.execCommand('copy'); } catch (e) {}
+            try {
+                document.execCommand('copy');
+                addSystemMessage('✅ 会议信息已复制到剪贴板');
+            } catch (e) {
+                addSystemMessage('⚠️ 复制失败，请手动复制');
+            }
             document.body.removeChild(textarea);
         }
         
@@ -1905,10 +1978,12 @@
             var content = document.getElementById('fullscreenContent');
             var controls = document.getElementById('fullscreenControls');
             var pauseOverlay = document.getElementById('pauseOverlay');
+            
             content.innerHTML = '';
             controls.style.display = 'none';
             if (pauseOverlay) pauseOverlay.classList.remove('show');
             resetImageZoom();
+            
             if (type === 'image') {
                 var wrap = document.createElement('div');
                 wrap.className = 'image-wrap';
@@ -1919,9 +1994,11 @@
                 content.appendChild(wrap);
                 player.classList.add('active');
                 document.body.style.overflow = 'hidden';
+                
                 initImageZoom(wrap, img);
                 return;
             }
+            
             if (type === 'video') {
                 var video = document.createElement('video');
                 video.src = mediaUrl;
@@ -1939,12 +2016,25 @@
                 fullscreenVideo = video;
                 isVideoPaused = true;
                 if (pauseOverlay) pauseOverlay.classList.add('show');
+                
                 var timeDisplay = document.getElementById('fullscreenTime');
                 var progressFill = document.getElementById('fullscreenProgressFill');
                 var progressBar = document.getElementById('fullscreenProgress');
                 var dot = progressBar.querySelector('.progress-dot');
-                video.addEventListener('loadedmetadata', function() { updateFullscreenTime(); if (!video.paused) { if (pauseOverlay) pauseOverlay.classList.remove('show'); } });
-                video.addEventListener('canplay', function() { if (!video.paused) { if (pauseOverlay) pauseOverlay.classList.remove('show'); } });
+                
+                video.addEventListener('loadedmetadata', function() { 
+                    updateFullscreenTime();
+                    if (!video.paused) {
+                        if (pauseOverlay) pauseOverlay.classList.remove('show');
+                    }
+                });
+                
+                video.addEventListener('canplay', function() {
+                    if (!video.paused) {
+                        if (pauseOverlay) pauseOverlay.classList.remove('show');
+                    }
+                });
+                
                 video.onclick = function(e) {
                     e.stopPropagation();
                     if (video.paused) {
@@ -1957,6 +2047,7 @@
                         isVideoPaused = true;
                     }
                 };
+                
                 video.addEventListener('timeupdate', function() {
                     updateFullscreenTime();
                     if (video.duration) {
@@ -1965,8 +2056,15 @@
                         if (dot) dot.style.left = pct + '%';
                     }
                 });
-                video.addEventListener('play', function() { if (pauseOverlay) pauseOverlay.classList.remove('show'); isVideoPaused = false; });
-                video.addEventListener('pause', function() { if (pauseOverlay && !video.ended) pauseOverlay.classList.add('show'); isVideoPaused = true; });
+                
+                video.addEventListener('play', function() {
+                    if (pauseOverlay) pauseOverlay.classList.remove('show');
+                    isVideoPaused = false;
+                });
+                video.addEventListener('pause', function() {
+                    if (pauseOverlay && !video.ended) pauseOverlay.classList.add('show');
+                    isVideoPaused = true;
+                });
                 video.addEventListener('ended', function() {
                     if (pauseOverlay) pauseOverlay.classList.add('show');
                     video.currentTime = 0;
@@ -1974,12 +2072,16 @@
                     if (dot) dot.style.left = '0%';
                     isVideoPaused = true;
                 });
+                
                 progressBar.onclick = function(e) {
                     e.stopPropagation();
                     var rect = progressBar.getBoundingClientRect();
                     var percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-                    if (video.duration) { video.currentTime = percent * video.duration; }
+                    if (video.duration) {
+                        video.currentTime = percent * video.duration;
+                    }
                 };
+                
                 setTimeout(function() {
                     video.play().then(function() {
                         if (pauseOverlay) pauseOverlay.classList.remove('show');
@@ -2013,7 +2115,10 @@
             var player = document.getElementById('fullscreenPlayer');
             player.classList.remove('active');
             document.body.style.overflow = '';
-            if (fullscreenVideo) { try { fullscreenVideo.pause(); } catch(e) {} fullscreenVideo = null; }
+            if (fullscreenVideo) {
+                try { fullscreenVideo.pause(); } catch(e) {}
+                fullscreenVideo = null;
+            }
             var pauseOverlay = document.getElementById('pauseOverlay');
             if (pauseOverlay) pauseOverlay.classList.remove('show');
             isVideoPaused = false;
@@ -2023,6 +2128,7 @@
         // ===== 会议倒计时 =====
         var countdownSeconds = 300;
         var countdownInterval = null;
+        
         function updateCountdown() {
             var display = document.getElementById('countdownDisplay');
             if (!display) return;
@@ -2039,6 +2145,7 @@
                 display.classList.remove('ended');
             }
         }
+        
         function startCountdown() {
             if (countdownInterval) clearInterval(countdownInterval);
             countdownSeconds = 300;
@@ -2048,9 +2155,13 @@
             countdownInterval = setInterval(function() {
                 countdownSeconds--;
                 updateCountdown();
-                if (countdownSeconds <= 0) { clearInterval(countdownInterval); countdownInterval = null; }
+                if (countdownSeconds <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                }
             }, 1000);
         }
+        
         function updateCountdownPosition() {
             var banner = document.getElementById('connectBanner');
             var countdown = document.getElementById('countdownBanner');
@@ -2059,15 +2170,29 @@
         }
         
         // ===== 弹窗控制 =====
-        function openModal(id) { document.getElementById(id).classList.add('active'); document.body.style.overflow = 'hidden'; }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); document.body.style.overflow = ''; }
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
         function openTokenModal() { openModal('tokenModal'); }
         function openEconomyArticle() { openModal('economyModal'); }
         function openAirdropArticle() { openModal('airdropModal'); }
         function openOfficialArticle() { openModal('officialModal'); }
-        function showAirdropModal() { if (!airdropClaimed && !airdropSkipped) { setTimeout(function() { openModal('airdropClaimModal'); }, 600); } }
+        
+        function showAirdropModal() {
+            if (!airdropClaimed && !airdropSkipped) {
+                setTimeout(function() { openModal('airdropClaimModal'); }, 600);
+            }
+        }
+        
         var airdropClaimed = false;
         var airdropSkipped = false;
+        
         function claimAirdrop() {
             airdropClaimed = true;
             var btn = document.getElementById('claimBtn');
@@ -2075,9 +2200,17 @@
             btn.disabled = true;
             btn.style.background = '#ccc';
             closeModal('airdropClaimModal');
-            setTimeout(function() { addOtherMessage('欢迎加入币圈社区！一起见证生态成长 🚀', '币圈助手'); }, 800);
+            addSystemMessage('🎉 恭喜您！已成功领取 1,500 CC 空投奖励！');
+            setTimeout(function() {
+                addOtherMessage('欢迎加入币圈社区！一起见证生态成长 🚀', '币圈助手');
+            }, 800);
         }
-        function skipAirdrop() { airdropSkipped = true; closeModal('airdropClaimModal'); }
+        
+        function skipAirdrop() {
+            airdropSkipped = true;
+            closeModal('airdropClaimModal');
+            addSystemMessage('⏳ 空投已暂存，可随时在「私募/空投」页面领取');
+        }
         
         // ===== 表情包数据 =====
         var emojiList = [
@@ -2193,13 +2326,17 @@
             wrapper.className = 'msg-wrapper own';
             var displaySender = (sender && sender !== '我') ? sender.slice(0, 6) + '...' + sender.slice(-1) : '我';
             var vidId = 'vid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+            
             if (videoUrl && videoUrl.startsWith('blob:')) {
                 window._videoBlobUrls[vidId] = { url: videoUrl, file: file };
             }
+            
             var progressSvg = '\n                <div class="video-progress" id="' + vidId + '_progress">\n                    <svg width="48" height="48" viewBox="0 0 48 48">\n                        <circle class="progress-bg" cx="24" cy="24" r="19"/>\n                        <circle class="progress-fg" cx="24" cy="24" r="19" \n                                stroke-dasharray="119.4" stroke-dashoffset="119.4"/>\n                    </svg>\n                    <div class="progress-center">\n                        <span class="progress-text">0%</span>\n                        <svg class="pause-icon" width="14" height="14" viewBox="0 0 14 14">\n                            <rect x="2" y="1" width="3.5" height="12" rx="1" fill="white"/>\n                            <rect x="8.5" y="1" width="3.5" height="12" rx="1" fill="white"/>\n                        </svg>\n                    </div>\n                </div>\n            ';
+            
             wrapper.innerHTML = '\n                <div class="msg-avatar">我</div>\n                <div class="msg-body">\n                    <span class="msg-sender">' + displaySender + '</span>\n                    <div class="msg-bubble" style="padding:0;background:transparent;border-radius:6px;overflow:hidden;">\n                        <div class="video-wrapper" id="' + vidId + '_wrapper" style="border:none;outline:none;background:#000;">\n                            <video id="' + vidId + '" src="' + videoUrl + '" preload="metadata" playsinline webkit-playsinline style="border:none;outline:none;display:block;width:100%;height:auto;background:#000;" crossorigin="anonymous"></video>\n                            <div class="play-overlay" id="' + vidId + '_overlay">' + progressSvg + '</div>\n                            <div class="duration-badge" id="' + vidId + '_badge">00:00</div>\n                        </div>\n                    </div>\n                    <span class="msg-time">' + getTime() + '</span>\n                </div>\n            ';
             messages.appendChild(wrapper);
             scrollToBottom();
+            
             var video = document.getElementById(vidId);
             var wrapperDiv = document.getElementById(vidId + '_wrapper');
             var overlay = document.getElementById(vidId + '_overlay');
@@ -2208,9 +2345,11 @@
             var progressText = progressContainer ? progressContainer.querySelector('.progress-text') : null;
             var pauseIcon = progressContainer ? progressContainer.querySelector('.pause-icon') : null;
             var progressFg = progressContainer ? progressContainer.querySelector('.progress-fg') : null;
+            
             if (video && wrapperDiv) {
                 var uploadProgress = 0;
                 var circumference = 119.4;
+                
                 function updateUploadProgress() {
                     if (uploadProgress < 100) {
                         uploadProgress += Math.random() * 8 + 2;
@@ -2223,7 +2362,28 @@
                         if (overlay) overlay.classList.add('hidden');
                     }
                 }
+                
                 setTimeout(updateUploadProgress, 500);
+                
+                video.addEventListener('error', function(e) {
+                    console.warn('视频加载错误，尝试重新加载:', e);
+                    if (videoUrl && videoUrl.startsWith('blob:')) {
+                        try {
+                            fetch(videoUrl).then(function(response) {
+                                if (response.ok) {
+                                    video.load();
+                                } else {
+                                    addSystemMessage('⚠️ 视频加载失败，请重新发送');
+                                }
+                            }).catch(function() {
+                                addSystemMessage('⚠️ 视频加载失败，请重新发送');
+                            });
+                        } catch(err) {
+                            addSystemMessage('⚠️ 视频加载失败，请重新发送');
+                        }
+                    }
+                });
+                
                 video.addEventListener('loadedmetadata', function() {
                     var dur = Math.floor(video.duration);
                     var m = Math.floor(dur / 60);
@@ -2232,36 +2392,52 @@
                     video.currentTime = 0;
                 });
                 if (video.readyState >= 1) video.currentTime = 0;
+                
                 video.addEventListener('timeupdate', function() {
                     if (video.duration && progressFg && uploadProgress >= 100) {
                         var pct = Math.min(100, (video.currentTime / video.duration) * 100);
                         var offset = circumference - (pct / 100) * circumference;
                         progressFg.setAttribute('stroke-dashoffset', offset);
-                        if (progressText) { progressText.textContent = Math.round(pct) + '%'; }
+                        if (progressText) {
+                            progressText.textContent = Math.round(pct) + '%';
+                        }
                     }
                 });
+                
                 video.addEventListener('play', function() {
-                    if (uploadProgress >= 100) { if (overlay) overlay.classList.add('hidden'); }
+                    if (uploadProgress >= 100) {
+                        if (overlay) overlay.classList.add('hidden');
+                    }
                     if (pauseIcon) pauseIcon.style.display = 'none';
                     if (progressText) progressText.style.display = 'block';
                 });
+                
                 video.addEventListener('pause', function() {
-                    if (uploadProgress >= 100) { if (overlay) overlay.classList.remove('hidden'); }
+                    if (uploadProgress >= 100) {
+                        if (overlay) overlay.classList.remove('hidden');
+                    }
                     if (pauseIcon) pauseIcon.style.display = 'none';
                     if (progressText) progressText.style.display = 'block';
                 });
+                
                 video.addEventListener('ended', function() {
                     if (overlay) overlay.classList.remove('hidden');
                     if (pauseIcon) pauseIcon.style.display = 'none';
                     if (progressText) progressText.style.display = 'block';
                     video.currentTime = 0;
-                    if (progressFg && uploadProgress >= 100) { progressFg.setAttribute('stroke-dashoffset', '119.4'); }
+                    if (progressFg && uploadProgress >= 100) {
+                        progressFg.setAttribute('stroke-dashoffset', '119.4');
+                    }
                     if (progressText) progressText.textContent = '0%';
                 });
+                
                 wrapperDiv.onclick = function(e) {
                     e.stopPropagation();
                     if (uploadProgress < 100) return;
-                    if (!video.paused) { video.pause(); if (overlay) overlay.classList.remove('hidden'); }
+                    if (!video.paused) {
+                        video.pause();
+                        if (overlay) overlay.classList.remove('hidden');
+                    }
                     openFullscreen(videoUrl, 'video');
                 };
             }
@@ -2278,13 +2454,17 @@
             wrapper.className = 'msg-wrapper own';
             var displaySender = (sender && sender !== '我') ? sender.slice(0, 6) + '...' + sender.slice(-1) : '我';
             var durationStr = formatDuration(duration);
-            wrapper.innerHTML = '\n                <div class="msg-avatar">我</div>\n                <div class="msg-body">\n                    <span class="msg-sender">' + displaySender + '</span>\n                    <div class="msg-bubble" style="padding: 4px 0;">\n                        <div class="voice-msg-wrapper" data-msgid="' + msgId + '" onclick="playVoiceMessage(\'' + msgId + '\')">\n                            <span class="voice-icon" id="voiceIcon_' + msgId + '">\n                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">\n                                    <path d="M11 5L6 9H2v6h4l5 4V5z"/>\n                                </svg>\n                            </span>\n                            <span class="duration">' + durationStr + '</span>\n                        </div>\n                    </div>\n                    <span class="msg-time">' + getTime() + '</span>\n                </div>\n            ';
+            wrapper.innerHTML = '\n                <div class="msg-avatar">我</div>\n                <div class="msg-body">\n                    <span class="msg-sender">' + displaySender + '</span>\n                    <div class="msg-bubble" style="padding: 4px 0;">\n                        <div class="voice-msg-wrapper" data-msgid="' + msgId + '" onclick="playVoiceMessage(\'' + msgId + '\')">\n                            <span class="voice-icon" id="voiceIcon_' + msgId + '">\n                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#07c160" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">\n                                    <path d="M11 5L6 9H2v6h4l5 4V5z"/>\n                                </svg>\n                            </span>\n                            <span class="duration">' + durationStr + '</span>\n                        </div>\n                    </div>\n                    <span class="msg-time">' + getTime() + '</span>\n                </div>\n            ';
             messages.appendChild(wrapper);
             scrollToBottom();
+            setTimeout(function() {
+                var replies = ['收到语音！👍', '已收到', '好的', '明白了', '支持！', '嗯嗯'];
+                addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
+            }, 600 + Math.random() * 1000);
         }
         
         function getSpeakerSVG(state, color) {
-            var strokeColor = color || (state === 'playing' ? '#07c160' : '#333');
+            var strokeColor = color || (state === 'playing' ? '#07c160' : '#07c160');
             if (state === 'playing') {
                 return '\n                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="' + strokeColor + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">\n                        <path d="M11 5L6 9H2v6h4l5 4V5z"/>\n                        <path d="M15.54 8.46a5 5 0 010 7.07" class="wave1"/>\n                        <path d="M19.07 4.93a10 10 0 010 14.14" class="wave2"/>\n                    </svg>\n                ';
             } else {
@@ -2295,7 +2475,7 @@
         function updateSpeakerIcon(msgId, state) {
             var iconContainer = document.getElementById('voiceIcon_' + msgId);
             if (!iconContainer) return;
-            var color = state === 'playing' ? '#07c160' : '#333';
+            var color = '#07c160';
             iconContainer.innerHTML = getSpeakerSVG(state, color);
             if (state === 'playing') {
                 iconContainer.querySelectorAll('.wave1, .wave2').forEach(function(el) {
@@ -2316,7 +2496,7 @@
         
         function playVoiceMessage(msgId) {
             var data = window._voiceData;
-            if (!data || !data[msgId]) return;
+            if (!data || !data[msgId]) { addSystemMessage('⚠️ 语音文件不存在'); return; }
             if (currentPlayingId === msgId && currentAudio && !currentAudio.paused) {
                 currentAudio.pause();
                 updateSpeakerIcon(msgId, 'idle');
@@ -2346,12 +2526,14 @@
                 currentAudio = null;
                 currentPlayingId = null;
                 URL.revokeObjectURL(url);
+                addSystemMessage('⚠️ 语音播放失败');
             };
             audio.play().catch(function(err) {
                 updateSpeakerIcon(msgId, 'idle');
                 currentAudio = null;
                 currentPlayingId = null;
                 URL.revokeObjectURL(url);
+                addSystemMessage('⚠️ 语音播放失败: ' + err.message);
             });
         }
         
@@ -2392,7 +2574,9 @@
         document.getElementById('msgInput').addEventListener('input', updateSendBtn);
         
         // ===== 图片上传 =====
-        function handleImageUpload() { document.getElementById('imageInput').click(); }
+        function handleImageUpload() {
+            document.getElementById('imageInput').click();
+        }
         document.getElementById('imageInput').addEventListener('change', function(e) {
             var files = e.target.files;
             if (!files || files.length === 0) return;
@@ -2402,6 +2586,7 @@
                 var reader = new FileReader();
                 reader.onload = function(ev) {
                     addOwnImageMessage(ev.target.result, userAddress || '我');
+                    addSystemMessage('图片已发送');
                     setTimeout(function() {
                         var replies = ['好图！👍', '不错', '收到', '支持！', '666'];
                         addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
@@ -2414,7 +2599,9 @@
         });
         
         // ===== 视频上传 =====
-        function handleVideoUpload() { document.getElementById('videoInput').click(); }
+        function handleVideoUpload() {
+            document.getElementById('videoInput').click();
+        }
         document.getElementById('videoInput').addEventListener('change', function(e) {
             var files = e.target.files;
             if (!files || files.length === 0) return;
@@ -2423,6 +2610,7 @@
                 if (!file.type.startsWith('video/')) continue;
                 var videoUrl = URL.createObjectURL(file);
                 addOwnVideoMessage(videoUrl, userAddress || '我', file);
+                addSystemMessage('视频已发送');
                 setTimeout(function() {
                     var replies = ['好视频！🎥', '精彩', '收到', '支持！', '厉害了'];
                     addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
@@ -2435,7 +2623,9 @@
         window.addEventListener('beforeunload', function() {
             if (window._videoBlobUrls) {
                 Object.values(window._videoBlobUrls).forEach(function(item) {
-                    try { URL.revokeObjectURL(item.url); } catch(e) {}
+                    try {
+                        URL.revokeObjectURL(item.url);
+                    } catch(e) {}
                 });
                 window._videoBlobUrls = {};
             }
@@ -2453,14 +2643,15 @@
                 input.style.textAlign = 'center';
                 input.style.color = '#333';
                 input.style.userSelect = 'none';
-                // ✅ 保持统一颜色
-                voiceBtn.innerHTML = '\n                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">\n                        <rect x="9" y="2" width="6" height="12" rx="3"/>\n                        <path d="M5 10V12C5 15.866 8.134 19 12 19C15.866 19 19 15.866 19 12V10"/>\n                        <line x1="12" y1="19" x2="12" y2="22"/>\n                    </svg>\n                ';
-                voiceBtn.style.background = 'transparent';
+                voiceBtn.innerHTML = '\n                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#07c160" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n                        <rect x="9" y="2" width="6" height="12" rx="3"/>\n                        <path d="M5 10V12C5 15.866 8.134 19 12 19C15.866 19 19 15.866 19 12V10"/>\n                        <line x1="12" y1="19" x2="12" y2="22"/>\n                        <circle cx="12" cy="12" r="2" fill="#07c160"/>\n                    </svg>\n                ';
+                voiceBtn.style.background = '#e8f5e9';
+                voiceBtn.style.borderRadius = '50%';
                 input.addEventListener('pointerdown', onPointerDown);
                 input.addEventListener('pointerup', onPointerUp);
                 input.addEventListener('pointerleave', onPointerUp);
                 input.addEventListener('pointercancel', onPointerUp);
                 input.addEventListener('pointermove', onPointerMove);
+                addSystemMessage('录音模式已开启，按住输入框录音');
             } else {
                 isVoiceMode = false;
                 input.placeholder = '输入消息...';
@@ -2469,7 +2660,7 @@
                 input.style.textAlign = 'left';
                 input.style.color = '#333';
                 input.style.userSelect = 'auto';
-                voiceBtn.innerHTML = '\n                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">\n                        <rect x="9" y="2" width="6" height="12" rx="3"/>\n                        <path d="M5 10V12C5 15.866 8.134 19 12 19C15.866 19 19 15.866 19 12V10"/>\n                        <line x1="12" y1="19" x2="12" y2="22"/>\n                    </svg>\n                ';
+                voiceBtn.innerHTML = '\n                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#07c160" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">\n                        <rect x="9" y="2" width="6" height="12" rx="3"/>\n                        <path d="M5 10V12C5 15.866 8.134 19 12 19C15.866 19 19 15.866 19 12V10"/>\n                        <line x1="12" y1="19" x2="12" y2="22"/>\n                    </svg>\n                ';
                 voiceBtn.style.background = 'transparent';
                 input.removeEventListener('pointerdown', onPointerDown);
                 input.removeEventListener('pointerup', onPointerUp);
@@ -2477,6 +2668,7 @@
                 input.removeEventListener('pointercancel', onPointerUp);
                 input.removeEventListener('pointermove', onPointerMove);
                 if (isRecording) stopRecording(false);
+                addSystemMessage('已切换为键盘输入模式');
             }
         }
         
@@ -2504,7 +2696,7 @@
                 var input = document.getElementById('msgInput');
                 input.classList.remove('cancel-mode');
                 var secs = recordingDuration;
-                input.value = secs < 60 ? '🎙️ 录音中 ' + secs + 's' : '🎙️ 录音中 ' + Math.floor(secs/60) + ':' + String(secs%60).padStart(2,'0');
+                input.value = secs < 60 ? '录音中 ' + secs + 's' : '录音中 ' + Math.floor(secs/60) + ':' + String(secs%60).padStart(2,'0');
             }
         }
         
@@ -2525,7 +2717,7 @@
                 recordingDuration = 0;
                 var input = document.getElementById('msgInput');
                 input.classList.add('recording');
-                input.value = '🎙️ 录音中 0s';
+                input.value = '录音中 0s';
                 mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
                 mediaRecorder.ondataavailable = function(event) { if (event.data.size > 0) audioChunks.push(event.data); };
                 mediaRecorder.onstop = function() { stream.getTracks().forEach(function(track) { track.stop(); }); };
@@ -2534,11 +2726,12 @@
                     recordingDuration++;
                     var input = document.getElementById('msgInput');
                     if (input && isRecording) {
-                        input.value = recordingDuration < 60 ? '🎙️ 录音中 ' + recordingDuration + 's' : '🎙️ 录音中 ' + Math.floor(recordingDuration/60) + ':' + String(recordingDuration%60).padStart(2,'0');
+                        input.value = recordingDuration < 60 ? '录音中 ' + recordingDuration + 's' : '录音中 ' + Math.floor(recordingDuration/60) + ':' + String(recordingDuration%60).padStart(2,'0');
                     }
                     if (recordingDuration >= VOICE_CONFIG.maxDuration && isRecording) stopRecording(true);
                 }, 1000);
             } catch (err) {
+                addSystemMessage('❌ 无法访问麦克风: ' + err.message);
                 isRecording = false;
                 document.getElementById('msgInput').classList.remove('recording');
                 document.getElementById('msgInput').value = '';
@@ -2559,11 +2752,14 @@
             input.placeholder = '按住录音，松开发送';
             document.getElementById('cancelTip').classList.remove('show');
             var duration = recordingDuration;
-            if (!send) { audioChunks = []; return; }
-            if (duration < VOICE_CONFIG.minDuration) { audioChunks = []; return; }
+            if (!send) { addSystemMessage('⏸️ 已取消录音'); audioChunks = []; return; }
+            if (duration < VOICE_CONFIG.minDuration) { addSystemMessage('⏸️ 说话时间太短 (需≥1秒)'); audioChunks = []; return; }
             if (audioChunks.length > 0) {
                 var audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                 addVoiceMessage(duration, audioBlob, userAddress || '我');
+                addSystemMessage('语音消息已发送 (时长 ' + formatDuration(duration) + ')');
+            } else {
+                addSystemMessage('⚠️ 录音数据异常，请重试');
             }
             audioChunks = [];
         }
@@ -2572,7 +2768,9 @@
         function toggleEmojiPanel() {
             var overlay = document.getElementById('emojiOverlay');
             overlay.classList.toggle('active');
-            if (overlay.classList.contains('active')) { renderEmojis(); }
+            if (overlay.classList.contains('active')) {
+                renderEmojis();
+            }
         }
         
         function renderEmojis() {
@@ -2596,12 +2794,15 @@
         }
         
         // ===== 加号弹窗 =====
-        function toggleMorePanel() { document.getElementById('moreOverlay').classList.toggle('active'); }
+        function toggleMorePanel() {
+            document.getElementById('moreOverlay').classList.toggle('active');
+        }
         
         function handleMoreAction(action) {
             if (action === '图片') { handleImageUpload(); return; }
             if (action === '视频') { handleVideoUpload(); return; }
             toggleMorePanel();
+            addSystemMessage('📌 发起「' + action + '」功能 (演示)');
             setTimeout(function() {
                 var replies = ['支持 ' + action + '！', '我也要参与 ' + action, action + ' 功能不错', '已收到 ' + action + ' 请求'];
                 addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
@@ -2614,9 +2815,11 @@
             var current = parseInt(badge.textContent);
             if (current > 0) {
                 badge.textContent = '0';
+                addSystemMessage('🔔 已读所有通知');
             } else {
                 notifCount = 3;
                 badge.textContent = notifCount;
+                addSystemMessage('🔔 有 3 条新通知');
             }
         }
         
