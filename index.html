@@ -1640,11 +1640,10 @@
             
             if (scaledH > ch) {
                 // 图片高度大于容器高度，允许上下拖动
-                // 但图片边缘必须始终对齐屏幕边缘，不能拖出空白
                 var maxY = scaledH - ch;
-                // ty范围：顶部对齐时ty=0，底部对齐时ty=-maxY
-                // 不允许ty>0（顶部不能低于屏幕顶部）
-                // 不允许ty<-maxY（底部不能高于屏幕底部）
+                // ty范围：0（顶部对齐）到 -maxY（底部对齐）
+                // 不允许ty>0（顶部不能低于屏幕顶部，否则顶部出现空白）
+                // 不允许ty<-maxY（底部不能高于屏幕底部，否则底部出现空白）
                 ty = Math.max(-maxY, Math.min(0, ty));
             } else {
                 // 图片高度小于容器高度，上下居中，不允许拖动
@@ -1694,26 +1693,19 @@
                     return;
                 }
                 
-                // 始终计算左右铺满的缩放比例
                 var scaleToFitWidth = containerWidth / imgWidth;
-                
-                // 限制最大缩放倍数
                 scaleToFitWidth = Math.min(scaleToFitWidth, 8);
-                // 最小缩放倍数为1
                 scaleToFitWidth = Math.max(scaleToFitWidth, 1);
                 
                 imageScale = scaleToFitWidth;
                 imageTranslateX = 0;
                 
-                // 计算缩放后图片高度
                 var scaledHeight = imgHeight * imageScale;
                 
                 if (scaledHeight > containerHeight) {
-                    // 图片高度超出屏幕，顶部对齐
                     imageTranslateY = 0;
                     img.style.transformOrigin = 'top center';
                 } else {
-                    // 图片高度小于屏幕，上下居中
                     imageTranslateY = (containerHeight - scaledHeight) / 2;
                     img.style.transformOrigin = 'center center';
                 }
@@ -1749,7 +1741,7 @@
             }, 3000);
         }
         
-        // ✅ 双击切换：原始大小 ↔ 铺满屏幕
+        // ✅ 双击切换
         function onImageDblClick(e) {
             e.stopPropagation();
             var img = currentImage;
