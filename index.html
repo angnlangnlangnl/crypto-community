@@ -1349,6 +1349,90 @@
             display: block;
         }
         
+        /* ===== 会议信息弹窗 ===== */
+        .meeting-modal .modal-content {
+            max-width: 480px;
+        }
+        .meeting-modal .meeting-info {
+            padding: 8px 0;
+        }
+        .meeting-modal .meeting-info .meeting-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+        .meeting-modal .meeting-info .meeting-time {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .meeting-modal .meeting-info .meeting-link {
+            font-size: 13px;
+            color: #1a73e8;
+            word-break: break-all;
+            margin-bottom: 6px;
+            padding: 8px 12px;
+            background: #f0f7ff;
+            border-radius: 8px;
+        }
+        .meeting-modal .meeting-info .meeting-code {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+            padding: 6px 12px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            display: inline-block;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+        .meeting-modal .meeting-info .meeting-tip {
+            font-size: 12px;
+            color: #999;
+            margin-top: 10px;
+            padding: 10px 12px;
+            background: #fafafa;
+            border-radius: 8px;
+            border-left: 3px solid #07c160;
+        }
+        .meeting-modal .meeting-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .meeting-modal .meeting-actions button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .meeting-modal .meeting-actions .btn-join {
+            background: #07c160;
+            color: white;
+        }
+        .meeting-modal .meeting-actions .btn-join:hover {
+            background: #06ad56;
+        }
+        .meeting-modal .meeting-actions .btn-copy {
+            background: #e8e8e8;
+            color: #333;
+        }
+        .meeting-modal .meeting-actions .btn-copy:hover {
+            background: #d5d5d5;
+        }
+        .meeting-modal .meeting-actions .btn-close {
+            background: #e8e8e8;
+            color: #333;
+        }
+        .meeting-modal .meeting-actions .btn-close:hover {
+            background: #d5d5d5;
+        }
+        
         /* 适配小屏 */
         @media (max-width: 420px) {
             .more-grid { gap: 12px 4px; }
@@ -1401,6 +1485,9 @@
             .fullscreen-player .pause-overlay svg { width: 48px; height: 48px; }
             .fullscreen-player .media-content video { height: 100vh; width: auto; }
             .fullscreen-player .media-content img { width: 100%; height: auto; max-height: 100vh; }
+            .meeting-modal .meeting-info .meeting-title { font-size: 15px; }
+            .meeting-modal .meeting-info .meeting-code { font-size: 13px; }
+            .meeting-modal .meeting-actions button { font-size: 12px; padding: 8px; }
         }
         
         @media (max-width: 360px) {
@@ -1538,6 +1625,28 @@
             <div class="progress-bar" id="fullscreenProgress">
                 <div class="progress-fill" id="fullscreenProgressFill"></div>
                 <div class="progress-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 会议信息弹窗 ===== -->
+    <div class="modal-overlay meeting-modal" id="meetingModal">
+        <div class="modal-content">
+            <button class="modal-close-btn" onclick="closeModal('meetingModal')">✕</button>
+            <div class="modal-title">📞 腾讯会议</div>
+            <div class="meeting-info">
+                <div class="meeting-title">悟 邀请您参加腾讯会议</div>
+                <div class="meeting-time">📅 会议时间：2026/08/22 15:30-16:30 (GMT+08:00) 中国标准时间 - 北京</div>
+                <div class="meeting-link">🔗 点击链接直接加入会议：<br>https://meeting.tencent.com/dm/hIbayciQ5BHJ</div>
+                <div style="margin: 8px 0;">
+                    <span class="meeting-code">#腾讯会议：945-379-565</span>
+                </div>
+                <div class="meeting-tip">💡 复制该信息，打开手机腾讯会议即可参与</div>
+            </div>
+            <div class="meeting-actions">
+                <button class="btn-join" onclick="joinMeeting()">立即加入</button>
+                <button class="btn-copy" onclick="copyMeetingInfo()">复制信息</button>
+                <button class="btn-close" onclick="closeModal('meetingModal')">关闭</button>
             </div>
         </div>
     </div>
@@ -1704,6 +1813,78 @@
         let currentPlayingId = null;
         let fullscreenVideo = null;
         let isVideoPaused = false;
+        
+        // ===== 会议功能 =====
+        function handleEnterMeeting() {
+            openModal('meetingModal');
+        }
+        
+        function joinMeeting() {
+            // 尝试打开腾讯会议链接
+            const link = document.createElement('a');
+            link.href = 'https://meeting.tencent.com/dm/hIbayciQ5BHJ';
+            link.target = '_blank';
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // 同时尝试唤醒腾讯会议App
+            const appLink = document.createElement('a');
+            appLink.href = 'tencent://meeting?code=945379565';
+            appLink.style.display = 'none';
+            document.body.appendChild(appLink);
+            appLink.click();
+            document.body.removeChild(appLink);
+            
+            closeModal('meetingModal');
+            addSystemMessage('📞 正在尝试加入会议...');
+            setTimeout(() => {
+                addSystemMessage('✅ 已打开腾讯会议，请确认加入');
+            }, 1500);
+        }
+        
+        function copyMeetingInfo() {
+            const info = `悟 邀请您参加腾讯会议
+会议主题：悟的快速会议
+会议时间：2026/08/22 15:30-16:30 (GMT+08:00) 中国标准时间 - 北京
+
+点击链接直接加入会议：
+https://meeting.tencent.com/dm/hIbayciQ5BHJ
+
+#腾讯会议：945-379-565
+
+复制该信息，打开手机腾讯会议即可参与`;
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(info).then(function() {
+                    addSystemMessage('✅ 会议信息已复制到剪贴板');
+                }).catch(function() {
+                    // 降级方案
+                    fallbackCopy(info);
+                });
+            } else {
+                fallbackCopy(info);
+            }
+            closeModal('meetingModal');
+        }
+        
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            textarea.style.top = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                addSystemMessage('✅ 会议信息已复制到剪贴板');
+            } catch (e) {
+                addSystemMessage('⚠️ 复制失败，请手动复制');
+            }
+            document.body.removeChild(textarea);
+        }
         
         // ===== 全屏播放器控制 =====
         function openFullscreen(mediaUrl, type) {
@@ -2032,7 +2213,7 @@
             };
         }
         
-        // ===== 视频消息 - 显示上传进度 =====
+        // ===== 视频消息 =====
         function addOwnVideoMessage(videoUrl, sender) {
             messageCount++;
             const messages = document.getElementById('messages');
@@ -2042,7 +2223,6 @@
             let displaySender = (sender && sender !== '我') ? sender.slice(0, 6) + '...' + sender.slice(-1) : '我';
             const vidId = 'vid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
             
-            // 初始进度0%
             const progressSvg = `
                 <div class="video-progress" id="${vidId}_progress">
                     <svg width="48" height="48" viewBox="0 0 48 48">
@@ -2087,7 +2267,6 @@
             const progressFg = progressContainer ? progressContainer.querySelector('.progress-fg') : null;
             
             if (video && wrapperDiv) {
-                // 模拟上传进度 (0% -> 100%)
                 let uploadProgress = 0;
                 const circumference = 119.4;
                 
@@ -2100,15 +2279,12 @@
                         if (progressText) progressText.textContent = Math.round(uploadProgress) + '%';
                         setTimeout(updateUploadProgress, 300 + Math.random() * 400);
                     } else {
-                        // 上传完成，隐藏覆盖层
                         if (overlay) overlay.classList.add('hidden');
                     }
                 }
                 
-                // 开始模拟上传进度
                 setTimeout(updateUploadProgress, 500);
                 
-                // 显示时长
                 video.addEventListener('loadedmetadata', function() {
                     const dur = Math.floor(video.duration);
                     const m = Math.floor(dur / 60);
@@ -2118,7 +2294,6 @@
                 });
                 if (video.readyState >= 1) video.currentTime = 0;
                 
-                // 视频播放进度更新（仅在上传完成后生效）
                 video.addEventListener('timeupdate', function() {
                     if (video.duration && progressFg && uploadProgress >= 100) {
                         const pct = Math.min(100, (video.currentTime / video.duration) * 100);
@@ -2130,7 +2305,6 @@
                     }
                 });
                 
-                // 播放/暂停切换显示
                 video.addEventListener('play', function() {
                     if (uploadProgress >= 100) {
                         if (overlay) overlay.classList.add('hidden');
@@ -2158,10 +2332,9 @@
                     if (progressText) progressText.textContent = '0%';
                 });
                 
-                // 单击视频进入全屏播放（仅在上传完成后）
                 wrapperDiv.onclick = function(e) {
                     e.stopPropagation();
-                    if (uploadProgress < 100) return; // 上传中不可点击
+                    if (uploadProgress < 100) return;
                     if (!video.paused) {
                         video.pause();
                         if (overlay) overlay.classList.remove('hidden');
@@ -2570,25 +2743,6 @@
                 const replies = [`支持 ${action}！`, `我也要参与 ${action}`, `${action} 功能不错`, `已收到 ${action} 请求`];
                 addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
             }, 500 + Math.random() * 1000);
-        }
-        
-        // ===== 进入会议 =====
-        function handleEnterMeeting() {
-            if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
-            const display = document.getElementById('countdownDisplay');
-            if (display) { display.textContent = '已开始'; display.classList.add('ended'); }
-            addSystemMessage('📞 正在进入会议...');
-            const link = document.createElement('a');
-            link.href = 'tencent://meeting?';
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            setTimeout(() => { window.open('https://meeting.tencent.com/', '_blank'); }, 300);
-            setTimeout(() => {
-                addSystemMessage('✅ 已尝试唤醒腾讯会议，请检查是否已打开');
-                addOtherMessage('欢迎加入会议！', '会议主持人');
-            }, 1500);
         }
         
         // ===== 通知点击 =====
