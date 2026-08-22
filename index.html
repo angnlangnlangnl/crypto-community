@@ -1622,7 +1622,7 @@
         var zoomHintTimeout = null;
         var isFullscreenImage = false;
         
-        // 边界约束函数
+        // ✅ 修复：边界约束函数
         function constrainTransform(img, scale, tx, ty) {
             if (!img) return { tx: 0, ty: 0 };
             
@@ -1639,8 +1639,8 @@
             tx = 0;
             
             if (scaledH > ch) {
-                var maxY = scaledH - ch;
-                ty = Math.max(-maxY, Math.min(0, ty));
+                var maxY = (scaledH - ch) / 2;
+                ty = Math.max(-maxY, Math.min(maxY, ty));
             } else {
                 ty = (ch - scaledH) / 2;
             }
@@ -1648,6 +1648,7 @@
             return { tx: tx, ty: ty };
         }
         
+        // ✅ 修复：初始化图片，确保图片可见
         function initImageZoom(imageWrap, img) {
             currentImageWrap = imageWrap;
             currentImage = img;
@@ -1658,6 +1659,9 @@
             isFullscreenImage = true;
             img.className = '';
             img.style.transformOrigin = 'center center';
+            img.style.display = 'block';
+            img.style.visibility = 'visible';
+            img.style.opacity = '1';
             
             showZoomHint();
             
@@ -1675,6 +1679,7 @@
             img.addEventListener('touchend', onImageTouchEnd, { passive: false });
             img.addEventListener('mousedown', onImageMouseDown);
             
+            // ✅ 修复：应用智能缩放，确保图片可见
             function applySmartZoom() {
                 var container = imageWrap;
                 var containerWidth = container.clientWidth;
@@ -1682,11 +1687,17 @@
                 var imgWidth = img.naturalWidth || img.width;
                 var imgHeight = img.naturalHeight || img.height;
                 
-                if (containerWidth === 0 || imgWidth === 0 || imgHeight === 0) {
+                if (containerWidth === 0 || containerHeight === 0) {
                     requestAnimationFrame(applySmartZoom);
                     return;
                 }
                 
+                if (imgWidth === 0 || imgHeight === 0) {
+                    requestAnimationFrame(applySmartZoom);
+                    return;
+                }
+                
+                // 计算横向铺满的缩放比例
                 var scaleToFitWidth = containerWidth / imgWidth;
                 scaleToFitWidth = Math.min(scaleToFitWidth, 8);
                 scaleToFitWidth = Math.max(scaleToFitWidth, 1);
@@ -1697,13 +1708,22 @@
                 var scaledHeight = imgHeight * imageScale;
                 
                 if (scaledHeight > containerHeight) {
+                    // 图片高度超出屏幕，顶部对齐
                     imageTranslateY = (scaledHeight - containerHeight) / 2;
                 } else {
+                    // 图片高度小于屏幕，上下居中
                     imageTranslateY = (containerHeight - scaledHeight) / 2;
                 }
                 
                 isImageZoomed = true;
                 img.className = 'zoomed';
+                
+                // ✅ 设置容器尺寸包裹图片
+                if (imageWrap) {
+                    imageWrap.style.width = containerWidth + 'px';
+                    imageWrap.style.height = Math.min(scaledHeight, containerHeight) + 'px';
+                    imageWrap.style.overflow = 'hidden';
+                }
                 
                 img.style.transform = 'translate(0px, ' + imageTranslateY + 'px) scale(' + imageScale + ')';
             }
@@ -1968,7 +1988,7 @@
                 wrap.className = 'image-wrap';
                 var img = document.createElement('img');
                 img.src = mediaUrl;
-                img.style.cssText = 'display:block;border:none;outline:none;image-orientation:from-image;max-width:100%;max-height:none;width:auto;height:auto;';
+                img.style.cssText = 'display:block;border:none;outline:none;image-orientation:from-image;width:100%;height:auto;max-width:100%;max-height:none;';
                 wrap.appendChild(img);
                 content.appendChild(wrap);
                 player.classList.add('active');
