@@ -1011,6 +1011,54 @@
             to { opacity: 1; }
         }
         
+        /* ===== 语音消息气泡 ===== */
+        .voice-msg-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 14px 6px 10px;
+            border-radius: 8px;
+            background: #f0f0f0;
+            min-width: 80px;
+            max-width: 200px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .msg-wrapper.own .voice-msg-wrapper {
+            background: #95ec69;
+        }
+        .voice-msg-wrapper .play-btn {
+            font-size: 20px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .voice-msg-wrapper .waveform {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            height: 24px;
+            min-width: 40px;
+        }
+        .voice-msg-wrapper .waveform .bar {
+            width: 3px;
+            background: #666;
+            border-radius: 2px;
+            transition: height 0.1s;
+        }
+        .msg-wrapper.own .voice-msg-wrapper .waveform .bar {
+            background: #333;
+        }
+        .voice-msg-wrapper .duration {
+            font-size: 11px;
+            color: #888;
+            flex-shrink: 0;
+            font-variant-numeric: tabular-nums;
+        }
+        .msg-wrapper.own .voice-msg-wrapper .duration {
+            color: #444;
+        }
+        
         /* 适配小屏 */
         @media (max-width: 420px) {
             .more-grid {
@@ -1059,6 +1107,11 @@
             .airdrop-item { padding: 10px 12px; }
             .airdrop-item .icon { font-size: 22px; }
             .airdrop-item .amount { font-size: 14px; }
+            .voice-msg-wrapper { padding: 4px 10px 4px 8px; min-width: 60px; max-width: 150px; }
+            .voice-msg-wrapper .play-btn { font-size: 16px; }
+            .voice-msg-wrapper .duration { font-size: 10px; }
+            .voice-msg-wrapper .waveform { height: 18px; gap: 1.5px; }
+            .voice-msg-wrapper .waveform .bar { width: 2.5px; }
         }
         
         @media (max-width: 360px) {
@@ -1464,9 +1517,15 @@
         let airdropClaimed = false;
         let airdropSkipped = false;
         let isRecording = false;
-        let recognitionInstance = null;
+        let mediaRecorder = null;
+        let audioChunks = [];
         let recordingTimer = null;
-        let voiceResultText = '';
+        let recordingDuration = 0;
+        let audioContext = null;
+        let analyser = null;
+        let dataArray = null;
+        let animationFrame = null;
+        let currentAudio = null;
         
         // ===== 会议倒计时 =====
         let countdownSeconds = 300;
@@ -1680,6 +1739,154 @@
             scrollToBottom();
         }
         
+        function addVoiceMessage(text, duration, audioBlob, sender) {
+            messageCount++;
+            const messages = document.getElementById('messages');
+            const emptyState = document.getElementById('emptyState');
+            if (emptyState) emptyState.style.display = 'none';
+            
+            // 生成唯一ID
+            const msgId = 'voice_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+            
+            // 存储音频数据
+            if (!window._voiceData) window._voiceData = {};
+            window._voiceData[msgId] = audioBlob;
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'msg-wrapper own';
+            let displaySender = '';
+            if (sender && sender !== '我') {
+                displaySender = sender.slice(0, 6) + '...' + sender.slice(-1);
+            } else {
+                displaySender = '我';
+            }
+            
+            const durationStr = formatDuration(duration);
+            
+            wrapper.innerHTML = `
+                <div class="msg-avatar">我</div>
+                <div class="msg-body">
+                    <span class="msg-sender">${displaySender}</span>
+                    <div class="msg-bubble" style="padding: 4px 0;">
+                        <div class="voice-msg-wrapper" data-msgid="${msgId}" onclick="playVoiceMessage('${msgId}')">
+                            <span class="play-btn" id="playBtn_${msgId}">▶️</span>
+                            <div class="waveform" id="waveform_${msgId}">
+                                ${generateWaveformBars()}
+                            </div>
+                            <span class="duration">${durationStr}</span>
+                        </div>
+                    </div>
+                    <span class="msg-time">${getTime()}</span>
+                </div>
+            `;
+            messages.appendChild(wrapper);
+            scrollToBottom();
+        }
+        
+        function addOtherVoiceMessage(text, duration, audioBlob, sender) {
+            messageCount++;
+            const messages = document.getElementById('messages');
+            
+            const msgId = 'voice_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+            if (!window._voiceData) window._voiceData = {};
+            window._voiceData[msgId] = audioBlob;
+            
+            let displaySender = '';
+            if (sender && sender !== '币圈助手') {
+                displaySender = sender.slice(0, 6) + '...' + sender.slice(-1);
+            } else {
+                displaySender = sender;
+            }
+            
+            const durationStr = formatDuration(duration);
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'msg-wrapper other';
+            wrapper.innerHTML = `
+                <div class="msg-avatar">助</div>
+                <div class="msg-body">
+                    <span class="msg-sender">${displaySender}</span>
+                    <div class="msg-bubble" style="padding: 4px 0;">
+                        <div class="voice-msg-wrapper" data-msgid="${msgId}" onclick="playVoiceMessage('${msgId}')">
+                            <span class="play-btn" id="playBtn_${msgId}">▶️</span>
+                            <div class="waveform" id="waveform_${msgId}">
+                                ${generateWaveformBars()}
+                            </div>
+                            <span class="duration">${durationStr}</span>
+                        </div>
+                    </div>
+                    <span class="msg-time">${getTime()}</span>
+                </div>
+            `;
+            messages.appendChild(wrapper);
+            scrollToBottom();
+        }
+        
+        function generateWaveformBars() {
+            let bars = '';
+            for (let i = 0; i < 24; i++) {
+                const height = 4 + Math.random() * 16;
+                bars += `<span class="bar" style="height:${height}px;"></span>`;
+            }
+            return bars;
+        }
+        
+        function formatDuration(seconds) {
+            const s = Math.floor(seconds);
+            const m = Math.floor(s / 60);
+            const secs = s % 60;
+            if (m > 0) {
+                return m + ':' + String(secs).padStart(2, '0');
+            }
+            return '0:' + String(secs).padStart(2, '0');
+        }
+        
+        function playVoiceMessage(msgId) {
+            const data = window._voiceData;
+            if (!data || !data[msgId]) {
+                addSystemMessage('⚠️ 语音文件不存在');
+                return;
+            }
+            
+            // 停止当前播放
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+                // 重置所有播放按钮
+                document.querySelectorAll('.voice-msg-wrapper .play-btn').forEach(btn => {
+                    btn.textContent = '▶️';
+                });
+            }
+            
+            const audioBlob = data[msgId];
+            const url = URL.createObjectURL(audioBlob);
+            const audio = new Audio(url);
+            currentAudio = audio;
+            
+            const playBtn = document.getElementById('playBtn_' + msgId);
+            if (playBtn) playBtn.textContent = '⏸️';
+            
+            audio.onended = function() {
+                if (playBtn) playBtn.textContent = '▶️';
+                currentAudio = null;
+                URL.revokeObjectURL(url);
+            };
+            
+            audio.onerror = function() {
+                if (playBtn) playBtn.textContent = '▶️';
+                currentAudio = null;
+                URL.revokeObjectURL(url);
+                addSystemMessage('⚠️ 语音播放失败');
+            };
+            
+            audio.play().catch(function(err) {
+                if (playBtn) playBtn.textContent = '▶️';
+                currentAudio = null;
+                URL.revokeObjectURL(url);
+                addSystemMessage('⚠️ 语音播放失败: ' + err.message);
+            });
+        }
+        
         function addOtherMessage(text, sender) {
             messageCount++;
             const messages = document.getElementById('messages');
@@ -1734,7 +1941,7 @@
         }
         document.getElementById('msgInput').addEventListener('input', updateSendBtn);
         
-        // ===== 语音模式 - 修复版 =====
+        // ===== 语音模式 - 真正的录音功能 =====
         function toggleVoiceMode() {
             const input = document.getElementById('msgInput');
             const voiceBtn = document.getElementById('voiceBtn');
@@ -1742,7 +1949,7 @@
             if (!isVoiceMode) {
                 // 进入语音模式
                 isVoiceMode = true;
-                input.placeholder = '按住说话，松开发送';
+                input.placeholder = '按住录音，松开发送';
                 input.readOnly = true;
                 input.style.background = '#f0f0f0';
                 input.style.textAlign = 'center';
@@ -1765,7 +1972,7 @@
                 input.addEventListener('pointerleave', onPointerUp);
                 input.addEventListener('pointercancel', onPointerUp);
                 
-                addSystemMessage('🎤 语音模式已开启，按住输入框说话');
+                addSystemMessage('🎤 录音模式已开启，按住输入框录音');
             } else {
                 // 退出语音模式
                 isVoiceMode = false;
@@ -1809,133 +2016,142 @@
             }
         }
         
-        function startRecording() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                addSystemMessage('❌ 您的浏览器不支持语音识别');
-                return;
-            }
-            
-            isRecording = true;
-            voiceResultText = '';
-            const input = document.getElementById('msgInput');
-            input.classList.add('recording');
-            input.value = '🎙️ 录音中...';
-            
-            // 创建识别实例
-            recognitionInstance = new SpeechRecognition();
-            recognitionInstance.lang = 'zh-CN';
-            recognitionInstance.continuous = false;
-            recognitionInstance.interimResults = true;
-            recognitionInstance.maxAlternatives = 1;
-            
-            let hasResult = false;
-            
-            recognitionInstance.onresult = function(event) {
-                let final = '';
-                let interim = '';
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    if (event.results[i].isFinal) {
-                        final += event.results[i][0].transcript;
-                    } else {
-                        interim += event.results[i][0].transcript;
-                    }
-                }
-                const text = final || interim;
-                if (text.trim()) {
-                    hasResult = true;
-                    voiceResultText = text;
-                    input.value = text;
-                    input.classList.remove('recording');
-                    input.classList.add('recognition-done');
-                    // 识别到最终结果后自动停止
-                    if (final) {
-                        setTimeout(() => {
-                            if (isRecording) stopRecording();
-                        }, 300);
-                    }
-                }
-            };
-            
-            recognitionInstance.onerror = function(event) {
-                if (event.error === 'not-allowed') {
-                    addSystemMessage('❌ 请允许浏览器使用麦克风权限');
-                } else if (event.error === 'no-speech') {
-                    // 无语音输入，静默处理
-                } else if (event.error !== 'aborted') {
-                    addSystemMessage('⚠️ 语音识别错误: ' + event.error);
-                }
-                if (isRecording) {
-                    setTimeout(() => stopRecording(), 300);
-                }
-            };
-            
-            recognitionInstance.onend = function() {
-                if (isRecording) {
-                    setTimeout(() => {
-                        if (isRecording) stopRecording();
-                    }, 300);
-                }
-            };
-            
-            // 启动识别
+        // ===== 真正的录音功能 =====
+        async function startRecording() {
             try {
-                recognitionInstance.start();
+                // 获取音频流
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    } 
+                });
+                
+                isRecording = true;
+                audioChunks = [];
+                recordingDuration = 0;
+                
+                const input = document.getElementById('msgInput');
+                input.classList.add('recording');
+                input.value = '🎙️ 录音中 0s';
+                
+                // 创建MediaRecorder
+                mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'audio/webm;codecs=opus'
+                });
+                
+                mediaRecorder.ondataavailable = function(event) {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+                
+                mediaRecorder.onstop = function() {
+                    // 停止所有音轨
+                    stream.getTracks().forEach(track => track.stop());
+                    
+                    // 处理录音结果
+                    if (audioChunks.length > 0) {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const duration = recordingDuration;
+                        const input = document.getElementById('msgInput');
+                        input.classList.remove('recording', 'recognition-done');
+                        input.style.background = '#f0f0f0';
+                        input.style.color = '#333';
+                        input.value = '';
+                        input.placeholder = '按住录音，松开发送';
+                        
+                        // 发送语音消息
+                        if (duration >= 1) {
+                            addVoiceMessage('', duration, audioBlob, userAddress || '我');
+                            addSystemMessage('🎤 语音消息已发送 (时长 ' + formatDuration(duration) + ')');
+                            
+                            // 自动回复
+                            setTimeout(() => {
+                                const replies = ['收到语音！👍', '已收到', '好的', '明白了', '支持！', '嗯嗯'];
+                                addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
+                            }, 600 + Math.random() * 1000);
+                        } else {
+                            addSystemMessage('⏸️ 录音时间太短，已取消发送');
+                        }
+                    } else {
+                        const input = document.getElementById('msgInput');
+                        input.classList.remove('recording', 'recognition-done');
+                        input.style.background = '#f0f0f0';
+                        input.style.color = '#333';
+                        input.value = '';
+                        input.placeholder = '按住录音，松开发送';
+                    }
+                    
+                    // 清理
+                    if (audioContext) {
+                        audioContext.close();
+                        audioContext = null;
+                    }
+                    if (animationFrame) {
+                        cancelAnimationFrame(animationFrame);
+                        animationFrame = null;
+                    }
+                };
+                
+                // 开始录音
+                mediaRecorder.start(100);
+                
+                // 录音计时
+                if (recordingTimer) clearInterval(recordingTimer);
+                recordingTimer = setInterval(() => {
+                    recordingDuration++;
+                    const input = document.getElementById('msgInput');
+                    if (input && isRecording) {
+                        const mins = Math.floor(recordingDuration / 60);
+                        const secs = recordingDuration % 60;
+                        if (mins > 0) {
+                            input.value = '🎙️ 录音中 ' + mins + ':' + String(secs).padStart(2, '0');
+                        } else {
+                            input.value = '🎙️ 录音中 ' + secs + 's';
+                        }
+                    }
+                }, 1000);
+                
+                // 超时保护（60秒）
+                setTimeout(() => {
+                    if (isRecording) {
+                        stopRecording();
+                    }
+                }, 60000);
+                
             } catch (err) {
-                addSystemMessage('⚠️ 语音识别启动失败');
-                stopRecording();
+                addSystemMessage('❌ 无法访问麦克风: ' + err.message);
+                isRecording = false;
+                const input = document.getElementById('msgInput');
+                input.classList.remove('recording');
+                input.value = '';
+                input.placeholder = '按住录音，松开发送';
             }
-            
-            // 超时保护（10秒）
-            setTimeout(() => {
-                if (isRecording) stopRecording();
-            }, 10000);
         }
         
         function stopRecording() {
             if (!isRecording) return;
             isRecording = false;
             
-            // 停止识别
-            if (recognitionInstance) {
-                try {
-                    recognitionInstance.stop();
-                } catch(e) {}
-                recognitionInstance = null;
+            if (recordingTimer) {
+                clearInterval(recordingTimer);
+                recordingTimer = null;
+            }
+            
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
             }
             
             const input = document.getElementById('msgInput');
-            input.classList.remove('recording', 'recognition-done');
+            input.classList.remove('recording');
             input.style.background = '#f0f0f0';
             input.style.color = '#333';
-            input.style.textAlign = 'center';
-            
-            const text = input.value.trim();
-            const cleanText = text
-                .replace(/^🎙️ 录音中[\.]*\s*/, '')
-                .replace(/^🎙️ 录音中/, '')
-                .trim();
-            
-            // 优先使用识别结果，否则使用输入框内容
-            const finalText = voiceResultText || cleanText;
-            
-            if (finalText && finalText.length > 0 && !finalText.startsWith('🎙️')) {
-                // 发送语音消息
-                addOwnMessage(finalText, userAddress || '我');
+            if (!input.value || input.value.startsWith('🎙️')) {
                 input.value = '';
-                addSystemMessage('🎤 语音消息已发送');
-                
-                // 自动回复
-                setTimeout(() => {
-                    const replies = ['收到！👍', '同意', '有道理', '关注一下', '好项目！', '学习了', '支持！', '已关注'];
-                    addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
-                }, 600 + Math.random() * 1500);
-            } else {
-                input.value = '';
-                // 静默处理
             }
-            input.placeholder = '按住说话，松开发送';
-            voiceResultText = '';
+            input.placeholder = '按住录音，松开发送';
         }
         
         // ===== 表情包弹窗 =====
