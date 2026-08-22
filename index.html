@@ -336,6 +336,7 @@
             color: #999;
         }
         
+        /* ===== 图片消息样式 ===== */
         .msg-bubble {
             padding: 10px 14px;
             border-radius: 8px;
@@ -343,19 +344,53 @@
             line-height: 1.4;
             word-wrap: break-word;
             word-break: break-word;
+            overflow: hidden;
         }
-        
         .msg-wrapper.own .msg-bubble {
             background: #95ec69;
             color: #333;
             border-top-right-radius: 2px;
         }
-        
         .msg-wrapper.other .msg-bubble {
             background: white;
             color: #333;
             border-top-left-radius: 2px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+        }
+        .msg-bubble img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            display: block;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .msg-bubble img:active {
+            transform: scale(0.98);
+        }
+        .msg-bubble .video-container {
+            max-width: 220px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .msg-bubble .video-container video {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            display: block;
+            background: #000;
+        }
+        .msg-bubble .video-container .play-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            color: white;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+            pointer-events: none;
+            opacity: 0.9;
         }
         
         .msg-time {
@@ -530,10 +565,6 @@
             color: white !important;
             animation: pulse 0.5s ease-in-out infinite alternate;
         }
-        .input-field.recognition-done {
-            background: #4ecdc4 !important;
-            color: white !important;
-        }
         .input-field.cancel-mode {
             background: #ffb3b3 !important;
             color: #cc0000 !important;
@@ -572,6 +603,11 @@
         .messages::-webkit-scrollbar-thumb {
             background: #ccc;
             border-radius: 2px;
+        }
+        
+        /* ===== 隐藏的文件输入 ===== */
+        .file-input-hidden {
+            display: none;
         }
         
         /* ========== 弹窗/页面通用样式 ========== */
@@ -1142,6 +1178,9 @@
             .voice-msg-wrapper .voice-icon svg { width: 17px; height: 17px; }
             .voice-msg-wrapper .duration { font-size: 10px; min-width: 22px; }
             .cancel-tip { font-size: 13px; padding: 8px 16px; bottom: 90px; }
+            .msg-bubble img { max-width: 150px; max-height: 150px; }
+            .msg-bubble .video-container { max-width: 160px; }
+            .msg-bubble .video-container .play-overlay { font-size: 32px; }
         }
         
         @media (max-width: 360px) {
@@ -1165,6 +1204,8 @@
             .countdown-banner {
                 top: 98px;
             }
+            .msg-bubble img { max-width: 260px; max-height: 260px; }
+            .msg-bubble .video-container { max-width: 280px; }
         }
     </style>
 </head>
@@ -1259,6 +1300,10 @@
         
         <button class="send-btn" id="sendBtn" onclick="sendMessage()">发送</button>
     </div>
+    
+    <!-- 隐藏的文件输入 -->
+    <input type="file" class="file-input-hidden" id="imageInput" accept="image/*" multiple>
+    <input type="file" class="file-input-hidden" id="videoInput" accept="video/*">
 
     <!-- ===== 取消提示浮窗 ===== -->
     <div class="cancel-tip" id="cancelTip">⬆ 松开取消发送</div>
@@ -1777,7 +1822,103 @@
             scrollToBottom();
         }
         
-        // ===== 语音消息 - 使用喇叭样式 =====
+        function addOwnImageMessage(imageUrl, sender) {
+            messageCount++;
+            const messages = document.getElementById('messages');
+            const emptyState = document.getElementById('emptyState');
+            if (emptyState) emptyState.style.display = 'none';
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'msg-wrapper own';
+            let displaySender = '';
+            if (sender && sender !== '我') {
+                displaySender = sender.slice(0, 6) + '...' + sender.slice(-1);
+            } else {
+                displaySender = '我';
+            }
+            wrapper.innerHTML = `
+                <div class="msg-avatar">我</div>
+                <div class="msg-body">
+                    <span class="msg-sender">${displaySender}</span>
+                    <div class="msg-bubble"><img src="${imageUrl}" alt="图片" onclick="viewImage('${imageUrl}')"></div>
+                    <span class="msg-time">${getTime()}</span>
+                </div>
+            `;
+            messages.appendChild(wrapper);
+            scrollToBottom();
+        }
+        
+        function addOwnVideoMessage(videoUrl, sender) {
+            messageCount++;
+            const messages = document.getElementById('messages');
+            const emptyState = document.getElementById('emptyState');
+            if (emptyState) emptyState.style.display = 'none';
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'msg-wrapper own';
+            let displaySender = '';
+            if (sender && sender !== '我') {
+                displaySender = sender.slice(0, 6) + '...' + sender.slice(-1);
+            } else {
+                displaySender = '我';
+            }
+            wrapper.innerHTML = `
+                <div class="msg-avatar">我</div>
+                <div class="msg-body">
+                    <span class="msg-sender">${displaySender}</span>
+                    <div class="msg-bubble">
+                        <div class="video-container">
+                            <video src="${videoUrl}" controls preload="metadata" style="max-width:100%;max-height:200px;border-radius:8px;"></video>
+                            <div class="play-overlay">▶️</div>
+                        </div>
+                    </div>
+                    <span class="msg-time">${getTime()}</span>
+                </div>
+            `;
+            messages.appendChild(wrapper);
+            scrollToBottom();
+            
+            // 点击视频容器播放/暂停
+            const container = wrapper.querySelector('.video-container');
+            const video = wrapper.querySelector('video');
+            const overlay = wrapper.querySelector('.play-overlay');
+            if (container && video) {
+                container.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (video.paused) {
+                        video.play();
+                        if (overlay) overlay.style.display = 'none';
+                    } else {
+                        video.pause();
+                        if (overlay) overlay.style.display = 'block';
+                    }
+                });
+                video.addEventListener('play', function() {
+                    if (overlay) overlay.style.display = 'none';
+                });
+                video.addEventListener('pause', function() {
+                    if (overlay && !video.ended) overlay.style.display = 'block';
+                });
+                video.addEventListener('ended', function() {
+                    if (overlay) overlay.style.display = 'block';
+                });
+            }
+        }
+        
+        // ===== 图片查看器 =====
+        function viewImage(url) {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:3000;display:flex;align-items:center;justify-content:center;cursor:pointer;animation:fadeIn 0.3s ease;';
+            overlay.innerHTML = `<img src="${url}" style="max-width:90%;max-height:90%;border-radius:8px;object-fit:contain;box-shadow:0 10px 40px rgba(0,0,0,0.5);">`;
+            overlay.onclick = function() {
+                document.body.removeChild(overlay);
+                document.body.style.overflow = '';
+            };
+            document.body.appendChild(overlay);
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // ===== 语音消息 =====
         function addVoiceMessage(duration, audioBlob, sender) {
             messageCount++;
             const messages = document.getElementById('messages');
@@ -1799,20 +1940,17 @@
             
             const durationStr = formatDuration(duration);
             
-            // 喇叭SVG - 静态（未播放）
-            const speakerSvg = `
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M11 5L6 9H2v6h4l5 4V5z"/>
-                </svg>
-            `;
-            
             wrapper.innerHTML = `
                 <div class="msg-avatar">我</div>
                 <div class="msg-body">
                     <span class="msg-sender">${displaySender}</span>
                     <div class="msg-bubble" style="padding: 4px 0;">
                         <div class="voice-msg-wrapper" data-msgid="${msgId}" onclick="playVoiceMessage('${msgId}')">
-                            <span class="voice-icon" id="voiceIcon_${msgId}">${speakerSvg}</span>
+                            <span class="voice-icon" id="voiceIcon_${msgId}">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                                </svg>
+                            </span>
                             <span class="duration">${durationStr}</span>
                         </div>
                     </div>
@@ -1828,7 +1966,6 @@
             }, 600 + Math.random() * 1000);
         }
         
-        // ===== 获取喇叭SVG - 三种状态 =====
         function getSpeakerSVG(state, color) {
             const strokeColor = color || (state === 'playing' ? '#07c160' : '#333');
             if (state === 'playing') {
@@ -1848,16 +1985,11 @@
             }
         }
         
-        // ===== 更新喇叭图标状态 =====
         function updateSpeakerIcon(msgId, state) {
             const iconContainer = document.getElementById('voiceIcon_' + msgId);
             if (!iconContainer) return;
-            
-            const isOwn = iconContainer.closest('.msg-wrapper.own') !== null;
-            const color = state === 'playing' ? '#07c160' : (isOwn ? '#333' : '#333');
+            const color = state === 'playing' ? '#07c160' : '#333';
             iconContainer.innerHTML = getSpeakerSVG(state, color);
-            
-            // 重新应用动画样式（CSS动画需要重新触发）
             if (state === 'playing') {
                 iconContainer.querySelectorAll('.wave1, .wave2').forEach(el => {
                     el.style.animation = 'none';
@@ -1878,7 +2010,6 @@
             return '0:' + String(secs).padStart(2, '0');
         }
         
-        // ===== 语音播放 =====
         function playVoiceMessage(msgId) {
             const data = window._voiceData;
             if (!data || !data[msgId]) {
@@ -1886,7 +2017,6 @@
                 return;
             }
             
-            // 如果点击的是当前正在播放的语音，则暂停
             if (currentPlayingId === msgId && currentAudio && !currentAudio.paused) {
                 currentAudio.pause();
                 updateSpeakerIcon(msgId, 'idle');
@@ -1894,7 +2024,6 @@
                 return;
             }
             
-            // 停止当前播放
             if (currentAudio) {
                 currentAudio.pause();
                 currentAudio = null;
@@ -1910,7 +2039,6 @@
             currentAudio = audio;
             currentPlayingId = msgId;
             
-            // 更新为播放中状态
             updateSpeakerIcon(msgId, 'playing');
             
             audio.onended = function() {
@@ -1990,6 +2118,63 @@
             }
         }
         document.getElementById('msgInput').addEventListener('input', updateSendBtn);
+        
+        // ===== 图片上传功能 =====
+        function handleImageUpload() {
+            const input = document.getElementById('imageInput');
+            input.click();
+        }
+        
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (!file.type.startsWith('image/')) continue;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    addOwnImageMessage(ev.target.result, userAddress || '我');
+                    addSystemMessage('📷 图片已发送');
+                    // 自动回复
+                    setTimeout(() => {
+                        const replies = ['好图！👍', '不错', '收到', '支持！', '666'];
+                        addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
+                    }, 500 + Math.random() * 1000);
+                };
+                reader.readAsDataURL(file);
+            }
+            e.target.value = '';
+            toggleMorePanel();
+        });
+        
+        // ===== 视频生成功能 =====
+        function handleVideoUpload() {
+            const input = document.getElementById('videoInput');
+            input.click();
+        }
+        
+        document.getElementById('videoInput').addEventListener('change', function(e) {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (!file.type.startsWith('video/')) continue;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    addOwnVideoMessage(ev.target.result, userAddress || '我');
+                    addSystemMessage('🎬 视频已发送');
+                    setTimeout(() => {
+                        const replies = ['好视频！🎥', '精彩', '收到', '支持！', '厉害了'];
+                        addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
+                    }, 500 + Math.random() * 1000);
+                };
+                reader.readAsDataURL(file);
+            }
+            e.target.value = '';
+            toggleMorePanel();
+        });
         
         // ===== 语音模式 =====
         function toggleVoiceMode() {
@@ -2242,6 +2427,14 @@
         }
         
         function handleMoreAction(action) {
+            if (action === '图片') {
+                handleImageUpload();
+                return;
+            }
+            if (action === '视频') {
+                handleVideoUpload();
+                return;
+            }
             toggleMorePanel();
             addSystemMessage(`📌 发起「${action}」功能 (演示)`);
             setTimeout(() => {
