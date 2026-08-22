@@ -474,7 +474,7 @@
             padding: 0;
             position: relative;
         }
-        /* 图片 - 保持原始比例，左右铺满 */
+        /* 图片 - 优先铺满左右边框，保持原图不变形 */
         .fullscreen-player .media-content img {
             width: 100%;
             height: auto;
@@ -551,22 +551,25 @@
         .fullscreen-player .media-controls .progress-bar:hover .progress-dot {
             opacity: 1;
         }
-        /* 暂停状态 - 中间显示半透明白色暂停图标 */
+        /* 暂停状态 - 圆形半透明暂停图标 */
         .fullscreen-player .pause-overlay {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 72px;
-            color: rgba(255, 255, 255, 0.2);
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s ease;
-            line-height: 1;
             z-index: 2;
         }
         .fullscreen-player .pause-overlay.show {
             opacity: 1;
+        }
+        .fullscreen-player .pause-overlay svg {
+            display: block;
+            width: 64px;
+            height: 64px;
+            filter: drop-shadow(0 2px 12px rgba(0,0,0,0.3));
         }
         
         .msg-time {
@@ -1347,7 +1350,7 @@
             .fullscreen-player .media-controls { bottom: 30px; left: 12px; right: 12px; }
             .fullscreen-player .media-controls .time-display { font-size: 11px; }
             .fullscreen-player .close-btn { font-size: 24px; top: 12px; right: 16px; }
-            .fullscreen-player .pause-overlay { font-size: 48px; }
+            .fullscreen-player .pause-overlay svg { width: 48px; height: 48px; }
             .fullscreen-player .media-content video { height: 100vh; width: auto; }
             .fullscreen-player .media-content img { width: 100%; height: auto; }
         }
@@ -1367,6 +1370,7 @@
             .msg-bubble .video-wrapper video { max-height: 280px; }
             .fullscreen-player .media-content video { height: 100vh; width: auto; }
             .fullscreen-player .media-content img { width: 100%; height: auto; }
+            .fullscreen-player .pause-overlay svg { width: 72px; height: 72px; }
         }
     </style>
 </head>
@@ -1470,7 +1474,14 @@
     <div class="fullscreen-player" id="fullscreenPlayer">
         <button class="close-btn" id="fullscreenClose" onclick="event.stopPropagation();closeFullscreen();">✕</button>
         <div class="media-content" id="fullscreenContent" onclick="event.stopPropagation();"></div>
-        <div class="pause-overlay" id="pauseOverlay">⏸</div>
+        <!-- 圆形半透明暂停图标 -->
+        <div class="pause-overlay" id="pauseOverlay">
+            <svg width="64" height="64" viewBox="0 0 48 48">
+                <circle cx="24" cy="24" r="24" fill="rgba(0,0,0,0.5)"/>
+                <rect x="17" y="15" width="4.5" height="18" rx="1.5" fill="white"/>
+                <rect x="26.5" y="15" width="4.5" height="18" rx="1.5" fill="white"/>
+            </svg>
+        </div>
         <div class="media-controls" id="fullscreenControls" style="display:none;">
             <div class="time-display" id="fullscreenTime">00:00 / 00:00</div>
             <div class="progress-bar" id="fullscreenProgress">
@@ -1657,6 +1668,7 @@
             if (type === 'image') {
                 const img = document.createElement('img');
                 img.src = mediaUrl;
+                // 优先铺满左右边框，保持原图不变形
                 img.style.cssText = 'width:100%;height:auto;max-height:100vh;object-fit:contain;border:none;outline:none;display:block;image-orientation:from-image;';
                 content.appendChild(img);
                 player.classList.add('active');
@@ -2017,7 +2029,6 @@
                 // 单击视频进入全屏播放
                 wrapperDiv.onclick = function(e) {
                     e.stopPropagation();
-                    // 如果视频在播放，暂停后进入全屏
                     if (!video.paused) {
                         video.pause();
                         if (overlay) overlay.classList.remove('hidden');
