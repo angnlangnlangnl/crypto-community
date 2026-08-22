@@ -54,6 +54,21 @@
             font-weight: 600;
             color: #333;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .chat-title .btc-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+        .chat-title .btc-icon svg {
+            width: 20px;
+            height: 20px;
         }
         
         .header-right {
@@ -979,6 +994,17 @@
             to { opacity: 1; }
         }
         
+        /* 语音录制状态 */
+        .voice-recording {
+            background: #ff6b6b !important;
+            color: white !important;
+            animation: pulse 0.5s ease-in-out infinite alternate;
+        }
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+        
         /* 适配小屏 */
         @media (max-width: 420px) {
             .more-grid {
@@ -1005,6 +1031,8 @@
             .header-address { font-size: 11px; padding: 2px 8px; }
             .header-right { gap: 10px; }
             .chat-title { font-size: 14px; }
+            .chat-title .btc-icon { width: 16px; height: 16px; }
+            .chat-title .btc-icon svg { width: 16px; height: 16px; }
             .back-btn { font-size: 16px; width: 24px; height: 24px; }
             .toolbar-btn { font-size: 11px; padding: 4px 10px; }
             .toolbar { gap: 6px; padding: 2px 8px 8px 8px; }
@@ -1056,7 +1084,20 @@
     <div class="header">
         <div class="header-left">
             <span class="back-btn">‹</span>
-            <span class="chat-title" id="chatTitle">🚀 币圈社区 (719)</span>
+            <span class="chat-title" id="chatTitle">
+                <span class="btc-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#f7931a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" stroke="#f7931a" stroke-width="2" fill="none"/>
+                        <path d="M8 7h5.5a2.5 2.5 0 0 1 0 5H8" stroke="#f7931a" stroke-width="2"/>
+                        <path d="M8 12h6a2.5 2.5 0 0 1 0 5H8" stroke="#f7931a" stroke-width="2"/>
+                        <line x1="10" y1="7" x2="10" y2="17" stroke="#f7931a" stroke-width="2"/>
+                        <line x1="14" y1="7" x2="14" y2="17" stroke="#f7931a" stroke-width="2"/>
+                        <path d="M12 5v2" stroke="#f7931a" stroke-width="2"/>
+                        <path d="M12 17v2" stroke="#f7931a" stroke-width="2"/>
+                    </svg>
+                </span>
+                币圈社区 (719)
+            </span>
         </div>
         <div class="header-right">
             <span class="header-address" id="headerAddress">0x12...34ab</span>
@@ -1416,6 +1457,9 @@
         let notifCount = 3;
         let airdropClaimed = false;
         let airdropSkipped = false;
+        let isRecording = false;
+        let recordingTimer = null;
+        let recordingSeconds = 0;
         
         // ===== 会议倒计时 =====
         let countdownSeconds = 300;
@@ -1577,7 +1621,6 @@
                         if (emptyState) emptyState.style.display = 'none';
                         addSystemMessage('🎉 欢迎来到币圈社区！');
                         startCountdown();
-                        // 检测为新用户，弹出空投弹窗
                         showAirdropModal();
                     }
                 } catch (error) {
@@ -1684,30 +1727,47 @@
         }
         document.getElementById('msgInput').addEventListener('input', updateSendBtn);
         
-        // ----- 语音模式切换 -----
+        // ===== 语音模式 - 修复版 =====
         function toggleVoiceMode() {
             const input = document.getElementById('msgInput');
             const voiceBtn = document.getElementById('voiceBtn');
-            isVoiceMode = !isVoiceMode;
             
-            if (isVoiceMode) {
-                input.placeholder = '按住说话';
+            if (!isVoiceMode) {
+                // 进入语音模式
+                isVoiceMode = true;
+                input.placeholder = '按住说话，松开发送';
                 input.readOnly = true;
-                input.style.background = '#e8e8e8';
+                input.style.background = '#f0f0f0';
                 input.style.textAlign = 'center';
+                input.style.color = '#333';
                 voiceBtn.innerHTML = `
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="6" width="20" height="12" rx="2"/>
-                        <line x1="6" y1="12" x2="6" y2="12"/>
-                        <line x1="10" y1="12" x2="14" y2="12"/>
-                        <line x1="18" y1="12" x2="18" y2="12"/>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="2" width="6" height="12" rx="3"/>
+                        <path d="M5 10V12C5 15.866 8.134 19 12 19C15.866 19 19 15.866 19 12V10"/>
+                        <line x1="12" y1="19" x2="12" y2="22"/>
+                        <circle cx="12" cy="12" r="2" fill="#ff4444"/>
                     </svg>
                 `;
+                voiceBtn.style.background = '#ffe0e0';
+                voiceBtn.style.borderRadius = '50%';
+                
+                // 绑定鼠标/触摸事件
+                input.addEventListener('mousedown', startVoiceRecording);
+                input.addEventListener('mouseup', stopVoiceRecording);
+                input.addEventListener('mouseleave', stopVoiceRecording);
+                input.addEventListener('touchstart', startVoiceRecording);
+                input.addEventListener('touchend', stopVoiceRecording);
+                input.addEventListener('touchcancel', stopVoiceRecording);
+                
+                addSystemMessage('🎤 语音模式已开启，按住输入框说话');
             } else {
+                // 退出语音模式
+                isVoiceMode = false;
                 input.placeholder = '输入消息...';
                 input.readOnly = false;
                 input.style.background = 'white';
                 input.style.textAlign = 'left';
+                input.style.color = '#333';
                 voiceBtn.innerHTML = `
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="9" y="2" width="6" height="12" rx="3"/>
@@ -1715,7 +1775,155 @@
                         <line x1="12" y1="19" x2="12" y2="22"/>
                     </svg>
                 `;
+                voiceBtn.style.background = 'transparent';
+                
+                input.removeEventListener('mousedown', startVoiceRecording);
+                input.removeEventListener('mouseup', stopVoiceRecording);
+                input.removeEventListener('mouseleave', stopVoiceRecording);
+                input.removeEventListener('touchstart', startVoiceRecording);
+                input.removeEventListener('touchend', stopVoiceRecording);
+                input.removeEventListener('touchcancel', stopVoiceRecording);
+                
+                if (isRecording) {
+                    stopVoiceRecording();
+                }
+                addSystemMessage('⌨️ 已切换为键盘输入模式');
             }
+        }
+        
+        function startVoiceRecording(e) {
+            if (!isVoiceMode) return;
+            e.preventDefault();
+            
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                addSystemMessage('❌ 您的浏览器不支持语音录制，请使用Chrome或Edge浏览器');
+                return;
+            }
+            
+            isRecording = true;
+            recordingSeconds = 0;
+            const input = document.getElementById('msgInput');
+            input.style.background = '#ff6b6b';
+            input.style.color = 'white';
+            input.value = '🎙️ 录音中...';
+            input.style.textAlign = 'center';
+            
+            // 模拟录音计时
+            if (recordingTimer) clearInterval(recordingTimer);
+            recordingTimer = setInterval(() => {
+                recordingSeconds++;
+                const dots = '.'.repeat(recordingSeconds % 4);
+                input.value = `🎙️ 录音中${dots}`;
+            }, 300);
+            
+            // 实际录音 - 使用Web Speech API (语音识别)
+            try {
+                if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    const recognition = new SpeechRecognition();
+                    recognition.lang = 'zh-CN';
+                    recognition.continuous = false;
+                    recognition.interimResults = true;
+                    
+                    recognition.onresult = function(event) {
+                        let transcript = '';
+                        for (let i = event.resultIndex; i < event.results.length; i++) {
+                            transcript += event.results[i][0].transcript;
+                        }
+                        input.value = transcript;
+                        input.style.background = '#4ecdc4';
+                        input.style.color = 'white';
+                    };
+                    
+                    recognition.onerror = function(event) {
+                        if (event.error === 'not-allowed') {
+                            addSystemMessage('❌ 请允许浏览器使用麦克风权限');
+                        } else if (event.error !== 'aborted') {
+                            addSystemMessage('⚠️ 语音识别错误: ' + event.error);
+                        }
+                        stopVoiceRecording();
+                    };
+                    
+                    recognition.onend = function() {
+                        if (isRecording) {
+                            // 如果用户没有主动停止，则自动结束录制
+                            stopVoiceRecording();
+                        }
+                    };
+                    
+                    // 保存识别实例以便停止
+                    window._recognition = recognition;
+                    recognition.start();
+                } else {
+                    // 降级方案：模拟语音输入
+                    addSystemMessage('⚠️ 您的浏览器不支持语音识别，请使用Chrome浏览器');
+                    // 模拟3秒后完成
+                    setTimeout(() => {
+                        if (isRecording) {
+                            const input = document.getElementById('msgInput');
+                            input.value = '语音输入示例 (模拟)';
+                            input.style.background = '#4ecdc4';
+                            input.style.color = 'white';
+                            setTimeout(() => {
+                                if (isRecording) stopVoiceRecording();
+                            }, 500);
+                        }
+                    }, 1500);
+                }
+            } catch (err) {
+                addSystemMessage('⚠️ 语音识别启动失败: ' + err.message);
+                // 3秒后自动停止
+                setTimeout(() => {
+                    if (isRecording) stopVoiceRecording();
+                }, 2000);
+            }
+        }
+        
+        function stopVoiceRecording() {
+            if (!isRecording) return;
+            isRecording = false;
+            
+            if (recordingTimer) {
+                clearInterval(recordingTimer);
+                recordingTimer = null;
+            }
+            
+            // 停止语音识别
+            if (window._recognition) {
+                try {
+                    window._recognition.stop();
+                } catch(e) {}
+                window._recognition = null;
+            }
+            
+            const input = document.getElementById('msgInput');
+            const text = input.value.trim();
+            
+            // 恢复输入框样式
+            input.style.background = '#f0f0f0';
+            input.style.color = '#333';
+            input.style.textAlign = 'center';
+            input.placeholder = '按住说话，松开发送';
+            
+            // 如果识别到有效文字，自动发送
+            if (text && text !== '🎙️ 录音中...' && !text.startsWith('🎙️ 录音中')) {
+                // 去除可能的占位文本
+                const cleanText = text.replace(/^🎙️ 录音中[\.]*\s*/, '').trim();
+                if (cleanText) {
+                    input.value = cleanText;
+                    // 模拟点击发送
+                    setTimeout(() => {
+                        sendMessage();
+                    }, 200);
+                } else {
+                    input.value = '';
+                    addSystemMessage('⏸️ 未检测到有效语音，请重试');
+                }
+            } else {
+                input.value = '';
+                addSystemMessage('⏸️ 未检测到有效语音，请重试');
+            }
+            input.style.textAlign = 'center';
         }
         
         // ===== 表情包弹窗 =====
@@ -1815,7 +2023,7 @@
             }
         }
         
-        document.getElementById('chatTitle').textContent = '🚀 币圈社区 (719)';
+        document.getElementById('chatTitle').textContent = '币圈社区 (719)';
         setTimeout(updateCountdownPosition, 100);
     </script>
 </body>
