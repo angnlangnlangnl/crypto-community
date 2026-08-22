@@ -70,6 +70,22 @@
             width: 20px;
             height: 20px;
         }
+        .chat-title .online-badge {
+            background: #e74c3c;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 3px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+            flex-shrink: 0;
+        }
         
         .header-right {
             display: flex;
@@ -95,35 +111,6 @@
             flex-shrink: 0;
         }
         
-        .notification-wrap {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            cursor: pointer;
-            font-size: 16px;
-            line-height: 1;
-        }
-        .notification-wrap .badge {
-            position: absolute;
-            top: -5px;
-            right: -7px;
-            background: #e74c3c;
-            color: white;
-            font-size: 9px;
-            font-weight: 600;
-            min-width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 3px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
-        }
-        
         .menu-icon {
             display: inline-flex;
             flex-direction: column;
@@ -137,10 +124,10 @@
         }
         .menu-icon span {
             display: block;
-            width: 20px;
-            height: 2px;
+            width: 4px;
+            height: 4px;
             background: #333;
-            border-radius: 2px;
+            border-radius: 50%;
             transition: all 0.2s;
         }
         .menu-icon:hover span {
@@ -1299,6 +1286,7 @@
             color: #333;
             word-break: break-all;
             line-height: 1.3;
+            flex: 1;
         }
         
         .cancel-tip {
@@ -1322,6 +1310,174 @@
             display: block;
         }
         
+        /* ===== 代币信息弹窗样式 ===== */
+        .token-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .token-item {
+            padding: 10px 12px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .token-item .label {
+            font-size: 11px;
+            color: #999;
+        }
+        .token-item .value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+        .token-item .value.highlight {
+            color: #07c160;
+            font-weight: 600;
+        }
+        .token-item.token-full {
+            grid-column: span 2;
+        }
+        .token-item .token-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+        .token-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .token-actions button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .token-actions .btn-primary {
+            background: #07c160;
+            color: white;
+        }
+        .token-actions .btn-secondary {
+            background: #e8e8e8;
+            color: #333;
+        }
+        
+        /* ===== 文章弹窗样式 ===== */
+        .article-content {
+            padding: 8px 0;
+        }
+        .article-content .article-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        .article-content .article-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .article-content .article-body {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.7;
+        }
+        .article-content .article-body p {
+            margin-bottom: 10px;
+        }
+        .article-content .highlight-box {
+            background: #f0f7ff;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #1a73e8;
+        }
+        
+        /* ===== 空投弹窗样式 ===== */
+        .airdrop-total {
+            text-align: center;
+            padding: 16px;
+            background: #f0f7ff;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        .airdrop-total .label {
+            font-size: 13px;
+            color: #666;
+        }
+        .airdrop-total .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #07c160;
+        }
+        .airdrop-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .airdrop-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+        }
+        .airdrop-item .icon {
+            font-size: 24px;
+        }
+        .airdrop-item .info {
+            flex: 1;
+        }
+        .airdrop-item .info .name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+        .airdrop-item .info .desc {
+            font-size: 12px;
+            color: #999;
+        }
+        .airdrop-item .amount {
+            font-size: 16px;
+            font-weight: 600;
+            color: #07c160;
+        }
+        .airdrop-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .airdrop-actions button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .airdrop-actions .btn-claim {
+            background: #07c160;
+            color: white;
+        }
+        .airdrop-actions .btn-skip {
+            background: #e8e8e8;
+            color: #333;
+        }
+        
         @media (max-width: 420px) {
             .more-grid { gap: 8px 4px; }
             .more-item .icon { width: 44px; height: 44px; }
@@ -1337,17 +1493,16 @@
             .back-btn { font-size: 16px; width: 24px; height: 24px; }
             .toolbar-btn { font-size: 11px; padding: 4px 10px; }
             .toolbar { gap: 6px; padding: 2px 8px 8px 8px; }
-            .notification-wrap { font-size: 14px; }
-            .notification-wrap .badge { font-size: 8px; min-width: 14px; height: 14px; top: -4px; right: -6px; }
             .countdown-banner { padding: 4px 14px; gap: 6px; top: 88px; }
             .countdown-banner .cd-icon { font-size: 15px; }
             .countdown-banner .cd-label { font-size: 12px; }
             .countdown-banner .cd-time { font-size: 14px; min-width: 40px; }
-            .menu-icon { width: 18px; height: 18px; gap: 2.5px; }
-            .menu-icon span { width: 18px; height: 2px; }
+            .menu-icon { width: 18px; height: 18px; gap: 4px; }
+            .menu-icon span { width: 4px; height: 4px; }
             .messages { padding-top: 60px; }
             .modal-content { padding: 18px 14px 16px; max-width: 100%; margin: 10px; }
             .token-grid { grid-template-columns: 1fr; gap: 4px; }
+            .token-item.token-full { grid-column: span 1; }
             .article-content .article-title { font-size: 17px; }
             .more-panel { padding: 16px 12px 24px; }
             .emoji-panel { padding: 16px 12px 24px; }
@@ -1418,14 +1573,11 @@
                     </svg>
                 </span>
                 币圈社区 (719)
+                <span class="online-badge">3</span>
             </span>
         </div>
         <div class="header-right">
             <span class="header-address" id="headerAddress">0x12...34ab</span>
-            <span class="notification-wrap" onclick="handleNotificationClick()">
-                🔔
-                <span class="badge" id="notifBadge">3</span>
-            </span>
             <span class="menu-icon" onclick="alert('菜单功能开发中')">
                 <span></span>
                 <span></span>
@@ -1542,6 +1694,105 @@
     <!-- ===== 取消提示浮窗 ===== -->
     <div class="cancel-tip" id="cancelTip">⬆ 松开取消发送</div>
 
+    <!-- ===== 代币信息弹窗 ===== -->
+    <div class="modal-overlay" id="tokenModal">
+        <div class="modal-content">
+            <button class="modal-close-btn" onclick="closeModal('tokenModal')">✕</button>
+            <div class="modal-title">🪙 代币发行信息</div>
+            <div class="token-grid">
+                <div class="token-item"><span class="label">代币名称</span><span class="value highlight">CryptoCommunity (CC)</span></div>
+                <div class="token-item"><span class="label">代币符号</span><span class="value">$CC</span></div>
+                <div class="token-item"><span class="label">发行总量</span><span class="value">1,000,000,000 CC</span></div>
+                <div class="token-item"><span class="label">初始流通</span><span class="value">150,000,000 CC</span></div>
+                <div class="token-item"><span class="label">发行链</span><span class="value">Ethereum (ERC-20)</span></div>
+                <div class="token-item"><span class="label">发行日期</span><span class="value">2026-09-01</span></div>
+                <div class="token-item token-full"><span class="label">代币描述</span><div class="token-desc">币圈社区治理代币，用于社区投票、生态激励、交易手续费折扣及DAO治理。总量恒定，永不增发。</div></div>
+                <div class="token-item token-full"><span class="label">合约地址</span><div class="value" style="font-size:12px;font-family:monospace;word-break:break-all;color:#1a73e8;">0xCC1234567890abcdef1234567890abcdef12345678</div></div>
+            </div>
+            <div class="token-actions">
+                <button class="btn-primary" onclick="closeModal('tokenModal');addSystemMessage('✅ 已复制合约地址')">复制合约地址</button>
+                <button class="btn-secondary" onclick="closeModal('tokenModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 经济模式文章弹窗 ===== -->
+    <div class="modal-overlay" id="economyModal">
+        <div class="modal-content" style="max-width:560px;">
+            <button class="modal-close-btn" onclick="closeModal('economyModal')">✕</button>
+            <div class="article-content">
+                <div class="article-title">📈 经济模式：代币通缩与质押激励</div>
+                <div class="article-meta"><span>📅 2026-08-22</span><span>🏷️ 经济模型</span><span>⏱️ 5 min read</span></div>
+                <div class="article-body">
+                    <p><strong>币圈社区</strong> 采用双通缩经济模型，结合质押挖矿与交易燃烧机制，构建可持续的生态闭环。</p>
+                    <div class="highlight-box"><strong>核心数据</strong><br>• 每笔交易燃烧 2% 代币<br>• 质押年化收益 18%~35%<br>• 国库储备占比 10%<br>• 团队锁仓 36 个月</div>
+                    <p><strong>一、通缩机制</strong><br>每笔链上交易自动燃烧 2% 的 CC 代币，随生态繁荣不断减少流通量，形成天然通缩。预计上线首年燃烧 8000万 CC。</p>
+                    <p><strong>二、质押激励</strong><br>用户质押 CC 代币可获取平台分红与治理权。质押池分为 30天/90天/180天 三档，年化收益分别对应 18%、25%、35%。</p>
+                    <p><strong>三、国库治理</strong><br>10% 的交易手续费进入社区国库，由 DAO 投票决定资金用途，包括生态建设、市场推广、安全审计等。</p>
+                    <p><strong>四、经济飞轮</strong><br>交易燃烧 → 通缩升值 → 吸引质押 → 减少抛压 → 价格支撑 → 更多交易，形成正向循环。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 私募/空投文章弹窗 ===== -->
+    <div class="modal-overlay" id="airdropModal">
+        <div class="modal-content" style="max-width:560px;">
+            <button class="modal-close-btn" onclick="closeModal('airdropModal')">✕</button>
+            <div class="article-content">
+                <div class="article-title">🎁 私募与空投计划</div>
+                <div class="article-meta"><span>📅 2026-08-22</span><span>🏷️ 社区激励</span><span>⏱️ 4 min read</span></div>
+                <div class="article-body">
+                    <p><strong>币圈社区</strong> 正式启动首轮私募与空投计划，回馈早期支持者与社区活跃用户。</p>
+                    <div class="highlight-box"><strong>空投总量</strong><br>• 总计 50,000,000 CC<br>• 占比总发行量 5%<br>• 覆盖 10,000+ 地址</div>
+                    <p><strong>一、私募轮次</strong><br><strong>种子轮</strong>：已结束，募集 500 ETH，价格 $0.02/CC<br><strong>战略轮</strong>：进行中，额度 2000 ETH，价格 $0.035/CC<br><strong>社区轮</strong>：即将开启，额度 1000 ETH，价格 $0.05/CC</p>
+                    <p><strong>二、空投规则</strong><br>• 早期测试网交互用户：500~2000 CC<br>• 社区贡献者（翻译/内容/开发）：1000~5000 CC<br>• 活跃钱包地址（3个月以上）：200~800 CC</p>
+                    <p><strong>三、领取方式</strong><br>空投代币将在 TGE（代币生成事件）后 7 天内发放至用户钱包。需完成指定社群任务方可申领。</p>
+                    <p><strong>四、风险提示</strong><br>私募代币锁仓 6 个月，空投代币无锁仓。请勿向任何地址发送 ETH 以「激活」空投资格。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 查阅官网文章弹窗 ===== -->
+    <div class="modal-overlay" id="officialModal">
+        <div class="modal-content" style="max-width:560px;">
+            <button class="modal-close-btn" onclick="closeModal('officialModal')">✕</button>
+            <div class="article-content">
+                <div class="article-title">🌐 官网公告：社区2.0升级路线图</div>
+                <div class="article-meta"><span>📅 2026-08-22</span><span>🏷️ 官方公告</span><span>⏱️ 6 min read</span></div>
+                <div class="article-body">
+                    <p><strong>币圈社区</strong> 官方网站正式发布 2.0 升级路线图，涵盖技术架构、生态扩展与治理革新三大维度。</p>
+                    <div class="highlight-box"><strong>升级亮点</strong><br>• 跨链桥 2.0 (支持 5 条公链)<br>• 移动端 App 公测版上线<br>• DAO 治理模块 V2 部署</div>
+                    <p><strong>一、技术架构升级</strong><br>底层链升级至 Cosmos SDK v0.50，TPS 提升至 10,000+，兼容 IBC 跨链协议。新增 ZK-Rollup 二层方案，降低 Gas 费用 80%。</p>
+                    <p><strong>二、生态扩展计划</strong><br>Q4 2026 将上线 NFT 市场、DEX 聚合器、借贷协议 三大核心应用。已与 12 个头部项目达成战略合作。</p>
+                    <p><strong>三、DAO 治理革新</strong><br>引入「声誉权重投票」机制，治理参与度预计提升 300%。国库资金使用将完全上链，实现透明化。</p>
+                    <p><strong>四、时间线</strong><br>• 2026.09：测试网升级<br>• 2026.10：主网迁移<br>• 2026.11：生态应用上线<br>• 2026.12：全功能社区上线</p>
+                    <p style="margin-top:8px;color:#1a73e8;">🔗 更多详情请访问：<br><span style="font-family:monospace;font-size:13px;">https://cryptocommunity.io/roadmap</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 新用户空投弹窗 ===== -->
+    <div class="modal-overlay" id="airdropClaimModal">
+        <div class="modal-content">
+            <button class="modal-close-btn" onclick="closeModal('airdropClaimModal')">✕</button>
+            <div class="modal-title">🎁 新用户空投福利</div>
+            <div style="text-align:center; margin-bottom:12px; font-size:14px; color:#666;">检测到您是新用户，已自动为您准备空投奖励！</div>
+            <div class="airdrop-total"><div class="label">🎯 可领取总量</div><div class="value">1,500 CC</div></div>
+            <div class="airdrop-grid">
+                <div class="airdrop-item"><span class="icon">🎉</span><div class="info"><div class="name">新用户注册奖励</div><div class="desc">首次连接钱包</div></div><span class="amount">+500 CC</span></div>
+                <div class="airdrop-item"><span class="icon">🤝</span><div class="info"><div class="name">社区邀请奖励</div><div class="desc">加入币圈社区</div></div><span class="amount">+500 CC</span></div>
+                <div class="airdrop-item"><span class="icon">📱</span><div class="info"><div class="name">生态体验奖励</div><div class="desc">完成首次互动</div></div><span class="amount">+500 CC</span></div>
+            </div>
+            <div class="airdrop-actions">
+                <button class="btn-claim" id="claimBtn" onclick="claimAirdrop()">立即领取</button>
+                <button class="btn-skip" onclick="skipAirdrop()">稍后领取</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== 表情包弹窗 ===== -->
     <div class="emoji-overlay" id="emojiOverlay" onclick="if(event.target===this) toggleEmojiPanel()">
         <div class="emoji-panel">
@@ -1628,39 +1879,24 @@
         var zoomHintTimeout = null;
         var isFullscreenImage = false;
         
-        // ✅ 修复：边界约束函数 - 确保图片边缘始终对齐屏幕边缘，不留空白
         function constrainTransform(img, scale, tx, ty) {
             if (!img) return { tx: 0, ty: 0 };
-            
             var container = img.parentElement;
             if (!container) return { tx: 0, ty: 0 };
-            
             var ch = container.clientHeight;
-            
             var imgW = img.naturalWidth || img.width || 1;
             var imgH = img.naturalHeight || img.height || 1;
-            
             var scaledH = imgH * scale;
-            
             tx = 0;
-            
             if (scaledH > ch) {
-                // 图片高度大于容器高度，允许上下拖动
-                // 但图片边缘必须始终对齐屏幕边缘，不能拖出空白
                 var maxY = scaledH - ch;
-                // ty范围：顶部对齐时ty=0，底部对齐时ty=-maxY
-                // 不允许ty>0（顶部不能低于屏幕顶部）
-                // 不允许ty<-maxY（底部不能高于屏幕底部）
                 ty = Math.max(-maxY, Math.min(0, ty));
             } else {
-                // 图片高度小于容器高度，上下居中，不允许拖动
                 ty = (ch - scaledH) / 2;
             }
-            
             return { tx: tx, ty: ty };
         }
         
-        // ✅ 初始化时始终横向铺满屏幕
         function initImageZoom(imageWrap, img) {
             currentImageWrap = imageWrap;
             currentImage = img;
@@ -1670,9 +1906,7 @@
             isImageZoomed = false;
             isFullscreenImage = true;
             img.className = '';
-            
             showZoomHint();
-            
             img.removeEventListener('dblclick', onImageDblClick);
             img.removeEventListener('touchstart', onImageTouchStart);
             img.removeEventListener('touchmove', onImageTouchMove);
@@ -1680,67 +1914,44 @@
             img.removeEventListener('mousedown', onImageMouseDown);
             document.removeEventListener('mousemove', onImageMouseMove);
             document.removeEventListener('mouseup', onImageMouseUp);
-            
             img.addEventListener('dblclick', onImageDblClick);
             img.addEventListener('touchstart', onImageTouchStart, { passive: false });
             img.addEventListener('touchmove', onImageTouchMove, { passive: false });
             img.addEventListener('touchend', onImageTouchEnd, { passive: false });
             img.addEventListener('mousedown', onImageMouseDown);
-            
-            // ✅ 始终横向铺满屏幕
             function applySmartZoom() {
                 var container = imageWrap;
                 var containerWidth = container.clientWidth;
                 var containerHeight = container.clientHeight;
                 var imgWidth = img.naturalWidth || img.width;
                 var imgHeight = img.naturalHeight || img.height;
-                
                 if (containerWidth === 0 || imgWidth === 0 || imgHeight === 0) {
                     requestAnimationFrame(applySmartZoom);
                     return;
                 }
-                
-                // 始终计算左右铺满的缩放比例
                 var scaleToFitWidth = containerWidth / imgWidth;
-                
-                // 限制最大缩放倍数
                 scaleToFitWidth = Math.min(scaleToFitWidth, 8);
-                // 最小缩放倍数为1
                 scaleToFitWidth = Math.max(scaleToFitWidth, 1);
-                
                 imageScale = scaleToFitWidth;
                 imageTranslateX = 0;
-                
-                // 计算缩放后图片高度
                 var scaledHeight = imgHeight * imageScale;
-                
                 if (scaledHeight > containerHeight) {
-                    // 图片高度超出屏幕，顶部对齐
                     imageTranslateY = 0;
                     img.style.transformOrigin = 'top center';
                 } else {
-                    // 图片高度小于屏幕，上下居中
                     imageTranslateY = (containerHeight - scaledHeight) / 2;
                     img.style.transformOrigin = 'center center';
                 }
-                
                 isImageZoomed = true;
                 img.className = 'zoomed';
-                
                 img.style.transform = 'translate(0px, ' + imageTranslateY + 'px) scale(' + imageScale + ')';
             }
-            
-            img.onload = function() {
-                requestAnimationFrame(applySmartZoom);
-            };
-            
+            img.onload = function() { requestAnimationFrame(applySmartZoom); };
             if (img.complete && img.naturalWidth > 0) {
                 requestAnimationFrame(applySmartZoom);
             } else {
                 setTimeout(function() {
-                    if (img.complete && img.naturalWidth > 0) {
-                        requestAnimationFrame(applySmartZoom);
-                    }
+                    if (img.complete && img.naturalWidth > 0) { requestAnimationFrame(applySmartZoom); }
                 }, 100);
             }
         }
@@ -1750,35 +1961,26 @@
             if (!hint) return;
             hint.classList.add('show');
             if (zoomHintTimeout) clearTimeout(zoomHintTimeout);
-            zoomHintTimeout = setTimeout(function() {
-                hint.classList.remove('show');
-            }, 3000);
+            zoomHintTimeout = setTimeout(function() { hint.classList.remove('show'); }, 3000);
         }
         
-        // ✅ 双击切换：原始大小 ↔ 铺满屏幕
         function onImageDblClick(e) {
             e.stopPropagation();
             var img = currentImage;
             if (!img) return;
-            
             if (!isImageZoomed) {
                 var container = img.parentElement;
                 var containerWidth = container.clientWidth;
                 var containerHeight = container.clientHeight;
                 var imgWidth = img.naturalWidth || img.width;
                 var imgHeight = img.naturalHeight || img.height;
-                
                 if (imgWidth === 0 || imgHeight === 0) return;
-                
                 var scale = containerWidth / imgWidth;
                 scale = Math.min(scale, 8);
                 scale = Math.max(scale, 1);
-                
                 imageScale = scale;
                 imageTranslateX = 0;
-                
                 var scaledHeight = imgHeight * imageScale;
-                
                 if (scaledHeight > containerHeight) {
                     imageTranslateY = 0;
                     img.style.transformOrigin = 'top center';
@@ -1786,7 +1988,6 @@
                     imageTranslateY = (containerHeight - scaledHeight) / 2;
                     img.style.transformOrigin = 'center center';
                 }
-                
                 isImageZoomed = true;
                 img.className = 'zoomed';
                 img.style.transform = 'translate(0px, ' + imageTranslateY + 'px) scale(' + imageScale + ')';
@@ -1801,7 +2002,6 @@
             }
         }
         
-        // ✅ 任何时候都允许拖动
         function onImageTouchStart(e) {
             if (e.touches.length === 2) {
                 var touch1 = e.touches[0];
@@ -1817,12 +2017,10 @@
             }
         }
         
-        // ✅ 双指缩放任何时候都有效
         function onImageTouchMove(e) {
             e.preventDefault();
             var img = currentImage;
             if (!img) return;
-            
             if (e.touches.length === 2) {
                 var touch1 = e.touches[0];
                 var touch2 = e.touches[1];
@@ -1831,7 +2029,6 @@
                     var scaleDelta = currentDistance / lastTouchDistance;
                     var newScale = imageScale * scaleDelta;
                     newScale = Math.max(1, Math.min(newScale, 8));
-                    
                     var constrained = constrainTransform(img, newScale, 0, imageTranslateY);
                     imageTranslateX = constrained.tx;
                     imageTranslateY = constrained.ty;
@@ -1843,7 +2040,6 @@
             } else if (e.touches.length === 1 && isDragging) {
                 var dy = e.touches[0].clientY - dragStartY;
                 var newTy = dragStartTranslateY + dy;
-                
                 var constrained = constrainTransform(img, imageScale, 0, newTy);
                 imageTranslateX = constrained.tx;
                 imageTranslateY = constrained.ty;
@@ -1851,7 +2047,6 @@
             }
         }
         
-        // ✅ 触摸结束处理
         function onImageTouchEnd(e) {
             if (e.touches.length === 0) {
                 isDragging = false;
@@ -1868,7 +2063,6 @@
             dragStartTranslateX = imageTranslateX;
             dragStartTranslateY = imageTranslateY;
             e.preventDefault();
-            
             document.addEventListener('mousemove', onImageMouseMove);
             document.addEventListener('mouseup', onImageMouseUp);
         }
@@ -1879,7 +2073,6 @@
             if (!img) return;
             var dy = e.clientY - dragStartY;
             var newTy = dragStartTranslateY + dy;
-            
             var constrained = constrainTransform(img, imageScale, 0, newTy);
             imageTranslateX = constrained.tx;
             imageTranslateY = constrained.ty;
@@ -1909,17 +2102,11 @@
             document.removeEventListener('mouseup', onImageMouseUp);
             var hint = document.getElementById('zoomHint');
             if (hint) hint.classList.remove('show');
-            if (zoomHintTimeout) {
-                clearTimeout(zoomHintTimeout);
-                zoomHintTimeout = null;
-            }
+            if (zoomHintTimeout) { clearTimeout(zoomHintTimeout); zoomHintTimeout = null; }
         }
         
         // ===== 会议功能 =====
-        function handleEnterMeeting() {
-            openModal('meetingModal');
-        }
-        
+        function handleEnterMeeting() { openModal('meetingModal'); }
         function joinMeeting() {
             var link = document.createElement('a');
             link.href = 'https://meeting.tencent.com/dm/hIbayciQ5BHJ';
@@ -1928,36 +2115,23 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
             var appLink = document.createElement('a');
             appLink.href = 'tencent://meeting?code=945379565';
             appLink.style.display = 'none';
             document.body.appendChild(appLink);
             appLink.click();
             document.body.removeChild(appLink);
-            
             closeModal('meetingModal');
             addSystemMessage('📞 正在尝试加入会议...');
-            setTimeout(function() {
-                addSystemMessage('✅ 已打开腾讯会议，请确认加入');
-            }, 1500);
+            setTimeout(function() { addSystemMessage('✅ 已打开腾讯会议，请确认加入'); }, 1500);
         }
-        
         function copyMeetingInfo() {
             var info = '悟 邀请您参加腾讯会议\n会议主题：悟的快速会议\n会议时间：2026/08/22 15:30-16:30 (GMT+08:00) 中国标准时间 - 北京\n\n点击链接直接加入会议：\nhttps://meeting.tencent.com/dm/hIbayciQ5BHJ\n\n#腾讯会议：945-379-565\n\n复制该信息，打开手机腾讯会议即可参与';
-            
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(info).then(function() {
-                    addSystemMessage('✅ 会议信息已复制到剪贴板');
-                }).catch(function() {
-                    fallbackCopy(info);
-                });
-            } else {
-                fallbackCopy(info);
-            }
+                navigator.clipboard.writeText(info).then(function() { addSystemMessage('✅ 会议信息已复制到剪贴板'); }).catch(function() { fallbackCopy(info); });
+            } else { fallbackCopy(info); }
             closeModal('meetingModal');
         }
-        
         function fallbackCopy(text) {
             var textarea = document.createElement('textarea');
             textarea.value = text;
@@ -1966,30 +2140,22 @@
             textarea.style.top = '-9999px';
             document.body.appendChild(textarea);
             textarea.select();
-            try {
-                document.execCommand('copy');
-                addSystemMessage('✅ 会议信息已复制到剪贴板');
-            } catch (e) {
-                addSystemMessage('⚠️ 复制失败，请手动复制');
-            }
+            try { document.execCommand('copy'); addSystemMessage('✅ 会议信息已复制到剪贴板'); } catch (e) { addSystemMessage('⚠️ 复制失败，请手动复制'); }
             document.body.removeChild(textarea);
         }
         
         // ===== 全屏播放器控制 =====
         var fullscreenVideo = null;
         var isVideoPaused = false;
-        
         function openFullscreen(mediaUrl, type) {
             var player = document.getElementById('fullscreenPlayer');
             var content = document.getElementById('fullscreenContent');
             var controls = document.getElementById('fullscreenControls');
             var pauseOverlay = document.getElementById('pauseOverlay');
-            
             content.innerHTML = '';
             controls.style.display = 'none';
             if (pauseOverlay) pauseOverlay.classList.remove('show');
             resetImageZoom();
-            
             if (type === 'image') {
                 var wrap = document.createElement('div');
                 wrap.className = 'image-wrap';
@@ -2000,11 +2166,9 @@
                 content.appendChild(wrap);
                 player.classList.add('active');
                 document.body.style.overflow = 'hidden';
-                
                 initImageZoom(wrap, img);
                 return;
             }
-            
             if (type === 'video') {
                 var video = document.createElement('video');
                 video.src = mediaUrl;
@@ -2022,84 +2186,25 @@
                 fullscreenVideo = video;
                 isVideoPaused = true;
                 if (pauseOverlay) pauseOverlay.classList.add('show');
-                
                 var timeDisplay = document.getElementById('fullscreenTime');
                 var progressFill = document.getElementById('fullscreenProgressFill');
                 var progressBar = document.getElementById('fullscreenProgress');
                 var dot = progressBar.querySelector('.progress-dot');
-                
-                video.addEventListener('loadedmetadata', function() { 
-                    updateFullscreenTime();
-                    if (!video.paused) {
-                        if (pauseOverlay) pauseOverlay.classList.remove('show');
-                    }
-                });
-                
-                video.addEventListener('canplay', function() {
-                    if (!video.paused) {
-                        if (pauseOverlay) pauseOverlay.classList.remove('show');
-                    }
-                });
-                
+                video.addEventListener('loadedmetadata', function() { updateFullscreenTime(); if (!video.paused) { if (pauseOverlay) pauseOverlay.classList.remove('show'); } });
+                video.addEventListener('canplay', function() { if (!video.paused) { if (pauseOverlay) pauseOverlay.classList.remove('show'); } });
                 video.onclick = function(e) {
                     e.stopPropagation();
-                    if (video.paused) {
-                        video.play().catch(function() {});
-                        if (pauseOverlay) pauseOverlay.classList.remove('show');
-                        isVideoPaused = false;
-                    } else {
-                        video.pause();
-                        if (pauseOverlay) pauseOverlay.classList.add('show');
-                        isVideoPaused = true;
-                    }
+                    if (video.paused) { video.play().catch(function() {}); if (pauseOverlay) pauseOverlay.classList.remove('show'); isVideoPaused = false; }
+                    else { video.pause(); if (pauseOverlay) pauseOverlay.classList.add('show'); isVideoPaused = true; }
                 };
-                
-                video.addEventListener('timeupdate', function() {
-                    updateFullscreenTime();
-                    if (video.duration) {
-                        var pct = (video.currentTime / video.duration) * 100;
-                        progressFill.style.width = pct + '%';
-                        if (dot) dot.style.left = pct + '%';
-                    }
-                });
-                
-                video.addEventListener('play', function() {
-                    if (pauseOverlay) pauseOverlay.classList.remove('show');
-                    isVideoPaused = false;
-                });
-                video.addEventListener('pause', function() {
-                    if (pauseOverlay && !video.ended) pauseOverlay.classList.add('show');
-                    isVideoPaused = true;
-                });
-                video.addEventListener('ended', function() {
-                    if (pauseOverlay) pauseOverlay.classList.add('show');
-                    video.currentTime = 0;
-                    progressFill.style.width = '0%';
-                    if (dot) dot.style.left = '0%';
-                    isVideoPaused = true;
-                });
-                
-                progressBar.onclick = function(e) {
-                    e.stopPropagation();
-                    var rect = progressBar.getBoundingClientRect();
-                    var percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-                    if (video.duration) {
-                        video.currentTime = percent * video.duration;
-                    }
-                };
-                
-                setTimeout(function() {
-                    video.play().then(function() {
-                        if (pauseOverlay) pauseOverlay.classList.remove('show');
-                        isVideoPaused = false;
-                    }).catch(function() {
-                        if (pauseOverlay) pauseOverlay.classList.add('show');
-                        isVideoPaused = true;
-                    });
-                }, 200);
+                video.addEventListener('timeupdate', function() { updateFullscreenTime(); if (video.duration) { var pct = (video.currentTime / video.duration) * 100; progressFill.style.width = pct + '%'; if (dot) dot.style.left = pct + '%'; } });
+                video.addEventListener('play', function() { if (pauseOverlay) pauseOverlay.classList.remove('show'); isVideoPaused = false; });
+                video.addEventListener('pause', function() { if (pauseOverlay && !video.ended) pauseOverlay.classList.add('show'); isVideoPaused = true; });
+                video.addEventListener('ended', function() { if (pauseOverlay) pauseOverlay.classList.add('show'); video.currentTime = 0; progressFill.style.width = '0%'; if (dot) dot.style.left = '0%'; isVideoPaused = true; });
+                progressBar.onclick = function(e) { e.stopPropagation(); var rect = progressBar.getBoundingClientRect(); var percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)); if (video.duration) { video.currentTime = percent * video.duration; } };
+                setTimeout(function() { video.play().then(function() { if (pauseOverlay) pauseOverlay.classList.remove('show'); isVideoPaused = false; }).catch(function() { if (pauseOverlay) pauseOverlay.classList.add('show'); isVideoPaused = true; }); }, 200);
             }
         }
-        
         function updateFullscreenTime() {
             if (!fullscreenVideo) return;
             var timeDisplay = document.getElementById('fullscreenTime');
@@ -2108,7 +2213,6 @@
             var total = formatFullscreenTime(fullscreenVideo.duration || 0);
             timeDisplay.textContent = current + ' / ' + total;
         }
-        
         function formatFullscreenTime(seconds) {
             if (isNaN(seconds) || !isFinite(seconds)) return '00:00';
             var s = Math.floor(seconds);
@@ -2116,15 +2220,11 @@
             var secs = s % 60;
             return String(m).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
         }
-        
         function closeFullscreen() {
             var player = document.getElementById('fullscreenPlayer');
             player.classList.remove('active');
             document.body.style.overflow = '';
-            if (fullscreenVideo) {
-                try { fullscreenVideo.pause(); } catch(e) {}
-                fullscreenVideo = null;
-            }
+            if (fullscreenVideo) { try { fullscreenVideo.pause(); } catch(e) {} fullscreenVideo = null; }
             var pauseOverlay = document.getElementById('pauseOverlay');
             if (pauseOverlay) pauseOverlay.classList.remove('show');
             isVideoPaused = false;
@@ -2134,40 +2234,23 @@
         // ===== 会议倒计时 =====
         var countdownSeconds = 300;
         var countdownInterval = null;
-        
         function updateCountdown() {
             var display = document.getElementById('countdownDisplay');
             if (!display) return;
             var mins = String(Math.floor(countdownSeconds / 60)).padStart(2, '0');
             var secs = String(countdownSeconds % 60).padStart(2, '0');
             display.textContent = mins + ':' + secs;
-            if (countdownSeconds <= 0) {
-                clearInterval(countdownInterval);
-                countdownInterval = null;
-                display.textContent = '00:00';
-                display.classList.add('ended');
-                handleEnterMeeting();
-            } else {
-                display.classList.remove('ended');
-            }
+            if (countdownSeconds <= 0) { clearInterval(countdownInterval); countdownInterval = null; display.textContent = '00:00'; display.classList.add('ended'); handleEnterMeeting(); }
+            else { display.classList.remove('ended'); }
         }
-        
         function startCountdown() {
             if (countdownInterval) clearInterval(countdownInterval);
             countdownSeconds = 300;
             var display = document.getElementById('countdownDisplay');
             if (display) display.classList.remove('ended');
             updateCountdown();
-            countdownInterval = setInterval(function() {
-                countdownSeconds--;
-                updateCountdown();
-                if (countdownSeconds <= 0) {
-                    clearInterval(countdownInterval);
-                    countdownInterval = null;
-                }
-            }, 1000);
+            countdownInterval = setInterval(function() { countdownSeconds--; updateCountdown(); if (countdownSeconds <= 0) { clearInterval(countdownInterval); countdownInterval = null; } }, 1000);
         }
-        
         function updateCountdownPosition() {
             var banner = document.getElementById('connectBanner');
             var countdown = document.getElementById('countdownBanner');
@@ -2176,29 +2259,15 @@
         }
         
         // ===== 弹窗控制 =====
-        function openModal(id) {
-            document.getElementById(id).classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
-            document.body.style.overflow = '';
-        }
-        
+        function openModal(id) { document.getElementById(id).classList.add('active'); document.body.style.overflow = 'hidden'; }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); document.body.style.overflow = ''; }
         function openTokenModal() { openModal('tokenModal'); }
         function openEconomyArticle() { openModal('economyModal'); }
         function openAirdropArticle() { openModal('airdropModal'); }
         function openOfficialArticle() { openModal('officialModal'); }
-        
-        function showAirdropModal() {
-            if (!airdropClaimed && !airdropSkipped) {
-                setTimeout(function() { openModal('airdropClaimModal'); }, 600);
-            }
-        }
-        
+        function showAirdropModal() { if (!airdropClaimed && !airdropSkipped) { setTimeout(function() { openModal('airdropClaimModal'); }, 600); } }
         var airdropClaimed = false;
         var airdropSkipped = false;
-        
         function claimAirdrop() {
             airdropClaimed = true;
             var btn = document.getElementById('claimBtn');
@@ -2207,16 +2276,9 @@
             btn.style.background = '#ccc';
             closeModal('airdropClaimModal');
             addSystemMessage('🎉 恭喜您！已成功领取 1,500 CC 空投奖励！');
-            setTimeout(function() {
-                addOtherMessage('欢迎加入币圈社区！一起见证生态成长 🚀', '币圈助手');
-            }, 800);
+            setTimeout(function() { addOtherMessage('欢迎加入币圈社区！一起见证生态成长 🚀', '币圈助手'); }, 800);
         }
-        
-        function skipAirdrop() {
-            airdropSkipped = true;
-            closeModal('airdropClaimModal');
-            addSystemMessage('⏳ 空投已暂存，可随时在「私募/空投」页面领取');
-        }
+        function skipAirdrop() { airdropSkipped = true; closeModal('airdropClaimModal'); addSystemMessage('⏳ 空投已暂存，可随时在「私募/空投」页面领取'); }
         
         // ===== 表情包数据 =====
         var emojiList = [
@@ -2272,7 +2334,11 @@
                         interimText += event.results[i][0].transcript;
                     }
                 }
-                recognizedText = finalText || interimText;
+                if (finalText) {
+                    recognizedText = finalText;
+                } else if (interimText) {
+                    recognizedText = interimText;
+                }
                 
                 var input = document.getElementById('msgInput');
                 if (input && isRecording) {
@@ -2287,11 +2353,13 @@
             
             recognition.onerror = function(event) {
                 console.warn('语音识别错误:', event.error);
+                if (event.error === 'not-allowed') {
+                    addSystemMessage('⚠️ 请允许使用麦克风权限');
+                }
             };
             
             recognition.onend = function() {
                 isRecognizing = false;
-                // 如果还在录音，重新启动识别
                 if (isRecording && speechRecognition) {
                     try {
                         speechRecognition.start();
@@ -2331,12 +2399,8 @@
                         startCountdown();
                         showAirdropModal();
                     }
-                } catch (error) {
-                    alert('连接失败：' + error.message);
-                }
-            } else {
-                alert('请安装MetaMask钱包');
-            }
+                } catch (error) { alert('连接失败：' + error.message); }
+            } else { alert('请安装MetaMask钱包'); }
         }
         
         // ===== 消息发送 =====
@@ -2352,7 +2416,6 @@
                 addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
             }, 800 + Math.random() * 2000);
         }
-        
         function addOwnMessage(text, sender) {
             messageCount++;
             var messages = document.getElementById('messages');
@@ -2364,7 +2427,6 @@
             messages.appendChild(wrapper);
             scrollToBottom();
         }
-        
         function addOwnImageMessage(imageUrl, sender) {
             messageCount++;
             var messages = document.getElementById('messages');
@@ -2376,12 +2438,8 @@
             wrapper.innerHTML = '\n                <div class="msg-avatar">我</div>\n                <div class="msg-body">\n                    <span class="msg-sender">' + displaySender + '</span>\n                    <div class="msg-bubble" style="padding:0;background:transparent;border-radius:6px;overflow:hidden;">\n                        <div class="image-wrapper" style="border:none;outline:none;">\n                            <img id="' + imgId + '" src="' + imageUrl + '" alt="图片" style="border:none;outline:none;display:block;width:100%;height:auto;image-orientation:from-image;">\n                        </div>\n                    </div>\n                    <span class="msg-time">' + getTime() + '</span>\n                </div>\n            ';
             messages.appendChild(wrapper);
             scrollToBottom();
-            document.getElementById(imgId).onclick = function(e) {
-                e.stopPropagation();
-                openFullscreen(imageUrl, 'image');
-            };
+            document.getElementById(imgId).onclick = function(e) { e.stopPropagation(); openFullscreen(imageUrl, 'image'); };
         }
-        
         function addOwnVideoMessage(videoUrl, sender, file) {
             messageCount++;
             var messages = document.getElementById('messages');
@@ -2390,17 +2448,11 @@
             wrapper.className = 'msg-wrapper own';
             var displaySender = (sender && sender !== '我') ? sender.slice(0, 6) + '...' + sender.slice(-1) : '我';
             var vidId = 'vid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
-            
-            if (videoUrl && videoUrl.startsWith('blob:')) {
-                window._videoBlobUrls[vidId] = { url: videoUrl, file: file };
-            }
-            
-            var progressSvg = '\n                <div class="video-progress" id="' + vidId + '_progress">\n                    <svg width="48" height="48" viewBox="0 0 48 48">\n                        <circle class="progress-bg" cx="24" cy="24" r="19"/>\n                        <circle class="progress-fg" cx="24" cy="24" r="19" \n                                stroke-dasharray="119.4" stroke-dashoffset="119.4"/>\n                    </svg>\n                    <div class="progress-center">\n                        <span class="progress-text">0%</span>\n                        <svg class="pause-icon" width="14" height="14" viewBox="0 0 14 14">\n                            <rect x="2" y="1" width="3.5" height="12" rx="1" fill="white"/>\n                            <rect x="8.5" y="1" width="3.5" height="12" rx="1" fill="white"/>\n                        </svg>\n                    </div>\n                </div>\n            ';
-            
+            if (videoUrl && videoUrl.startsWith('blob:')) { window._videoBlobUrls[vidId] = { url: videoUrl, file: file }; }
+            var progressSvg = '\n                <div class="video-progress" id="' + vidId + '_progress">\n                    <svg width="48" height="48" viewBox="0 0 48 48">\n                        <circle class="progress-bg" cx="24" cy="24" r="19"/>\n                        <circle class="progress-fg" cx="24" cy="24" r="19" stroke-dasharray="119.4" stroke-dashoffset="119.4"/>\n                    </svg>\n                    <div class="progress-center">\n                        <span class="progress-text">0%</span>\n                        <svg class="pause-icon" width="14" height="14" viewBox="0 0 14 14">\n                            <rect x="2" y="1" width="3.5" height="12" rx="1" fill="white"/>\n                            <rect x="8.5" y="1" width="3.5" height="12" rx="1" fill="white"/>\n                        </svg>\n                    </div>\n                </div>\n            ';
             wrapper.innerHTML = '\n                <div class="msg-avatar">我</div>\n                <div class="msg-body">\n                    <span class="msg-sender">' + displaySender + '</span>\n                    <div class="msg-bubble" style="padding:0;background:transparent;border-radius:6px;overflow:hidden;">\n                        <div class="video-wrapper" id="' + vidId + '_wrapper" style="border:none;outline:none;background:#000;">\n                            <video id="' + vidId + '" src="' + videoUrl + '" preload="metadata" playsinline webkit-playsinline style="border:none;outline:none;display:block;width:100%;height:auto;background:#000;" crossorigin="anonymous"></video>\n                            <div class="play-overlay" id="' + vidId + '_overlay">' + progressSvg + '</div>\n                            <div class="duration-badge" id="' + vidId + '_badge">00:00</div>\n                        </div>\n                    </div>\n                    <span class="msg-time">' + getTime() + '</span>\n                </div>\n            ';
             messages.appendChild(wrapper);
             scrollToBottom();
-            
             var video = document.getElementById(vidId);
             var wrapperDiv = document.getElementById(vidId + '_wrapper');
             var overlay = document.getElementById(vidId + '_overlay');
@@ -2409,11 +2461,9 @@
             var progressText = progressContainer ? progressContainer.querySelector('.progress-text') : null;
             var pauseIcon = progressContainer ? progressContainer.querySelector('.pause-icon') : null;
             var progressFg = progressContainer ? progressContainer.querySelector('.progress-fg') : null;
-            
             if (video && wrapperDiv) {
                 var uploadProgress = 0;
                 var circumference = 119.4;
-                
                 function updateUploadProgress() {
                     if (uploadProgress < 100) {
                         uploadProgress += Math.random() * 8 + 2;
@@ -2422,86 +2472,25 @@
                         if (progressFg) progressFg.setAttribute('stroke-dashoffset', offset);
                         if (progressText) progressText.textContent = Math.round(uploadProgress) + '%';
                         setTimeout(updateUploadProgress, 300 + Math.random() * 400);
-                    } else {
-                        if (overlay) overlay.classList.add('hidden');
-                    }
+                    } else { if (overlay) overlay.classList.add('hidden'); }
                 }
-                
                 setTimeout(updateUploadProgress, 500);
-                
                 video.addEventListener('error', function(e) {
                     console.warn('视频加载错误，尝试重新加载:', e);
                     if (videoUrl && videoUrl.startsWith('blob:')) {
-                        try {
-                            fetch(videoUrl).then(function(response) {
-                                if (response.ok) {
-                                    video.load();
-                                } else {
-                                    addSystemMessage('⚠️ 视频加载失败，请重新发送');
-                                }
-                            }).catch(function() {
-                                addSystemMessage('⚠️ 视频加载失败，请重新发送');
-                            });
-                        } catch(err) {
-                            addSystemMessage('⚠️ 视频加载失败，请重新发送');
-                        }
+                        try { fetch(videoUrl).then(function(response) { if (response.ok) { video.load(); } else { addSystemMessage('⚠️ 视频加载失败，请重新发送'); } }).catch(function() { addSystemMessage('⚠️ 视频加载失败，请重新发送'); }); } catch(err) { addSystemMessage('⚠️ 视频加载失败，请重新发送'); }
                     }
                 });
-                
-                video.addEventListener('loadedmetadata', function() {
-                    var dur = Math.floor(video.duration);
-                    var m = Math.floor(dur / 60);
-                    var s = dur % 60;
-                    if (badge) badge.textContent = m + ':' + String(s).padStart(2, '0');
-                    video.currentTime = 0;
-                });
+                video.addEventListener('loadedmetadata', function() { var dur = Math.floor(video.duration); var m = Math.floor(dur / 60); var s = dur % 60; if (badge) badge.textContent = m + ':' + String(s).padStart(2, '0'); video.currentTime = 0; });
                 if (video.readyState >= 1) video.currentTime = 0;
-                
-                video.addEventListener('timeupdate', function() {
-                    if (video.duration && progressFg && uploadProgress >= 100) {
-                        var pct = Math.min(100, (video.currentTime / video.duration) * 100);
-                        var offset = circumference - (pct / 100) * circumference;
-                        progressFg.setAttribute('stroke-dashoffset', offset);
-                        if (progressText) {
-                            progressText.textContent = Math.round(pct) + '%';
-                        }
-                    }
-                });
-                
-                video.addEventListener('play', function() {
-                    if (uploadProgress >= 100) {
-                        if (overlay) overlay.classList.add('hidden');
-                    }
-                    if (pauseIcon) pauseIcon.style.display = 'none';
-                    if (progressText) progressText.style.display = 'block';
-                });
-                
-                video.addEventListener('pause', function() {
-                    if (uploadProgress >= 100) {
-                        if (overlay) overlay.classList.remove('hidden');
-                    }
-                    if (pauseIcon) pauseIcon.style.display = 'none';
-                    if (progressText) progressText.style.display = 'block';
-                });
-                
-                video.addEventListener('ended', function() {
-                    if (overlay) overlay.classList.remove('hidden');
-                    if (pauseIcon) pauseIcon.style.display = 'none';
-                    if (progressText) progressText.style.display = 'block';
-                    video.currentTime = 0;
-                    if (progressFg && uploadProgress >= 100) {
-                        progressFg.setAttribute('stroke-dashoffset', '119.4');
-                    }
-                    if (progressText) progressText.textContent = '0%';
-                });
-                
+                video.addEventListener('timeupdate', function() { if (video.duration && progressFg && uploadProgress >= 100) { var pct = Math.min(100, (video.currentTime / video.duration) * 100); var offset = circumference - (pct / 100) * circumference; progressFg.setAttribute('stroke-dashoffset', offset); if (progressText) { progressText.textContent = Math.round(pct) + '%'; } } });
+                video.addEventListener('play', function() { if (uploadProgress >= 100) { if (overlay) overlay.classList.add('hidden'); } if (pauseIcon) pauseIcon.style.display = 'none'; if (progressText) progressText.style.display = 'block'; });
+                video.addEventListener('pause', function() { if (uploadProgress >= 100) { if (overlay) overlay.classList.remove('hidden'); } if (pauseIcon) pauseIcon.style.display = 'none'; if (progressText) progressText.style.display = 'block'; });
+                video.addEventListener('ended', function() { if (overlay) overlay.classList.remove('hidden'); if (pauseIcon) pauseIcon.style.display = 'none'; if (progressText) progressText.style.display = 'block'; video.currentTime = 0; if (progressFg && uploadProgress >= 100) { progressFg.setAttribute('stroke-dashoffset', '119.4'); } if (progressText) progressText.textContent = '0%'; });
                 wrapperDiv.onclick = function(e) {
                     e.stopPropagation();
                     if (uploadProgress < 100) return;
-                    if (!video.paused) {
-                        video.pause();
-                        if (overlay) overlay.classList.remove('hidden');
-                    }
+                    if (!video.paused) { video.pause(); if (overlay) overlay.classList.remove('hidden'); }
                     openFullscreen(videoUrl, 'video');
                 };
             }
@@ -2509,16 +2498,13 @@
         
         // ✅ 语音消息：根据时长计算宽度
         function getVoiceWidth(duration) {
-            // 1秒约60px，60秒约200px，线性插值
             var minWidth = 60;
             var maxWidth = 200;
             var minDuration = 1;
             var maxDuration = 60;
-            
             var width = minWidth + (maxWidth - minWidth) * (duration - minDuration) / (maxDuration - minDuration);
             return Math.max(minWidth, Math.min(maxWidth, Math.round(width)));
         }
-        
         function addVoiceMessage(duration, audioBlob, sender, text) {
             messageCount++;
             var messages = document.getElementById('messages');
@@ -2526,27 +2512,20 @@
             var msgId = 'voice_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
             if (!window._voiceData) window._voiceData = {};
             window._voiceData[msgId] = audioBlob;
-            
             var wrapper = document.createElement('div');
             wrapper.className = 'msg-wrapper own';
             var displaySender = (sender && sender !== '我') ? sender.slice(0, 6) + '...' + sender.slice(-1) : '我';
             var durationStr = formatDuration(duration);
             var voiceWidth = getVoiceWidth(duration);
-            
             var voiceContent = '';
             if (text && text.trim()) {
                 voiceContent = '\n                            <span class="voice-text">' + text + '</span>\n                        ';
             }
-            
             wrapper.innerHTML = '\n                <div class="msg-avatar">我</div>\n                <div class="msg-body">\n                    <span class="msg-sender">' + displaySender + '</span>\n                    <div class="msg-bubble" style="padding: 4px 0;">\n                        <div class="voice-msg-wrapper" data-msgid="' + msgId + '" onclick="playVoiceMessage(\'' + msgId + '\')" style="width: ' + voiceWidth + 'px;">\n                            <span class="voice-icon" id="voiceIcon_' + msgId + '">\n                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#07c160" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">\n                                    <path d="M11 5L6 9H2v6h4l5 4V5z"/>\n                                </svg>\n                            </span>' + voiceContent + '\n                            <span class="duration">' + durationStr + '</span>\n                        </div>\n                    </div>\n                    <span class="msg-time">' + getTime() + '</span>\n                </div>\n            ';
             messages.appendChild(wrapper);
             scrollToBottom();
-            setTimeout(function() {
-                var replies = ['收到语音！👍', '已收到', '好的', '明白了', '支持！', '嗯嗯'];
-                addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
-            }, 600 + Math.random() * 1000);
+            setTimeout(function() { var replies = ['收到语音！👍', '已收到', '好的', '明白了', '支持！', '嗯嗯']; addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手'); }, 600 + Math.random() * 1000);
         }
-        
         function getSpeakerSVG(state, color) {
             var strokeColor = color || '#07c160';
             if (state === 'playing') {
@@ -2555,7 +2534,6 @@
                 return '\n                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="' + strokeColor + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">\n                        <path d="M11 5L6 9H2v6h4l5 4V5z"/>\n                    </svg>\n                ';
             }
         }
-        
         function updateSpeakerIcon(msgId, state) {
             var iconContainer = document.getElementById('voiceIcon_' + msgId);
             if (!iconContainer) return;
@@ -2564,63 +2542,31 @@
             if (state === 'playing') {
                 iconContainer.querySelectorAll('.wave1, .wave2').forEach(function(el) {
                     el.style.animation = 'none';
-                    setTimeout(function() {
-                        el.style.animation = el.classList.contains('wave1') ? 'wave 1s ease-in-out infinite' : 'wave 1.5s ease-in-out infinite';
-                    }, 10);
+                    setTimeout(function() { el.style.animation = el.classList.contains('wave1') ? 'wave 1s ease-in-out infinite' : 'wave 1.5s ease-in-out infinite'; }, 10);
                 });
             }
         }
-        
         function formatDuration(seconds) {
             var s = Math.floor(seconds);
             var m = Math.floor(s / 60);
             var secs = s % 60;
             return m > 0 ? m + ':' + String(secs).padStart(2, '0') : '0:' + String(secs).padStart(2, '0');
         }
-        
         function playVoiceMessage(msgId) {
             var data = window._voiceData;
             if (!data || !data[msgId]) { addSystemMessage('⚠️ 语音文件不存在'); return; }
-            if (currentPlayingId === msgId && currentAudio && !currentAudio.paused) {
-                currentAudio.pause();
-                updateSpeakerIcon(msgId, 'idle');
-                currentPlayingId = null;
-                return;
-            }
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio = null;
-                if (currentPlayingId) updateSpeakerIcon(currentPlayingId, 'idle');
-                currentPlayingId = null;
-            }
+            if (currentPlayingId === msgId && currentAudio && !currentAudio.paused) { currentAudio.pause(); updateSpeakerIcon(msgId, 'idle'); currentPlayingId = null; return; }
+            if (currentAudio) { currentAudio.pause(); currentAudio = null; if (currentPlayingId) updateSpeakerIcon(currentPlayingId, 'idle'); currentPlayingId = null; }
             var audioBlob = data[msgId];
             var url = URL.createObjectURL(audioBlob);
             var audio = new Audio(url);
             currentAudio = audio;
             currentPlayingId = msgId;
             updateSpeakerIcon(msgId, 'playing');
-            audio.onended = function() {
-                updateSpeakerIcon(msgId, 'idle');
-                currentAudio = null;
-                currentPlayingId = null;
-                URL.revokeObjectURL(url);
-            };
-            audio.onerror = function() {
-                updateSpeakerIcon(msgId, 'idle');
-                currentAudio = null;
-                currentPlayingId = null;
-                URL.revokeObjectURL(url);
-                addSystemMessage('⚠️ 语音播放失败');
-            };
-            audio.play().catch(function(err) {
-                updateSpeakerIcon(msgId, 'idle');
-                currentAudio = null;
-                currentPlayingId = null;
-                URL.revokeObjectURL(url);
-                addSystemMessage('⚠️ 语音播放失败: ' + err.message);
-            });
+            audio.onended = function() { updateSpeakerIcon(msgId, 'idle'); currentAudio = null; currentPlayingId = null; URL.revokeObjectURL(url); };
+            audio.onerror = function() { updateSpeakerIcon(msgId, 'idle'); currentAudio = null; currentPlayingId = null; URL.revokeObjectURL(url); addSystemMessage('⚠️ 语音播放失败'); };
+            audio.play().catch(function(err) { updateSpeakerIcon(msgId, 'idle'); currentAudio = null; currentPlayingId = null; URL.revokeObjectURL(url); addSystemMessage('⚠️ 语音播放失败: ' + err.message); });
         }
-        
         function addOtherMessage(text, sender) {
             messageCount++;
             var messages = document.getElementById('messages');
@@ -2631,7 +2577,6 @@
             messages.appendChild(wrapper);
             scrollToBottom();
         }
-        
         function addSystemMessage(text) {
             var messages = document.getElementById('messages');
             var div = document.createElement('div');
@@ -2640,27 +2585,13 @@
             messages.appendChild(div);
             scrollToBottom();
         }
-        
-        function getTime() {
-            return new Date().toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'});
-        }
-        
-        function scrollToBottom() {
-            var messages = document.getElementById('messages');
-            messages.scrollTop = messages.scrollHeight;
-        }
-        
-        function updateSendBtn() {
-            var input = document.getElementById('msgInput');
-            var sendBtn = document.getElementById('sendBtn');
-            input.value.trim() ? sendBtn.classList.add('show') : sendBtn.classList.remove('show');
-        }
+        function getTime() { return new Date().toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'}); }
+        function scrollToBottom() { var messages = document.getElementById('messages'); messages.scrollTop = messages.scrollHeight; }
+        function updateSendBtn() { var input = document.getElementById('msgInput'); var sendBtn = document.getElementById('sendBtn'); input.value.trim() ? sendBtn.classList.add('show') : sendBtn.classList.remove('show'); }
         document.getElementById('msgInput').addEventListener('input', updateSendBtn);
         
         // ===== 图片上传 =====
-        function handleImageUpload() {
-            document.getElementById('imageInput').click();
-        }
+        function handleImageUpload() { document.getElementById('imageInput').click(); }
         document.getElementById('imageInput').addEventListener('change', function(e) {
             var files = e.target.files;
             if (!files || files.length === 0) return;
@@ -2671,10 +2602,7 @@
                 reader.onload = function(ev) {
                     addOwnImageMessage(ev.target.result, userAddress || '我');
                     addSystemMessage('图片已发送');
-                    setTimeout(function() {
-                        var replies = ['好图！👍', '不错', '收到', '支持！', '666'];
-                        addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
-                    }, 500 + Math.random() * 1000);
+                    setTimeout(function() { var replies = ['好图！👍', '不错', '收到', '支持！', '666']; addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手'); }, 500 + Math.random() * 1000);
                 };
                 reader.readAsDataURL(file);
             }
@@ -2683,9 +2611,7 @@
         });
         
         // ===== 视频上传 =====
-        function handleVideoUpload() {
-            document.getElementById('videoInput').click();
-        }
+        function handleVideoUpload() { document.getElementById('videoInput').click(); }
         document.getElementById('videoInput').addEventListener('change', function(e) {
             var files = e.target.files;
             if (!files || files.length === 0) return;
@@ -2695,22 +2621,14 @@
                 var videoUrl = URL.createObjectURL(file);
                 addOwnVideoMessage(videoUrl, userAddress || '我', file);
                 addSystemMessage('视频已发送');
-                setTimeout(function() {
-                    var replies = ['好视频！🎥', '精彩', '收到', '支持！', '厉害了'];
-                    addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
-                }, 500 + Math.random() * 1000);
+                setTimeout(function() { var replies = ['好视频！🎥', '精彩', '收到', '支持！', '厉害了']; addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手'); }, 500 + Math.random() * 1000);
             }
             e.target.value = '';
             toggleMorePanel();
         });
-        
         window.addEventListener('beforeunload', function() {
             if (window._videoBlobUrls) {
-                Object.values(window._videoBlobUrls).forEach(function(item) {
-                    try {
-                        URL.revokeObjectURL(item.url);
-                    } catch(e) {}
-                });
+                Object.values(window._videoBlobUrls).forEach(function(item) { try { URL.revokeObjectURL(item.url); } catch(e) {} });
                 window._videoBlobUrls = {};
             }
         });
@@ -2755,7 +2673,6 @@
                 addSystemMessage('已切换为键盘输入模式');
             }
         }
-        
         function onPointerDown(e) {
             e.preventDefault();
             if (!isVoiceMode || isRecording) return;
@@ -2765,7 +2682,6 @@
             document.getElementById('cancelTip').classList.remove('show');
             startRecording();
         }
-        
         function onPointerMove(e) {
             if (!isRecording) return;
             var deltaY = pointerStartY - e.clientY;
@@ -2780,22 +2696,16 @@
                 document.getElementById('cancelTip').classList.remove('show');
                 var input = document.getElementById('msgInput');
                 input.classList.remove('cancel-mode');
-                if (recognizedText) {
-                    input.value = recognizedText;
-                } else {
-                    var secs = recordingDuration;
-                    input.value = secs < 60 ? '录音中 ' + secs + 's' : '录音中 ' + Math.floor(secs/60) + ':' + String(secs%60).padStart(2,'0');
-                }
+                if (recognizedText) { input.value = recognizedText; }
+                else { var secs = recordingDuration; input.value = secs < 60 ? '录音中 ' + secs + 's' : '录音中 ' + Math.floor(secs/60) + ':' + String(secs%60).padStart(2,'0'); }
             }
         }
-        
         function onPointerUp(e) {
             if (isRecording) stopRecording(!isCancelMode);
             isCancelMode = false;
             document.getElementById('cancelTip').classList.remove('show');
             document.getElementById('msgInput').classList.remove('cancel-mode');
         }
-        
         var VOICE_CONFIG = { minDuration: 1, maxDuration: 60 };
         
         async function startRecording() {
@@ -2810,14 +2720,9 @@
                 input.value = '录音中 0s';
                 
                 // 启动语音识别
-                if (!speechRecognition) {
-                    speechRecognition = initSpeechRecognition();
-                }
+                if (!speechRecognition) { speechRecognition = initSpeechRecognition(); }
                 if (speechRecognition && !isRecognizing) {
-                    try {
-                        speechRecognition.start();
-                        isRecognizing = true;
-                    } catch(e) {}
+                    try { speechRecognition.start(); isRecognizing = true; } catch(e) {}
                 }
                 
                 mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
@@ -2828,11 +2733,8 @@
                     recordingDuration++;
                     var input = document.getElementById('msgInput');
                     if (input && isRecording) {
-                        if (recognizedText) {
-                            input.value = recognizedText;
-                        } else {
-                            input.value = recordingDuration < 60 ? '录音中 ' + recordingDuration + 's' : '录音中 ' + Math.floor(recordingDuration/60) + ':' + String(recordingDuration%60).padStart(2,'0');
-                        }
+                        if (recognizedText) { input.value = recognizedText; }
+                        else { input.value = recordingDuration < 60 ? '录音中 ' + recordingDuration + 's' : '录音中 ' + Math.floor(recordingDuration/60) + ':' + String(recordingDuration%60).padStart(2,'0'); }
                     }
                     if (recordingDuration >= VOICE_CONFIG.maxDuration && isRecording) stopRecording(true);
                 }, 1000);
@@ -2844,7 +2746,6 @@
                 document.getElementById('msgInput').placeholder = '按住录音，松开发送';
             }
         }
-        
         function stopRecording(send) {
             if (!isRecording) return;
             isRecording = false;
@@ -2853,9 +2754,7 @@
             
             // 停止语音识别
             if (speechRecognition && isRecognizing) {
-                try {
-                    speechRecognition.stop();
-                } catch(e) {}
+                try { speechRecognition.stop(); } catch(e) {}
                 isRecognizing = false;
             }
             
@@ -2869,16 +2768,13 @@
             var duration = recordingDuration;
             var text = recognizedText;
             recognizedText = '';
-            
             if (!send) { addSystemMessage('⏸️ 已取消录音'); audioChunks = []; return; }
             if (duration < VOICE_CONFIG.minDuration) { addSystemMessage('⏸️ 说话时间太短 (需≥1秒)'); audioChunks = []; return; }
             if (audioChunks.length > 0) {
                 var audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                 addVoiceMessage(duration, audioBlob, userAddress || '我', text);
                 addSystemMessage('语音消息已发送 (时长 ' + formatDuration(duration) + ')');
-            } else {
-                addSystemMessage('⚠️ 录音数据异常，请重试');
-            }
+            } else { addSystemMessage('⚠️ 录音数据异常，请重试'); }
             audioChunks = [];
         }
         
@@ -2886,11 +2782,8 @@
         function toggleEmojiPanel() {
             var overlay = document.getElementById('emojiOverlay');
             overlay.classList.toggle('active');
-            if (overlay.classList.contains('active')) {
-                renderEmojis();
-            }
+            if (overlay.classList.contains('active')) { renderEmojis(); }
         }
-        
         function renderEmojis() {
             var grid = document.getElementById('emojiGrid');
             if (grid.children.length > 0) return;
@@ -2902,7 +2795,6 @@
                 grid.appendChild(item);
             });
         }
-        
         function selectEmoji(emoji) {
             toggleEmojiPanel();
             var input = document.getElementById('msgInput');
@@ -2912,34 +2804,16 @@
         }
         
         // ===== 加号弹窗 =====
-        function toggleMorePanel() {
-            document.getElementById('moreOverlay').classList.toggle('active');
-        }
-        
+        function toggleMorePanel() { document.getElementById('moreOverlay').classList.toggle('active'); }
         function handleMoreAction(action) {
             if (action === '图片') { handleImageUpload(); return; }
             if (action === '视频') { handleVideoUpload(); return; }
             toggleMorePanel();
             addSystemMessage('📌 发起「' + action + '」功能 (演示)');
-            setTimeout(function() {
-                var replies = ['支持 ' + action + '！', '我也要参与 ' + action, action + ' 功能不错', '已收到 ' + action + ' 请求'];
-                addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
-            }, 500 + Math.random() * 1000);
+            setTimeout(function() { var replies = ['支持 ' + action + '！', '我也要参与 ' + action, action + ' 功能不错', '已收到 ' + action + ' 请求']; addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手'); }, 500 + Math.random() * 1000);
         }
         
-        // ===== 通知点击 =====
-        function handleNotificationClick() {
-            var badge = document.getElementById('notifBadge');
-            var current = parseInt(badge.textContent);
-            if (current > 0) {
-                badge.textContent = '0';
-                addSystemMessage('🔔 已读所有通知');
-            } else {
-                notifCount = 3;
-                badge.textContent = notifCount;
-                addSystemMessage('🔔 有 3 条新通知');
-            }
-        }
+        // ===== 通知点击（已移除） =====
         
         document.getElementById('chatTitle').textContent = '币圈社区 (719)';
         setTimeout(updateCountdownPosition, 100);
