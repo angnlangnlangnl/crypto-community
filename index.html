@@ -1015,15 +1015,15 @@
             to { opacity: 1; }
         }
         
-        /* ===== 语音消息气泡 ===== */
+        /* ===== 语音消息气泡 - 喇叭样式 ===== */
         .voice-msg-wrapper {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             padding: 6px 14px 6px 10px;
             border-radius: 8px;
             background: #f0f0f0;
-            min-width: 80px;
+            min-width: 70px;
             max-width: 200px;
             cursor: pointer;
             user-select: none;
@@ -1032,49 +1032,36 @@
         .msg-wrapper.own .voice-msg-wrapper {
             background: #95ec69;
         }
-        .voice-msg-wrapper .play-btn {
-            font-size: 20px;
-            line-height: 1;
-            flex-shrink: 0;
-            transition: transform 0.2s;
-            width: 24px;
-            text-align: center;
-        }
-        .voice-msg-wrapper .play-btn.playing {
-            animation: spin 1.2s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .voice-msg-wrapper .waveform {
-            flex: 1;
+        .voice-msg-wrapper .voice-icon {
             display: flex;
             align-items: center;
-            gap: 2px;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 24px;
             height: 24px;
-            min-width: 40px;
         }
-        .voice-msg-wrapper .waveform .bar {
-            width: 3px;
-            background: #666;
-            border-radius: 2px;
-            transition: height 0.15s ease;
+        .voice-msg-wrapper .voice-icon svg {
+            width: 20px;
+            height: 20px;
+            display: block;
         }
-        .voice-msg-wrapper .waveform .bar.active {
-            background: #07c160;
+        .voice-msg-wrapper .voice-icon .wave1 {
+            animation: wave 1s ease-in-out infinite;
         }
-        .msg-wrapper.own .voice-msg-wrapper .waveform .bar {
-            background: #444;
+        .voice-msg-wrapper .voice-icon .wave2 {
+            animation: wave 1.5s ease-in-out infinite;
         }
-        .msg-wrapper.own .voice-msg-wrapper .waveform .bar.active {
-            background: #07c160;
+        @keyframes wave {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
         }
         .voice-msg-wrapper .duration {
             font-size: 11px;
             color: #888;
             flex-shrink: 0;
             font-variant-numeric: tabular-nums;
+            min-width: 28px;
+            text-align: left;
         }
         .msg-wrapper.own .voice-msg-wrapper .duration {
             color: #444;
@@ -1150,11 +1137,10 @@
             .airdrop-item { padding: 10px 12px; }
             .airdrop-item .icon { font-size: 22px; }
             .airdrop-item .amount { font-size: 14px; }
-            .voice-msg-wrapper { padding: 4px 10px 4px 8px; min-width: 60px; max-width: 150px; }
-            .voice-msg-wrapper .play-btn { font-size: 16px; width: 20px; }
-            .voice-msg-wrapper .duration { font-size: 10px; }
-            .voice-msg-wrapper .waveform { height: 18px; gap: 1.5px; }
-            .voice-msg-wrapper .waveform .bar { width: 2.5px; }
+            .voice-msg-wrapper { padding: 4px 10px 4px 8px; min-width: 55px; max-width: 150px; gap: 6px; }
+            .voice-msg-wrapper .voice-icon { width: 20px; height: 20px; }
+            .voice-msg-wrapper .voice-icon svg { width: 17px; height: 17px; }
+            .voice-msg-wrapper .duration { font-size: 10px; min-width: 22px; }
             .cancel-tip { font-size: 13px; padding: 8px 16px; bottom: 90px; }
         }
         
@@ -1578,8 +1564,6 @@
         let pointerStartY = 0;
         let currentAudio = null;
         let currentPlayingId = null;
-        let waveformAnimation = null;
-        let activeWaveformBars = [];
         
         // ===== 会议倒计时 =====
         let countdownSeconds = 300;
@@ -1793,6 +1777,7 @@
             scrollToBottom();
         }
         
+        // ===== 语音消息 - 使用喇叭样式 =====
         function addVoiceMessage(duration, audioBlob, sender) {
             messageCount++;
             const messages = document.getElementById('messages');
@@ -1814,16 +1799,20 @@
             
             const durationStr = formatDuration(duration);
             
+            // 喇叭SVG - 静态（未播放）
+            const speakerSvg = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                </svg>
+            `;
+            
             wrapper.innerHTML = `
                 <div class="msg-avatar">我</div>
                 <div class="msg-body">
                     <span class="msg-sender">${displaySender}</span>
                     <div class="msg-bubble" style="padding: 4px 0;">
                         <div class="voice-msg-wrapper" data-msgid="${msgId}" onclick="playVoiceMessage('${msgId}')">
-                            <span class="play-btn" id="playBtn_${msgId}">▶️</span>
-                            <div class="waveform" id="waveform_${msgId}">
-                                ${generateWaveformBars()}
-                            </div>
+                            <span class="voice-icon" id="voiceIcon_${msgId}">${speakerSvg}</span>
                             <span class="duration">${durationStr}</span>
                         </div>
                     </div>
@@ -1833,20 +1822,50 @@
             messages.appendChild(wrapper);
             scrollToBottom();
             
-            // 自动回复
             setTimeout(() => {
                 const replies = ['收到语音！👍', '已收到', '好的', '明白了', '支持！', '嗯嗯'];
                 addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
             }, 600 + Math.random() * 1000);
         }
         
-        function generateWaveformBars() {
-            let bars = '';
-            for (let i = 0; i < 24; i++) {
-                const height = 4 + Math.random() * 16;
-                bars += `<span class="bar" style="height:${height}px;"></span>`;
+        // ===== 获取喇叭SVG - 三种状态 =====
+        function getSpeakerSVG(state, color) {
+            const strokeColor = color || (state === 'playing' ? '#07c160' : '#333');
+            if (state === 'playing') {
+                return `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                        <path d="M15.54 8.46a5 5 0 010 7.07" class="wave1"/>
+                        <path d="M19.07 4.93a10 10 0 010 14.14" class="wave2"/>
+                    </svg>
+                `;
+            } else {
+                return `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                    </svg>
+                `;
             }
-            return bars;
+        }
+        
+        // ===== 更新喇叭图标状态 =====
+        function updateSpeakerIcon(msgId, state) {
+            const iconContainer = document.getElementById('voiceIcon_' + msgId);
+            if (!iconContainer) return;
+            
+            const isOwn = iconContainer.closest('.msg-wrapper.own') !== null;
+            const color = state === 'playing' ? '#07c160' : (isOwn ? '#333' : '#333');
+            iconContainer.innerHTML = getSpeakerSVG(state, color);
+            
+            // 重新应用动画样式（CSS动画需要重新触发）
+            if (state === 'playing') {
+                iconContainer.querySelectorAll('.wave1, .wave2').forEach(el => {
+                    el.style.animation = 'none';
+                    setTimeout(() => {
+                        el.style.animation = el.classList.contains('wave1') ? 'wave 1s ease-in-out infinite' : 'wave 1.5s ease-in-out infinite';
+                    }, 10);
+                });
+            }
         }
         
         function formatDuration(seconds) {
@@ -1859,7 +1878,7 @@
             return '0:' + String(secs).padStart(2, '0');
         }
         
-        // ===== 语音播放 - 带动态效果 =====
+        // ===== 语音播放 =====
         function playVoiceMessage(msgId) {
             const data = window._voiceData;
             if (!data || !data[msgId]) {
@@ -1870,12 +1889,7 @@
             // 如果点击的是当前正在播放的语音，则暂停
             if (currentPlayingId === msgId && currentAudio && !currentAudio.paused) {
                 currentAudio.pause();
-                stopWaveformAnimation(msgId);
-                const playBtn = document.getElementById('playBtn_' + msgId);
-                if (playBtn) {
-                    playBtn.textContent = '▶️';
-                    playBtn.classList.remove('playing');
-                }
+                updateSpeakerIcon(msgId, 'idle');
                 currentPlayingId = null;
                 return;
             }
@@ -1885,12 +1899,7 @@
                 currentAudio.pause();
                 currentAudio = null;
                 if (currentPlayingId) {
-                    stopWaveformAnimation(currentPlayingId);
-                    const oldBtn = document.getElementById('playBtn_' + currentPlayingId);
-                    if (oldBtn) {
-                        oldBtn.textContent = '▶️';
-                        oldBtn.classList.remove('playing');
-                    }
+                    updateSpeakerIcon(currentPlayingId, 'idle');
                 }
                 currentPlayingId = null;
             }
@@ -1901,32 +1910,18 @@
             currentAudio = audio;
             currentPlayingId = msgId;
             
-            const playBtn = document.getElementById('playBtn_' + msgId);
-            if (playBtn) {
-                playBtn.textContent = '⏸️';
-                playBtn.classList.add('playing');
-            }
-            
-            // 启动波形动画
-            startWaveformAnimation(msgId);
+            // 更新为播放中状态
+            updateSpeakerIcon(msgId, 'playing');
             
             audio.onended = function() {
-                if (playBtn) {
-                    playBtn.textContent = '▶️';
-                    playBtn.classList.remove('playing');
-                }
-                stopWaveformAnimation(msgId);
+                updateSpeakerIcon(msgId, 'idle');
                 currentAudio = null;
                 currentPlayingId = null;
                 URL.revokeObjectURL(url);
             };
             
             audio.onerror = function() {
-                if (playBtn) {
-                    playBtn.textContent = '▶️';
-                    playBtn.classList.remove('playing');
-                }
-                stopWaveformAnimation(msgId);
+                updateSpeakerIcon(msgId, 'idle');
                 currentAudio = null;
                 currentPlayingId = null;
                 URL.revokeObjectURL(url);
@@ -1934,80 +1929,12 @@
             };
             
             audio.play().catch(function(err) {
-                if (playBtn) {
-                    playBtn.textContent = '▶️';
-                    playBtn.classList.remove('playing');
-                }
-                stopWaveformAnimation(msgId);
+                updateSpeakerIcon(msgId, 'idle');
                 currentAudio = null;
                 currentPlayingId = null;
                 URL.revokeObjectURL(url);
                 addSystemMessage('⚠️ 语音播放失败: ' + err.message);
             });
-        }
-        
-        // ===== 波形动画 =====
-        function startWaveformAnimation(msgId) {
-            const waveform = document.getElementById('waveform_' + msgId);
-            if (!waveform) return;
-            const bars = waveform.querySelectorAll('.bar');
-            if (bars.length === 0) return;
-            
-            // 清除之前的动画
-            if (waveformAnimation) {
-                cancelAnimationFrame(waveformAnimation);
-                waveformAnimation = null;
-            }
-            
-            // 重置所有bar为active状态
-            bars.forEach(bar => bar.classList.add('active'));
-            
-            let lastUpdate = 0;
-            let barIndex = 0;
-            
-            function animate(timestamp) {
-                if (!currentAudio || currentPlayingId !== msgId) {
-                    // 停止动画
-                    bars.forEach(bar => bar.classList.remove('active'));
-                    return;
-                }
-                
-                if (timestamp - lastUpdate > 100) {
-                    lastUpdate = timestamp;
-                    // 滚动效果：依次高亮bar
-                    bars.forEach((bar, index) => {
-                        const distance = (index - barIndex + bars.length) % bars.length;
-                        if (distance < 6) {
-                            bar.classList.add('active');
-                            bar.style.height = (6 + Math.random() * 14) + 'px';
-                        } else {
-                            bar.classList.remove('active');
-                            bar.style.height = (4 + Math.random() * 12) + 'px';
-                        }
-                    });
-                    barIndex = (barIndex + 1) % bars.length;
-                }
-                
-                waveformAnimation = requestAnimationFrame(animate);
-            }
-            
-            waveformAnimation = requestAnimationFrame(animate);
-        }
-        
-        function stopWaveformAnimation(msgId) {
-            if (waveformAnimation) {
-                cancelAnimationFrame(waveformAnimation);
-                waveformAnimation = null;
-            }
-            const waveform = document.getElementById('waveform_' + msgId);
-            if (waveform) {
-                const bars = waveform.querySelectorAll('.bar');
-                bars.forEach(bar => {
-                    bar.classList.remove('active');
-                    // 恢复随机高度
-                    bar.style.height = (4 + Math.random() * 12) + 'px';
-                });
-            }
         }
         
         function addOtherMessage(text, sender) {
@@ -2064,7 +1991,7 @@
         }
         document.getElementById('msgInput').addEventListener('input', updateSendBtn);
         
-        // ===== 语音模式 - 微信风格 =====
+        // ===== 语音模式 =====
         function toggleVoiceMode() {
             const input = document.getElementById('msgInput');
             const voiceBtn = document.getElementById('voiceBtn');
