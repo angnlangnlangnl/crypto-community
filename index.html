@@ -521,7 +521,7 @@
         }
         .fullscreen-player .media-content .image-wrap {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: center;
             width: 100%;
             height: 100%;
@@ -534,14 +534,14 @@
             border: none;
             outline: none;
             image-orientation: from-image;
-            transform-origin: top center;
+            transform-origin: center center;
             transition: none;
             touch-action: none;
             will-change: transform;
             width: auto;
             height: auto;
             max-width: 100%;
-            max-height: none;
+            max-height: 100%;
             object-fit: contain;
         }
         .fullscreen-player .media-content .image-wrap img.zoomed {
@@ -1508,7 +1508,7 @@
                 <div class="progress-dot"></div>
             </div>
         </div>
-        <div class="zoom-hint" id="zoomHint">拖动查看 · 双指缩放</div>
+        <div class="zoom-hint" id="zoomHint">双击缩放 · 双指缩放</div>
     </div>
 
     <!-- ===== 会议信息弹窗 ===== -->
@@ -1621,9 +1621,8 @@
         var currentImage = null;
         var zoomHintTimeout = null;
         var isFullscreenImage = false;
-        var isLongImage = false;
         
-        // ✅ 修复：边界约束函数 - 超长图顶部对齐，底部可拖动查看
+        // ✅ 修复：边界约束函数 - 顶部对齐，左右铺满，底部可拖动
         function constrainTransform(img, scale, tx, ty) {
             if (!img) return { tx: 0, ty: 0 };
             
@@ -1641,21 +1640,16 @@
             
             var maxY = 0;
             if (scaledH > ch) {
-                maxY = (scaledH - ch) / 2;
+                maxY = scaledH - ch;
             }
             
-            // ✅ 修复：超长图允许向上拖动更多，顶部对齐边框
-            if (isLongImage && scaledH > ch) {
-                // 超长图：顶部对齐时 ty = -maxY，底部对齐时 ty = maxY
-                ty = Math.max(-maxY, Math.min(maxY, ty));
-            } else {
-                ty = Math.max(-maxY, Math.min(maxY, ty));
-            }
+            // ✅ 修复：ty范围从 -maxY 到 0（顶部对齐时ty=0，底部对齐时ty=-maxY）
+            ty = Math.max(-maxY, Math.min(0, ty));
             
             return { tx: tx, ty: ty };
         }
         
-        // ✅ 修复：初始化时检测超长图，顶部对齐边框
+        // ✅ 修复：初始化时检测图片是否超出屏幕，优先顶部和左右铺满
         function initImageZoom(imageWrap, img) {
             currentImageWrap = imageWrap;
             currentImage = img;
@@ -1664,7 +1658,6 @@
             imageTranslateY = 0;
             isImageZoomed = false;
             isFullscreenImage = true;
-            isLongImage = false;
             img.className = '';
             
             showZoomHint();
@@ -1683,8 +1676,8 @@
             img.addEventListener('touchend', onImageTouchEnd, { passive: false });
             img.addEventListener('mousedown', onImageMouseDown);
             
-            // ✅ 修复：使用 requestAnimationFrame 确保容器已渲染
-            function applyFullWidthZoom() {
+            // ✅ 修复：检测图片是否超出屏幕，优先顶部和左右铺满
+            function applySmartZoom() {
                 var container = imageWrap;
                 var containerWidth = container.clientWidth;
                 var containerHeight = container.clientHeight;
@@ -1692,49 +1685,47 @@
                 var imgHeight = img.naturalHeight || img.height;
                 
                 if (containerWidth === 0 || imgWidth === 0 || imgHeight === 0) {
-                    requestAnimationFrame(applyFullWidthZoom);
+                    requestAnimationFrame(applySmartZoom);
                     return;
                 }
                 
-                var scale = containerWidth / imgWidth;
-                scale = Math.min(scale, 8);
-                scale = Math.max(scale, 1);
+                // 计算左右铺满的缩放比例
+                var scaleToFitWidth = containerWidth / imgWidth;
                 
-                imageScale = scale;
+                // 计算缩放后图片高度
+                var scaledHeight = imgHeight * scaleToFitWidth;
                 
-                // ✅ 修复：检测超长图（高度远大于宽度）
-                var scaledH = imgHeight * scale;
-                if (scaledH > containerHeight * 1.5) {
-                    isLongImage = true;
-                    // 超长图：顶部对齐边框
-                    imageTranslateY = -(scaledH - containerHeight) / 2;
+                // ✅ 修复：如果缩放后高度超出屏幕，使用左右铺满，顶部对齐
+                if (scaledHeight > containerHeight) {
+                    imageScale = scaleToFitWidth;
+                    imageTranslateX = 0;
+                    imageTranslateY = 0; // 顶部对齐
+                    isImageZoomed = true;
+                    img.className = 'zoomed';
+                    
+                    img.style.transform = 'translate(0px, 0px) scale(' + imageScale + ')';
+                    img.style.transformOrigin = 'top center';
                 } else {
-                    isLongImage = false;
+                    // 图片不超出屏幕，保持原始大小居中
+                    imageScale = 1;
+                    imageTranslateX = 0;
                     imageTranslateY = 0;
+                    isImageZoomed = false;
+                    img.className = '';
+                    img.style.transform = 'translate(0px, 0px) scale(1)';
                 }
-                
-                imageTranslateX = 0;
-                isImageZoomed = true;
-                img.className = 'zoomed';
-                
-                var constrained = constrainTransform(img, imageScale, 0, imageTranslateY);
-                imageTranslateX = constrained.tx;
-                imageTranslateY = constrained.ty;
-                
-                img.style.transform = 'translate(' + imageTranslateX + 'px, ' + imageTranslateY + 'px) scale(' + imageScale + ')';
-                img.style.transformOrigin = 'top center';
             }
             
             img.onload = function() {
-                requestAnimationFrame(applyFullWidthZoom);
+                requestAnimationFrame(applySmartZoom);
             };
             
             if (img.complete && img.naturalWidth > 0) {
-                requestAnimationFrame(applyFullWidthZoom);
+                requestAnimationFrame(applySmartZoom);
             } else {
                 setTimeout(function() {
                     if (img.complete && img.naturalWidth > 0) {
-                        requestAnimationFrame(applyFullWidthZoom);
+                        requestAnimationFrame(applySmartZoom);
                     }
                 }, 100);
             }
@@ -1770,33 +1761,17 @@
                 scale = Math.max(scale, 1);
                 
                 imageScale = scale;
-                
-                // ✅ 修复：检测超长图
-                var scaledH = imgHeight * scale;
-                if (scaledH > containerHeight * 1.5) {
-                    isLongImage = true;
-                    imageTranslateY = -(scaledH - containerHeight) / 2;
-                } else {
-                    isLongImage = false;
-                    imageTranslateY = 0;
-                }
-                
                 imageTranslateX = 0;
+                imageTranslateY = 0;
                 isImageZoomed = true;
                 img.className = 'zoomed';
-                
-                var constrained = constrainTransform(img, imageScale, 0, imageTranslateY);
-                imageTranslateX = constrained.tx;
-                imageTranslateY = constrained.ty;
-                
-                img.style.transform = 'translate(' + imageTranslateX + 'px, ' + imageTranslateY + 'px) scale(' + imageScale + ')';
+                img.style.transform = 'translate(0px, 0px) scale(' + imageScale + ')';
                 img.style.transformOrigin = 'top center';
             } else {
                 imageScale = 1;
                 imageTranslateX = 0;
                 imageTranslateY = 0;
                 isImageZoomed = false;
-                isLongImage = false;
                 img.className = '';
                 img.style.transform = 'translate(0px, 0px) scale(1)';
             }
@@ -1902,7 +1877,6 @@
                 imageTranslateX = 0;
                 imageTranslateY = 0;
                 isImageZoomed = false;
-                isLongImage = false;
                 currentImage.className = '';
                 currentImage.style.transform = 'translate(0px, 0px) scale(1)';
             }
@@ -1999,7 +1973,7 @@
                 wrap.className = 'image-wrap';
                 var img = document.createElement('img');
                 img.src = mediaUrl;
-                img.style.cssText = 'display:block;border:none;outline:none;image-orientation:from-image;max-width:100%;max-height:none;width:auto;height:auto;';
+                img.style.cssText = 'display:block;border:none;outline:none;image-orientation:from-image;max-width:100%;max-height:100%;width:auto;height:auto;';
                 wrap.appendChild(img);
                 content.appendChild(wrap);
                 player.classList.add('active');
