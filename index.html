@@ -719,6 +719,93 @@
             margin-bottom: 4px;
         }
         
+        /* ===== 空投弹窗 ===== */
+        .airdrop-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 8px 0 16px 0;
+        }
+        .airdrop-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: #f0f7ff;
+            border-radius: 12px;
+            border: 1px solid #d6e8ff;
+        }
+        .airdrop-item .icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        .airdrop-item .info {
+            flex: 1;
+        }
+        .airdrop-item .info .name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        .airdrop-item .info .desc {
+            font-size: 12px;
+            color: #666;
+        }
+        .airdrop-item .amount {
+            font-size: 16px;
+            font-weight: 700;
+            color: #07c160;
+            flex-shrink: 0;
+        }
+        .airdrop-total {
+            text-align: center;
+            padding: 12px;
+            background: #e8f5e9;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+        .airdrop-total .label {
+            font-size: 12px;
+            color: #666;
+        }
+        .airdrop-total .value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #07c160;
+        }
+        .airdrop-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .airdrop-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .airdrop-actions .btn-claim {
+            background: #07c160;
+            color: white;
+        }
+        .airdrop-actions .btn-claim:hover {
+            background: #06ad56;
+        }
+        .airdrop-actions .btn-claim:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .airdrop-actions .btn-skip {
+            background: #e8e8e8;
+            color: #333;
+        }
+        .airdrop-actions .btn-skip:hover {
+            background: #d5d5d5;
+        }
+        
         /* ========== 表情包弹窗 ========== */
         .emoji-overlay {
             position: fixed;
@@ -935,6 +1022,9 @@
             .article-content .article-title { font-size: 17px; }
             .more-panel { padding: 16px 12px 24px; }
             .emoji-panel { padding: 16px 12px 24px; }
+            .airdrop-item { padding: 10px 12px; }
+            .airdrop-item .icon { font-size: 22px; }
+            .airdrop-item .amount { font-size: 14px; }
         }
         
         @media (max-width: 360px) {
@@ -1207,6 +1297,51 @@
         </div>
     </div>
 
+    <!-- ===== 新用户空投弹窗 ===== -->
+    <div class="modal-overlay" id="airdropClaimModal">
+        <div class="modal-content">
+            <button class="modal-close-btn" onclick="closeModal('airdropClaimModal')">✕</button>
+            <div class="modal-title">🎁 新用户空投福利</div>
+            <div style="text-align:center; margin-bottom:12px; font-size:14px; color:#666;">
+                检测到您是新用户，已自动为您准备空投奖励！
+            </div>
+            <div class="airdrop-total">
+                <div class="label">🎯 可领取总量</div>
+                <div class="value">1,500 CC</div>
+            </div>
+            <div class="airdrop-grid">
+                <div class="airdrop-item">
+                    <span class="icon">🎉</span>
+                    <div class="info">
+                        <div class="name">新用户注册奖励</div>
+                        <div class="desc">首次连接钱包</div>
+                    </div>
+                    <span class="amount">+500 CC</span>
+                </div>
+                <div class="airdrop-item">
+                    <span class="icon">🤝</span>
+                    <div class="info">
+                        <div class="name">社区邀请奖励</div>
+                        <div class="desc">加入币圈社区</div>
+                    </div>
+                    <span class="amount">+500 CC</span>
+                </div>
+                <div class="airdrop-item">
+                    <span class="icon">📱</span>
+                    <div class="info">
+                        <div class="name">生态体验奖励</div>
+                        <div class="desc">完成首次互动</div>
+                    </div>
+                    <span class="amount">+500 CC</span>
+                </div>
+            </div>
+            <div class="airdrop-actions">
+                <button class="btn-claim" id="claimBtn" onclick="claimAirdrop()">立即领取</button>
+                <button class="btn-skip" onclick="skipAirdrop()">稍后领取</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 表情包弹窗 -->
     <div class="emoji-overlay" id="emojiOverlay" onclick="if(event.target===this) toggleEmojiPanel()">
         <div class="emoji-panel">
@@ -1250,7 +1385,6 @@
                     </div>
                     <span class="label">转账</span>
                 </div>
-                <!-- 代币红包 - 使用新SVG图标 -->
                 <div class="more-item" onclick="handleMoreAction('代币红包')">
                     <div class="icon">
                         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1280,6 +1414,8 @@
         let messageCount = 0;
         let isVoiceMode = false;
         let notifCount = 3;
+        let airdropClaimed = false;
+        let airdropSkipped = false;
         
         // ===== 会议倒计时 =====
         let countdownSeconds = 300;
@@ -1359,6 +1495,34 @@
             openModal('officialModal');
         }
         
+        // ===== 空投领取 =====
+        function showAirdropModal() {
+            if (!airdropClaimed && !airdropSkipped) {
+                setTimeout(() => {
+                    openModal('airdropClaimModal');
+                }, 600);
+            }
+        }
+        
+        function claimAirdrop() {
+            airdropClaimed = true;
+            const btn = document.getElementById('claimBtn');
+            btn.textContent = '✅ 已领取';
+            btn.disabled = true;
+            btn.style.background = '#ccc';
+            closeModal('airdropClaimModal');
+            addSystemMessage('🎉 恭喜您！已成功领取 1,500 CC 空投奖励！');
+            setTimeout(() => {
+                addOtherMessage('欢迎加入币圈社区！一起见证生态成长 🚀', '币圈助手');
+            }, 800);
+        }
+        
+        function skipAirdrop() {
+            airdropSkipped = true;
+            closeModal('airdropClaimModal');
+            addSystemMessage('⏳ 空投已暂存，可随时在「私募/空投」页面领取');
+        }
+        
         // ===== 表情包数据 =====
         const emojiList = [
             '😀', '😁', '😂', '🤣', '😃', '😄', '😅',
@@ -1413,6 +1577,8 @@
                         if (emptyState) emptyState.style.display = 'none';
                         addSystemMessage('🎉 欢迎来到币圈社区！');
                         startCountdown();
+                        // 检测为新用户，弹出空投弹窗
+                        showAirdropModal();
                     }
                 } catch (error) {
                     alert('连接失败：' + error.message);
