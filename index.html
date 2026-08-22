@@ -436,7 +436,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.95);
+            background: #000;
             z-index: 3000;
             display: none;
             align-items: center;
@@ -453,7 +453,7 @@
             top: 16px;
             right: 20px;
             font-size: 30px;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.6);
             cursor: pointer;
             z-index: 10;
             transition: color 0.2s;
@@ -497,43 +497,36 @@
             background: #000;
             cursor: pointer;
         }
-        /* 全屏播放控制 - 进度条拉长到两端，时间居中 */
+        /* 全屏播放控制 - 干净无背景 */
         .fullscreen-player .media-controls {
             position: absolute;
-            bottom: 50px;
-            left: 0;
-            right: 0;
+            bottom: 40px;
+            left: 20px;
+            right: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
-            background: rgba(0,0,0,0.4);
-            padding: 12px 20px 16px;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            gap: 8px;
             z-index: 5;
-        }
-        .fullscreen-player .media-controls .top-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            position: relative;
+            pointer-events: none;
         }
         .fullscreen-player .media-controls .time-display {
-            color: rgba(255,255,255,0.85);
+            color: rgba(255,255,255,0.7);
             font-size: 13px;
             font-family: monospace;
             text-align: center;
             letter-spacing: 1px;
+            pointer-events: none;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.5);
         }
         .fullscreen-player .media-controls .progress-bar {
             width: 100%;
-            height: 4px;
-            background: rgba(255,255,255,0.25);
+            height: 3px;
+            background: rgba(255,255,255,0.2);
             border-radius: 2px;
             cursor: pointer;
             position: relative;
+            pointer-events: auto;
         }
         .fullscreen-player .media-controls .progress-bar .progress-fill {
             height: 100%;
@@ -542,6 +535,22 @@
             width: 0%;
             transition: width 0.1s ease;
         }
+        .fullscreen-player .media-controls .progress-bar .progress-dot {
+            position: absolute;
+            top: 50%;
+            right: -3px;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: #07c160;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+        .fullscreen-player .media-controls .progress-bar:hover .progress-dot {
+            opacity: 1;
+        }
         /* 暂停状态 - 中间显示半透明白色暂停图标 */
         .fullscreen-player .pause-overlay {
             position: absolute;
@@ -549,7 +558,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 72px;
-            color: rgba(255, 255, 255, 0.25);
+            color: rgba(255, 255, 255, 0.2);
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s ease;
@@ -1335,7 +1344,7 @@
             .msg-bubble .video-wrapper { max-width: 160px; max-height: 160px; }
             .msg-bubble .video-wrapper video { max-height: 160px; }
             .msg-bubble .video-wrapper .play-overlay { font-size: 32px; }
-            .fullscreen-player .media-controls { padding: 8px 12px 12px; bottom: 30px; }
+            .fullscreen-player .media-controls { bottom: 30px; left: 12px; right: 12px; }
             .fullscreen-player .media-controls .time-display { font-size: 11px; }
             .fullscreen-player .close-btn { font-size: 24px; top: 12px; right: 16px; }
             .fullscreen-player .pause-overlay { font-size: 48px; }
@@ -1463,11 +1472,10 @@
         <div class="media-content" id="fullscreenContent" onclick="event.stopPropagation();"></div>
         <div class="pause-overlay" id="pauseOverlay">⏸</div>
         <div class="media-controls" id="fullscreenControls" style="display:none;">
-            <div class="top-row">
-                <span class="time-display" id="fullscreenTime">00:00 / 00:00</span>
-            </div>
+            <div class="time-display" id="fullscreenTime">00:00 / 00:00</div>
             <div class="progress-bar" id="fullscreenProgress">
                 <div class="progress-fill" id="fullscreenProgressFill"></div>
+                <div class="progress-dot"></div>
             </div>
         </div>
     </div>
@@ -1676,6 +1684,7 @@
                 const timeDisplay = document.getElementById('fullscreenTime');
                 const progressFill = document.getElementById('fullscreenProgressFill');
                 const progressBar = document.getElementById('fullscreenProgress');
+                const dot = progressBar.querySelector('.progress-dot');
                 
                 // 点击视频切换播放/暂停
                 video.onclick = function(e) {
@@ -1691,26 +1700,13 @@
                     }
                 };
                 
-                // 点击全屏背景（非控制区域）切换播放
-                player.onclick = function(e) {
-                    if (e.target === player || e.target === content) {
-                        if (video.paused) {
-                            video.play().catch(function() {});
-                            if (pauseOverlay) pauseOverlay.classList.remove('show');
-                            isVideoPaused = false;
-                        } else {
-                            video.pause();
-                            if (pauseOverlay) pauseOverlay.classList.add('show');
-                            isVideoPaused = true;
-                        }
-                    }
-                };
-                
                 video.addEventListener('loadedmetadata', function() { updateFullscreenTime(); });
                 video.addEventListener('timeupdate', function() {
                     updateFullscreenTime();
                     if (video.duration) {
-                        progressFill.style.width = ((video.currentTime / video.duration) * 100) + '%';
+                        const pct = (video.currentTime / video.duration) * 100;
+                        progressFill.style.width = pct + '%';
+                        if (dot) dot.style.left = pct + '%';
                     }
                 });
                 
@@ -1726,9 +1722,11 @@
                     if (pauseOverlay) pauseOverlay.classList.add('show');
                     video.currentTime = 0;
                     progressFill.style.width = '0%';
+                    if (dot) dot.style.left = '0%';
                     isVideoPaused = true;
                 });
                 
+                // 进度条点击跳转
                 progressBar.onclick = function(e) {
                     e.stopPropagation();
                     const rect = progressBar.getBoundingClientRect();
@@ -1738,6 +1736,7 @@
                     }
                 };
                 
+                // 自动播放
                 setTimeout(function() {
                     video.play().then(function() {
                         if (pauseOverlay) pauseOverlay.classList.remove('show');
@@ -2015,27 +2014,16 @@
                 });
                 if (video.readyState >= 1) video.currentTime = 0;
                 
-                video.onclick = function(e) {
+                // 单击视频进入全屏播放
+                wrapperDiv.onclick = function(e) {
                     e.stopPropagation();
-                    if (video.paused) {
-                        video.play().catch(function() {});
-                        if (overlay) overlay.classList.add('hidden');
-                    } else {
+                    // 如果视频在播放，暂停后进入全屏
+                    if (!video.paused) {
                         video.pause();
                         if (overlay) overlay.classList.remove('hidden');
                     }
-                };
-                
-                wrapperDiv.onclick = function(e) {
-                    e.stopPropagation();
-                    if (e.target === video) return;
                     openFullscreen(videoUrl, 'video');
                 };
-                
-                video.addEventListener('dblclick', function(e) {
-                    e.stopPropagation();
-                    openFullscreen(videoUrl, 'video');
-                });
                 
                 video.addEventListener('play', function() { if (overlay) overlay.classList.add('hidden'); });
                 video.addEventListener('pause', function() { if (overlay && !video.ended) overlay.classList.remove('hidden'); });
