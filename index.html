@@ -208,7 +208,7 @@
         .messages {
             flex: 1;
             padding: 15px;
-            padding-top: 70px; /* 为固定浮窗留出空间 */
+            padding-top: 70px;
             overflow-y: auto;
             background: #ededed;
             display: flex;
@@ -221,7 +221,7 @@
         /* ===== 会议倒计时 - 固定浮窗 ===== */
         .countdown-banner {
             position: fixed;
-            top: 98px; /* 头部+连接条高度 */
+            top: 98px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 100;
@@ -538,6 +538,187 @@
             border-radius: 2px;
         }
         
+        /* ========== 弹窗/页面通用样式 ========== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            animation: fadeIn 0.25s ease;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: #f7f7f7;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 24px 20px 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+        .modal-content::-webkit-scrollbar {
+            width: 4px;
+        }
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 2px;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+            text-align: center;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .modal-close-btn {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            background: none;
+            border: none;
+            padding: 0;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        .modal-close-btn:hover {
+            color: #333;
+        }
+        
+        /* ===== 代币信息弹窗 ===== */
+        .token-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 16px;
+        }
+        .token-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .token-item .label {
+            font-size: 11px;
+            color: #999;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .token-item .value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            word-break: break-all;
+        }
+        .token-item .value.highlight {
+            color: #07c160;
+        }
+        .token-full {
+            grid-column: 1 / -1;
+        }
+        .token-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .token-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .token-actions button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .token-actions .btn-primary {
+            background: #07c160;
+            color: white;
+        }
+        .token-actions .btn-primary:hover {
+            background: #06ad56;
+        }
+        .token-actions .btn-secondary {
+            background: #e8e8e8;
+            color: #333;
+        }
+        .token-actions .btn-secondary:hover {
+            background: #d5d5d5;
+        }
+        
+        /* ===== 文章页面 ===== */
+        .article-content {
+            padding: 4px 0;
+        }
+        .article-content .article-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        .article-content .article-meta {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 16px;
+        }
+        .article-content .article-body {
+            font-size: 14px;
+            color: #444;
+            line-height: 1.8;
+        }
+        .article-content .article-body p {
+            margin-bottom: 12px;
+        }
+        .article-content .article-body .highlight-box {
+            background: rgba(26, 115, 232, 0.08);
+            border-left: 3px solid #1a73e8;
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            margin: 12px 0;
+        }
+        .article-content .article-body ul {
+            padding-left: 20px;
+            margin-bottom: 12px;
+        }
+        .article-content .article-body ul li {
+            margin-bottom: 4px;
+        }
+        
         /* ========== 表情包弹窗 ========== */
         .emoji-overlay {
             position: fixed;
@@ -572,16 +753,19 @@
         .emoji-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 12px 8px;
+            gap: 8px 6px;
             margin-bottom: 16px;
+            justify-items: center;
         }
         .emoji-item {
-            font-size: 32px;
+            font-size: 30px;
             text-align: center;
             cursor: pointer;
-            padding: 8px 4px;
-            border-radius: 12px;
+            padding: 6px 2px;
+            border-radius: 10px;
             transition: background 0.15s;
+            width: 100%;
+            line-height: 1.2;
         }
         .emoji-item:active {
             background: rgba(0,0,0,0.08);
@@ -644,36 +828,43 @@
         .more-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px 10px;
+            gap: 16px 8px;
             margin-bottom: 20px;
+            justify-items: center;
         }
         .more-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             cursor: pointer;
             padding: 8px 0;
             border-radius: 12px;
             transition: background 0.15s;
+            width: 100%;
         }
         .more-item:active {
             background: rgba(0,0,0,0.05);
         }
         .more-item .icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 16px;
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: white;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            flex-shrink: 0;
         }
         .more-item .icon svg {
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             stroke: #333;
+        }
+        .more-item .icon .emoji-icon {
+            font-size: 28px;
+            line-height: 1;
         }
         .more-item .label {
             font-size: 12px;
@@ -700,13 +891,30 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        
         /* 适配小屏 */
         @media (max-width: 420px) {
-            .more-grid { gap: 12px 6px; }
-            .more-item .icon { width: 48px; height: 48px; }
-            .more-item .icon svg { width: 28px; height: 28px; }
-            .emoji-grid { gap: 8px 4px; }
-            .emoji-item { font-size: 26px; padding: 6px 2px; }
+            .more-grid {
+                gap: 12px 4px;
+            }
+            .more-item .icon {
+                width: 46px;
+                height: 46px;
+            }
+            .more-item .icon svg {
+                width: 26px;
+                height: 26px;
+            }
+            .more-item .icon .emoji-icon {
+                font-size: 24px;
+            }
+            .emoji-grid {
+                gap: 4px 3px;
+            }
+            .emoji-item {
+                font-size: 24px;
+                padding: 4px 1px;
+            }
             .header-address { font-size: 11px; padding: 2px 8px; }
             .header-right { gap: 10px; }
             .chat-title { font-size: 14px; }
@@ -722,6 +930,17 @@
             .menu-icon { width: 18px; height: 18px; gap: 2.5px; }
             .menu-icon span { width: 18px; height: 2px; }
             .messages { padding-top: 60px; }
+            .modal-content { padding: 18px 14px 16px; max-width: 100%; margin: 10px; }
+            .token-grid { grid-template-columns: 1fr; gap: 4px; }
+            .article-content .article-title { font-size: 17px; }
+            .more-panel { padding: 16px 12px 24px; }
+            .emoji-panel { padding: 16px 12px 24px; }
+        }
+        
+        @media (max-width: 360px) {
+            .more-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
         
         @media (min-width: 768px) {
@@ -740,11 +959,6 @@
                 top: 98px;
             }
         }
-        /* 连接条隐藏后，倒计时跟随上移 */
-        .connect-banner.hidden ~ .messages .countdown-banner {
-            top: 58px;
-        }
-        /* 由于倒计时是fixed在body下，无法用兄弟选择器，用JS动态调整 */
     </style>
 </head>
 <body>
@@ -780,7 +994,6 @@
     
     <!-- 消息区域 -->
     <div class="messages" id="messages">
-        <!-- 会议倒计时 - 固定浮窗 -->
         <div class="countdown-banner" id="countdownBanner">
             <span class="cd-icon">⏰</span>
             <span class="cd-label">会议倒计时</span>
@@ -796,11 +1009,11 @@
     
     <!-- 输入框上方工具栏 -->
     <div class="toolbar">
-        <button class="toolbar-btn token" onclick="handleTokenInfo()">代币信息</button>
-        <button class="toolbar-btn economy" onclick="handleToolbarAction('经济模式')">经济模式</button>
+        <button class="toolbar-btn token" onclick="openTokenModal()">代币信息</button>
+        <button class="toolbar-btn economy" onclick="openEconomyArticle()">经济模式</button>
         <button class="toolbar-btn meeting" onclick="handleEnterMeeting()">进入会议</button>
-        <button class="toolbar-btn airdrop" onclick="handleToolbarAction('私募/空投')">私募/空投</button>
-        <button class="toolbar-btn official" onclick="handleToolbarAction('查阅官网')">查阅官网</button>
+        <button class="toolbar-btn airdrop" onclick="openAirdropArticle()">私募/空投</button>
+        <button class="toolbar-btn official" onclick="openOfficialArticle()">查阅官网</button>
     </div>
     
     <!-- 底部输入栏 -->
@@ -827,6 +1040,173 @@
         <button class="send-btn" id="sendBtn" onclick="sendMessage()">发送</button>
     </div>
 
+    <!-- ===== 代币信息弹窗 ===== -->
+    <div class="modal-overlay" id="tokenModal">
+        <div class="modal-content">
+            <button class="modal-close-btn" onclick="closeModal('tokenModal')">✕</button>
+            <div class="modal-title">🪙 代币发行信息</div>
+            <div class="token-grid">
+                <div class="token-item">
+                    <span class="label">代币名称</span>
+                    <span class="value highlight">CryptoCommunity (CC)</span>
+                </div>
+                <div class="token-item">
+                    <span class="label">代币符号</span>
+                    <span class="value">$CC</span>
+                </div>
+                <div class="token-item">
+                    <span class="label">发行总量</span>
+                    <span class="value">1,000,000,000 CC</span>
+                </div>
+                <div class="token-item">
+                    <span class="label">初始流通</span>
+                    <span class="value">150,000,000 CC</span>
+                </div>
+                <div class="token-item">
+                    <span class="label">发行链</span>
+                    <span class="value">Ethereum (ERC-20)</span>
+                </div>
+                <div class="token-item">
+                    <span class="label">发行日期</span>
+                    <span class="value">2026-09-01</span>
+                </div>
+                <div class="token-item token-full">
+                    <span class="label">代币描述</span>
+                    <div class="token-desc">币圈社区治理代币，用于社区投票、生态激励、交易手续费折扣及DAO治理。总量恒定，永不增发。</div>
+                </div>
+                <div class="token-item token-full">
+                    <span class="label">合约地址</span>
+                    <div class="value" style="font-size:12px;font-family:monospace;word-break:break-all;color:#1a73e8;">0xCC1234567890abcdef1234567890abcdef12345678</div>
+                </div>
+            </div>
+            <div class="token-actions">
+                <button class="btn-primary" onclick="closeModal('tokenModal');addSystemMessage('✅ 已复制合约地址')">复制合约地址</button>
+                <button class="btn-secondary" onclick="closeModal('tokenModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 经济模式文章弹窗 ===== -->
+    <div class="modal-overlay" id="economyModal">
+        <div class="modal-content" style="max-width:560px;">
+            <button class="modal-close-btn" onclick="closeModal('economyModal')">✕</button>
+            <div class="article-content">
+                <div class="article-title">📈 经济模式：代币通缩与质押激励</div>
+                <div class="article-meta">
+                    <span>📅 2026-08-22</span>
+                    <span>🏷️ 经济模型</span>
+                    <span>⏱️ 5 min read</span>
+                </div>
+                <div class="article-body">
+                    <p><strong>币圈社区</strong> 采用双通缩经济模型，结合质押挖矿与交易燃烧机制，构建可持续的生态闭环。</p>
+                    
+                    <div class="highlight-box">
+                        <strong>核心数据</strong><br>
+                        • 每笔交易燃烧 2% 代币<br>
+                        • 质押年化收益 18%~35%<br>
+                        • 国库储备占比 10%<br>
+                        • 团队锁仓 36 个月
+                    </div>
+                    
+                    <p><strong>一、通缩机制</strong><br>
+                    每笔链上交易自动燃烧 2% 的 CC 代币，随生态繁荣不断减少流通量，形成天然通缩。预计上线首年燃烧 8000万 CC。</p>
+                    
+                    <p><strong>二、质押激励</strong><br>
+                    用户质押 CC 代币可获取平台分红与治理权。质押池分为 30天/90天/180天 三档，年化收益分别对应 18%、25%、35%。</p>
+                    
+                    <p><strong>三、国库治理</strong><br>
+                    10% 的交易手续费进入社区国库，由 DAO 投票决定资金用途，包括生态建设、市场推广、安全审计等。</p>
+                    
+                    <p><strong>四、经济飞轮</strong><br>
+                    交易燃烧 → 通缩升值 → 吸引质押 → 减少抛压 → 价格支撑 → 更多交易，形成正向循环。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 私募/空投文章弹窗 ===== -->
+    <div class="modal-overlay" id="airdropModal">
+        <div class="modal-content" style="max-width:560px;">
+            <button class="modal-close-btn" onclick="closeModal('airdropModal')">✕</button>
+            <div class="article-content">
+                <div class="article-title">🎁 私募与空投计划</div>
+                <div class="article-meta">
+                    <span>📅 2026-08-22</span>
+                    <span>🏷️ 社区激励</span>
+                    <span>⏱️ 4 min read</span>
+                </div>
+                <div class="article-body">
+                    <p><strong>币圈社区</strong> 正式启动首轮私募与空投计划，回馈早期支持者与社区活跃用户。</p>
+                    
+                    <div class="highlight-box">
+                        <strong>空投总量</strong><br>
+                        • 总计 50,000,000 CC<br>
+                        • 占比总发行量 5%<br>
+                        • 覆盖 10,000+ 地址
+                    </div>
+                    
+                    <p><strong>一、私募轮次</strong><br>
+                    <strong>种子轮</strong>：已结束，募集 500 ETH，价格 $0.02/CC<br>
+                    <strong>战略轮</strong>：进行中，额度 2000 ETH，价格 $0.035/CC<br>
+                    <strong>社区轮</strong>：即将开启，额度 1000 ETH，价格 $0.05/CC</p>
+                    
+                    <p><strong>二、空投规则</strong><br>
+                    • 早期测试网交互用户：500~2000 CC<br>
+                    • 社区贡献者（翻译/内容/开发）：1000~5000 CC<br>
+                    • 活跃钱包地址（3个月以上）：200~800 CC</p>
+                    
+                    <p><strong>三、领取方式</strong><br>
+                    空投代币将在 TGE（代币生成事件）后 7 天内发放至用户钱包。需完成指定社群任务方可申领。</p>
+                    
+                    <p><strong>四、风险提示</strong><br>
+                    私募代币锁仓 6 个月，空投代币无锁仓。请勿向任何地址发送 ETH 以「激活」空投资格。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 查阅官网文章弹窗 ===== -->
+    <div class="modal-overlay" id="officialModal">
+        <div class="modal-content" style="max-width:560px;">
+            <button class="modal-close-btn" onclick="closeModal('officialModal')">✕</button>
+            <div class="article-content">
+                <div class="article-title">🌐 官网公告：社区2.0升级路线图</div>
+                <div class="article-meta">
+                    <span>📅 2026-08-22</span>
+                    <span>🏷️ 官方公告</span>
+                    <span>⏱️ 6 min read</span>
+                </div>
+                <div class="article-body">
+                    <p><strong>币圈社区</strong> 官方网站正式发布 2.0 升级路线图，涵盖技术架构、生态扩展与治理革新三大维度。</p>
+                    
+                    <div class="highlight-box">
+                        <strong>升级亮点</strong><br>
+                        • 跨链桥 2.0 (支持 5 条公链)<br>
+                        • 移动端 App 公测版上线<br>
+                        • DAO 治理模块 V2 部署
+                    </div>
+                    
+                    <p><strong>一、技术架构升级</strong><br>
+                    底层链升级至 Cosmos SDK v0.50，TPS 提升至 10,000+，兼容 IBC 跨链协议。新增 ZK-Rollup 二层方案，降低 Gas 费用 80%。</p>
+                    
+                    <p><strong>二、生态扩展计划</strong><br>
+                    Q4 2026 将上线 NFT 市场、DEX 聚合器、借贷协议 三大核心应用。已与 12 个头部项目达成战略合作。</p>
+                    
+                    <p><strong>三、DAO 治理革新</strong><br>
+                    引入「声誉权重投票」机制，治理参与度预计提升 300%。国库资金使用将完全上链，实现透明化。</p>
+                    
+                    <p><strong>四、时间线</strong><br>
+                    • 2026.09：测试网升级<br>
+                    • 2026.10：主网迁移<br>
+                    • 2026.11：生态应用上线<br>
+                    • 2026.12：全功能社区上线</p>
+                    
+                    <p style="margin-top:8px;color:#1a73e8;">🔗 更多详情请访问：<br><span style="font-family:monospace;font-size:13px;">https://cryptocommunity.io/roadmap</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 表情包弹窗 -->
     <div class="emoji-overlay" id="emojiOverlay" onclick="if(event.target===this) toggleEmojiPanel()">
         <div class="emoji-panel">
@@ -842,7 +1222,7 @@
             <div class="more-grid">
                 <div class="more-item" onclick="handleMoreAction('图片')">
                     <div class="icon">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="2" y="2" width="20" height="20" rx="2" ry="2"/>
                             <circle cx="9" cy="9" r="2"/>
                             <path d="M22 15l-5-5-6 6"/>
@@ -852,7 +1232,7 @@
                 </div>
                 <div class="more-item" onclick="handleMoreAction('视频')">
                     <div class="icon">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="2" y="4" width="20" height="16" rx="3" ry="3"/>
                             <polygon points="9 7 17 12 9 17 9 7"/>
                         </svg>
@@ -861,7 +1241,7 @@
                 </div>
                 <div class="more-item" onclick="handleMoreAction('转账')">
                     <div class="icon">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="2" y="5" width="20" height="14" rx="2"/>
                             <line x1="2" y1="10" x2="22" y2="10"/>
                             <circle cx="18" cy="14" r="1.5" fill="currentColor"/>
@@ -870,13 +1250,20 @@
                     </div>
                     <span class="label">转账</span>
                 </div>
+                <!-- 代币红包 - 使用新SVG图标 -->
                 <div class="more-item" onclick="handleMoreAction('代币红包')">
-                    <div class="icon">🧧</div>
+                    <div class="icon">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="6" width="18" height="14" rx="3" ry="3" fill="#e74c3c" stroke="#c0392b" stroke-width="1.5"/>
+                            <circle cx="12" cy="13" r="4" fill="#f1c40f" stroke="#f39c12" stroke-width="1.5"/>
+                            <text x="12" y="15" text-anchor="middle" font-size="8" fill="#e74c3c" font-weight="bold" font-family="sans-serif">CC</text>
+                        </svg>
+                    </div>
                     <span class="label">代币红包</span>
                 </div>
                 <div class="more-item" onclick="handleMoreAction('收藏')">
                     <div class="icon">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                         </svg>
                     </div>
@@ -934,14 +1321,42 @@
             }, 1000);
         }
         
-        // ===== 调整倒计时位置 =====
         function updateCountdownPosition() {
             const banner = document.getElementById('connectBanner');
             const countdown = document.getElementById('countdownBanner');
             if (!banner || !countdown) return;
             const isHidden = banner.classList.contains('hidden');
-            // 连接条隐藏时上移，显示时下移
             countdown.style.top = isHidden ? '58px' : '98px';
+        }
+        
+        // ===== 弹窗控制 =====
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        // ===== 代币信息 =====
+        function openTokenModal() {
+            openModal('tokenModal');
+        }
+        
+        // ===== 经济模式文章 =====
+        function openEconomyArticle() {
+            openModal('economyModal');
+        }
+        
+        // ===== 私募/空投文章 =====
+        function openAirdropArticle() {
+            openModal('airdropModal');
+        }
+        
+        // ===== 查阅官网文章 =====
+        function openOfficialArticle() {
+            openModal('officialModal');
         }
         
         // ===== 表情包数据 =====
@@ -988,7 +1403,6 @@
                     
                     const banner = document.getElementById('connectBanner');
                     banner.classList.add('hidden');
-                    // 更新倒计时位置
                     updateCountdownPosition();
                     
                     const shortAddr = userAddress.slice(0, 4) + '...' + userAddress.slice(-4);
@@ -1221,27 +1635,6 @@
             }, 1500);
         }
         
-        function handleToolbarAction(action) {
-            addSystemMessage(`📌 ${action} - 功能开发中`);
-            setTimeout(() => {
-                const replies = [
-                    `已收到 ${action} 请求`, 
-                    `${action} 功能即将上线`, 
-                    `感谢关注 ${action}`
-                ];
-                addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
-            }, 500 + Math.random() * 800);
-        }
-        
-        function handleTokenInfo() {
-            addSystemMessage('📊 正在加载代币信息...');
-            setTimeout(() => {
-                addSystemMessage('💰 BTC: $67,832 | ETH: $3,521 | SOL: $189.7');
-                addSystemMessage('📈 24h 涨跌: BTC +2.3% | ETH +1.8% | SOL +5.6%');
-                addOtherMessage('当前市场整体偏多，建议关注ETH走势', '币圈助手');
-            }, 800);
-        }
-        
         // ===== 通知点击 =====
         function handleNotificationClick() {
             const badge = document.getElementById('notifBadge');
@@ -1257,8 +1650,6 @@
         }
         
         document.getElementById('chatTitle').textContent = '🚀 币圈社区 (719)';
-        
-        // 初始化倒计时位置
         setTimeout(updateCountdownPosition, 100);
     </script>
 </body>
