@@ -534,6 +534,10 @@
             background: #4ecdc4 !important;
             color: white !important;
         }
+        .input-field.cancel-mode {
+            background: #ffb3b3 !important;
+            color: #cc0000 !important;
+        }
         
         @keyframes pulse {
             from { transform: scale(1); }
@@ -1059,6 +1063,28 @@
             color: #444;
         }
         
+        /* ===== 取消提示浮窗 ===== */
+        .cancel-tip {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 0, 0, 0.85);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            z-index: 500;
+            display: none;
+            animation: fadeIn 0.2s ease;
+            box-shadow: 0 4px 20px rgba(255,0,0,0.3);
+            white-space: nowrap;
+        }
+        .cancel-tip.show {
+            display: block;
+        }
+        
         /* 适配小屏 */
         @media (max-width: 420px) {
             .more-grid {
@@ -1112,6 +1138,7 @@
             .voice-msg-wrapper .duration { font-size: 10px; }
             .voice-msg-wrapper .waveform { height: 18px; gap: 1.5px; }
             .voice-msg-wrapper .waveform .bar { width: 2.5px; }
+            .cancel-tip { font-size: 13px; padding: 8px 16px; bottom: 90px; }
         }
         
         @media (max-width: 360px) {
@@ -1229,6 +1256,9 @@
         
         <button class="send-btn" id="sendBtn" onclick="sendMessage()">发送</button>
     </div>
+
+    <!-- ===== 取消提示浮窗 ===== -->
+    <div class="cancel-tip" id="cancelTip">⬆ 松开取消发送</div>
 
     <!-- ===== 代币信息弹窗 ===== -->
     <div class="modal-overlay" id="tokenModal">
@@ -1509,6 +1539,12 @@
     </div>
 
     <script>
+        // ===== 语音配置 =====
+        const VOICE_CONFIG = {
+            minDuration: 1,      // 最短1秒
+            maxDuration: 60,     // 最长60秒
+        };
+        
         let isConnected = false;
         let userAddress = '';
         let messageCount = 0;
@@ -1521,11 +1557,8 @@
         let audioChunks = [];
         let recordingTimer = null;
         let recordingDuration = 0;
-        let audioContext = null;
-        let analyser = null;
-        let dataArray = null;
-        let animationFrame = null;
-        let currentAudio = null;
+        let isCancelMode = false;
+        let pointerStartY = 0;
         
         // ===== 会议倒计时 =====
         let countdownSeconds = 300;
@@ -1739,16 +1772,13 @@
             scrollToBottom();
         }
         
-        function addVoiceMessage(text, duration, audioBlob, sender) {
+        function addVoiceMessage(duration, audioBlob, sender) {
             messageCount++;
             const messages = document.getElementById('messages');
             const emptyState = document.getElementById('emptyState');
             if (emptyState) emptyState.style.display = 'none';
             
-            // 生成唯一ID
             const msgId = 'voice_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
-            
-            // 存储音频数据
             if (!window._voiceData) window._voiceData = {};
             window._voiceData[msgId] = audioBlob;
             
@@ -1781,9 +1811,15 @@
             `;
             messages.appendChild(wrapper);
             scrollToBottom();
+            
+            // 自动回复
+            setTimeout(() => {
+                const replies = ['收到语音！👍', '已收到', '好的', '明白了', '支持！', '嗯嗯'];
+                addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
+            }, 600 + Math.random() * 1000);
         }
         
-        function addOtherVoiceMessage(text, duration, audioBlob, sender) {
+        function addOtherVoiceMessage(duration, audioBlob, sender) {
             messageCount++;
             const messages = document.getElementById('messages');
             
@@ -1848,11 +1884,9 @@
                 return;
             }
             
-            // 停止当前播放
             if (currentAudio) {
                 currentAudio.pause();
                 currentAudio = null;
-                // 重置所有播放按钮
                 document.querySelectorAll('.voice-msg-wrapper .play-btn').forEach(btn => {
                     btn.textContent = '▶️';
                 });
@@ -1886,6 +1920,8 @@
                 addSystemMessage('⚠️ 语音播放失败: ' + err.message);
             });
         }
+        
+        let currentAudio = null;
         
         function addOtherMessage(text, sender) {
             messageCount++;
@@ -1941,13 +1977,12 @@
         }
         document.getElementById('msgInput').addEventListener('input', updateSendBtn);
         
-        // ===== 语音模式 - 真正的录音功能 =====
+        // ===== 语音模式 - 微信风格 =====
         function toggleVoiceMode() {
             const input = document.getElementById('msgInput');
             const voiceBtn = document.getElementById('voiceBtn');
             
             if (!isVoiceMode) {
-                // 进入语音模式
                 isVoiceMode = true;
                 input.placeholder = '按住录音，松开发送';
                 input.readOnly = true;
@@ -1966,15 +2001,14 @@
                 voiceBtn.style.background = '#ffe0e0';
                 voiceBtn.style.borderRadius = '50%';
                 
-                // 绑定事件
                 input.addEventListener('pointerdown', onPointerDown);
                 input.addEventListener('pointerup', onPointerUp);
                 input.addEventListener('pointerleave', onPointerUp);
                 input.addEventListener('pointercancel', onPointerUp);
+                input.addEventListener('pointermove', onPointerMove);
                 
                 addSystemMessage('🎤 录音模式已开启，按住输入框录音');
             } else {
-                // 退出语音模式
                 isVoiceMode = false;
                 input.placeholder = '输入消息...';
                 input.readOnly = false;
@@ -1991,14 +2025,14 @@
                 `;
                 voiceBtn.style.background = 'transparent';
                 
-                // 移除事件
                 input.removeEventListener('pointerdown', onPointerDown);
                 input.removeEventListener('pointerup', onPointerUp);
                 input.removeEventListener('pointerleave', onPointerUp);
                 input.removeEventListener('pointercancel', onPointerUp);
+                input.removeEventListener('pointermove', onPointerMove);
                 
                 if (isRecording) {
-                    stopRecording();
+                    stopRecording(false);
                 }
                 addSystemMessage('⌨️ 已切换为键盘输入模式');
             }
@@ -2007,19 +2041,49 @@
         function onPointerDown(e) {
             e.preventDefault();
             if (!isVoiceMode || isRecording) return;
+            pointerStartY = e.clientY;
+            isCancelMode = false;
+            document.getElementById('cancelTip').classList.remove('show');
             startRecording();
+        }
+        
+        function onPointerMove(e) {
+            if (!isRecording) return;
+            const deltaY = pointerStartY - e.clientY;
+            if (deltaY > 60) {
+                isCancelMode = true;
+                document.getElementById('cancelTip').classList.add('show');
+                const input = document.getElementById('msgInput');
+                input.classList.add('cancel-mode');
+                input.value = '⬆ 松开取消发送';
+            } else {
+                isCancelMode = false;
+                document.getElementById('cancelTip').classList.remove('show');
+                const input = document.getElementById('msgInput');
+                input.classList.remove('cancel-mode');
+                const secs = recordingDuration;
+                if (secs < 60) {
+                    input.value = '🎙️ 录音中 ' + secs + 's';
+                } else {
+                    const m = Math.floor(secs / 60);
+                    const s = secs % 60;
+                    input.value = '🎙️ 录音中 ' + m + ':' + String(s).padStart(2, '0');
+                }
+            }
         }
         
         function onPointerUp(e) {
             if (isRecording) {
-                stopRecording();
+                stopRecording(!isCancelMode);
             }
+            isCancelMode = false;
+            document.getElementById('cancelTip').classList.remove('show');
+            const input = document.getElementById('msgInput');
+            input.classList.remove('cancel-mode');
         }
         
-        // ===== 真正的录音功能 =====
         async function startRecording() {
             try {
-                // 获取音频流
                 const stream = await navigator.mediaDevices.getUserMedia({ 
                     audio: {
                         echoCancellation: true,
@@ -2036,7 +2100,6 @@
                 input.classList.add('recording');
                 input.value = '🎙️ 录音中 0s';
                 
-                // 创建MediaRecorder
                 mediaRecorder = new MediaRecorder(stream, {
                     mimeType: 'audio/webm;codecs=opus'
                 });
@@ -2048,78 +2111,28 @@
                 };
                 
                 mediaRecorder.onstop = function() {
-                    // 停止所有音轨
                     stream.getTracks().forEach(track => track.stop());
-                    
-                    // 处理录音结果
-                    if (audioChunks.length > 0) {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                        const duration = recordingDuration;
-                        const input = document.getElementById('msgInput');
-                        input.classList.remove('recording', 'recognition-done');
-                        input.style.background = '#f0f0f0';
-                        input.style.color = '#333';
-                        input.value = '';
-                        input.placeholder = '按住录音，松开发送';
-                        
-                        // 发送语音消息
-                        if (duration >= 1) {
-                            addVoiceMessage('', duration, audioBlob, userAddress || '我');
-                            addSystemMessage('🎤 语音消息已发送 (时长 ' + formatDuration(duration) + ')');
-                            
-                            // 自动回复
-                            setTimeout(() => {
-                                const replies = ['收到语音！👍', '已收到', '好的', '明白了', '支持！', '嗯嗯'];
-                                addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
-                            }, 600 + Math.random() * 1000);
-                        } else {
-                            addSystemMessage('⏸️ 录音时间太短，已取消发送');
-                        }
-                    } else {
-                        const input = document.getElementById('msgInput');
-                        input.classList.remove('recording', 'recognition-done');
-                        input.style.background = '#f0f0f0';
-                        input.style.color = '#333';
-                        input.value = '';
-                        input.placeholder = '按住录音，松开发送';
-                    }
-                    
-                    // 清理
-                    if (audioContext) {
-                        audioContext.close();
-                        audioContext = null;
-                    }
-                    if (animationFrame) {
-                        cancelAnimationFrame(animationFrame);
-                        animationFrame = null;
-                    }
                 };
                 
-                // 开始录音
                 mediaRecorder.start(100);
                 
-                // 录音计时
-                if (recordingTimer) clearInterval(recordingTimer);
                 recordingTimer = setInterval(() => {
                     recordingDuration++;
                     const input = document.getElementById('msgInput');
                     if (input && isRecording) {
-                        const mins = Math.floor(recordingDuration / 60);
-                        const secs = recordingDuration % 60;
-                        if (mins > 0) {
-                            input.value = '🎙️ 录音中 ' + mins + ':' + String(secs).padStart(2, '0');
+                        if (recordingDuration < 60) {
+                            input.value = '🎙️ 录音中 ' + recordingDuration + 's';
                         } else {
-                            input.value = '🎙️ 录音中 ' + secs + 's';
+                            const m = Math.floor(recordingDuration / 60);
+                            const s = recordingDuration % 60;
+                            input.value = '🎙️ 录音中 ' + m + ':' + String(s).padStart(2, '0');
                         }
                     }
-                }, 1000);
-                
-                // 超时保护（60秒）
-                setTimeout(() => {
-                    if (isRecording) {
-                        stopRecording();
+                    // 达到60秒自动停止并发送
+                    if (recordingDuration >= VOICE_CONFIG.maxDuration && isRecording) {
+                        stopRecording(true);
                     }
-                }, 60000);
+                }, 1000);
                 
             } catch (err) {
                 addSystemMessage('❌ 无法访问麦克风: ' + err.message);
@@ -2131,7 +2144,7 @@
             }
         }
         
-        function stopRecording() {
+        function stopRecording(send) {
             if (!isRecording) return;
             isRecording = false;
             
@@ -2145,13 +2158,39 @@
             }
             
             const input = document.getElementById('msgInput');
-            input.classList.remove('recording');
+            input.classList.remove('recording', 'cancel-mode');
             input.style.background = '#f0f0f0';
             input.style.color = '#333';
-            if (!input.value || input.value.startsWith('🎙️')) {
-                input.value = '';
-            }
+            input.value = '';
             input.placeholder = '按住录音，松开发送';
+            
+            document.getElementById('cancelTip').classList.remove('show');
+            
+            const duration = recordingDuration;
+            
+            // 检查是否取消
+            if (!send) {
+                addSystemMessage('⏸️ 已取消录音');
+                audioChunks = [];
+                return;
+            }
+            
+            // 检查时长
+            if (duration < VOICE_CONFIG.minDuration) {
+                addSystemMessage('⏸️ 说话时间太短 (需≥1秒)');
+                audioChunks = [];
+                return;
+            }
+            
+            // 发送语音
+            if (audioChunks.length > 0) {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                addVoiceMessage(duration, audioBlob, userAddress || '我');
+                addSystemMessage('🎤 语音消息已发送 (时长 ' + formatDuration(duration) + ')');
+            } else {
+                addSystemMessage('⚠️ 录音数据异常，请重试');
+            }
+            audioChunks = [];
         }
         
         // ===== 表情包弹窗 =====
