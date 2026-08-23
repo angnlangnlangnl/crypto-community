@@ -235,8 +235,11 @@
             align-items: center;
             gap: 10px;
             box-shadow: 0 4px 20px rgba(26, 115, 232, 0.18);
-            transition: all 0.3s ease;
+            transition: top 0.4s ease, transform 0.4s ease;
             white-space: nowrap;
+        }
+        .countdown-banner.moved-up {
+            top: 58px;
         }
         .countdown-banner .cd-icon {
             font-size: 18px;
@@ -718,41 +721,21 @@
             color: #07c160;
             border-color: #07c160;
         }
-        .toolbar-btn.token:hover {
-            background: #07c160;
-            color: white;
-        }
         .toolbar-btn.economy {
             color: #f7931a;
             border-color: #f7931a;
-        }
-        .toolbar-btn.economy:hover {
-            background: #f7931a;
-            color: white;
         }
         .toolbar-btn.meeting {
             color: #1a73e8;
             border-color: #1a73e8;
         }
-        .toolbar-btn.meeting:hover {
-            background: #1a73e8;
-            color: white;
-        }
         .toolbar-btn.airdrop {
             color: #e91e63;
             border-color: #e91e63;
         }
-        .toolbar-btn.airdrop:hover {
-            background: #e91e63;
-            color: white;
-        }
         .toolbar-btn.official {
             color: #9c27b0;
             border-color: #9c27b0;
-        }
-        .toolbar-btn.official:hover {
-            background: #9c27b0;
-            color: white;
         }
         
         .input-area {
@@ -1070,9 +1053,6 @@
             color: #333;
             cursor: pointer;
         }
-        .emoji-close-btn:active {
-            background: #d0d0d0;
-        }
         .emoji-panel .panel-title {
             font-size: 15px;
             font-weight: 600;
@@ -1130,9 +1110,6 @@
             transition: background 0.15s;
             width: 100%;
         }
-        .more-item:active {
-            background: rgba(0,0,0,0.05);
-        }
         .more-item .icon {
             width: 50px;
             height: 50px;
@@ -1172,9 +1149,6 @@
             cursor: pointer;
             margin-top: 4px;
         }
-        .more-close-btn:active {
-            background: #d0d0d0;
-        }
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -1191,7 +1165,6 @@
             max-width: 200px;
             cursor: pointer;
             user-select: none;
-            position: relative;
         }
         .msg-wrapper.own .voice-msg-wrapper {
             background: #95ec69;
@@ -1204,38 +1177,11 @@
             width: 24px;
             height: 24px;
         }
-        .voice-msg-wrapper .voice-icon svg {
-            width: 20px;
-            height: 20px;
-            display: block;
-        }
-        .voice-msg-wrapper .voice-icon .wave1 {
-            animation: wave 1s ease-in-out infinite;
-        }
-        .voice-msg-wrapper .voice-icon .wave2 {
-            animation: wave 1.5s ease-in-out infinite;
-        }
-        @keyframes wave {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.2; }
-        }
         .voice-msg-wrapper .duration {
             font-size: 11px;
             color: #888;
             flex-shrink: 0;
-            font-variant-numeric: tabular-nums;
             min-width: 28px;
-            text-align: left;
-        }
-        .msg-wrapper.own .voice-msg-wrapper .duration {
-            color: #444;
-        }
-        .voice-msg-wrapper .voice-text {
-            font-size: 13px;
-            color: #333;
-            word-break: break-all;
-            line-height: 1.3;
-            flex: 1;
         }
         
         .cancel-tip {
@@ -1251,8 +1197,6 @@
             font-weight: 600;
             z-index: 500;
             display: none;
-            animation: fadeIn 0.2s ease;
-            box-shadow: 0 4px 20px rgba(255,0,0,0.3);
             white-space: nowrap;
         }
         .cancel-tip.show {
@@ -1269,9 +1213,6 @@
             padding: 10px 12px;
             background: white;
             border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
         }
         .token-item .label {
             font-size: 11px;
@@ -1281,18 +1222,6 @@
             font-size: 14px;
             font-weight: 500;
             color: #333;
-        }
-        .token-item .value.highlight {
-            color: #07c160;
-            font-weight: 600;
-        }
-        .token-item.token-full {
-            grid-column: span 2;
-        }
-        .token-item .token-desc {
-            font-size: 13px;
-            color: #666;
-            line-height: 1.5;
         }
         .token-actions {
             display: flex;
@@ -1304,13 +1233,7 @@
             padding: 10px;
             border: none;
             border-radius: 12px;
-            font-size: 14px;
-            font-weight: 500;
             cursor: pointer;
-        }
-        .token-actions .btn-primary {
-            background: #07c160;
-            color: white;
         }
         .token-actions .btn-secondary {
             background: #e8e8e8;
@@ -1323,33 +1246,11 @@
         .article-content .article-title {
             font-size: 18px;
             font-weight: 600;
-            color: #1a1a1a;
             margin-bottom: 8px;
-        }
-        .article-content .article-meta {
-            display: flex;
-            gap: 12px;
-            font-size: 12px;
-            color: #999;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
         }
         .article-content .article-body {
             font-size: 14px;
-            color: #333;
             line-height: 1.7;
-        }
-        .article-content .article-body p {
-            margin-bottom: 10px;
-        }
-        .article-content .highlight-box {
-            background: #f0f7ff;
-            border-radius: 8px;
-            padding: 12px;
-            margin: 10px 0;
-            font-size: 13px;
-            line-height: 1.6;
-            color: #1a73e8;
         }
         
         .airdrop-total {
@@ -1359,47 +1260,9 @@
             border-radius: 12px;
             margin-bottom: 16px;
         }
-        .airdrop-total .label {
-            font-size: 13px;
-            color: #666;
-        }
         .airdrop-total .value {
             font-size: 28px;
             font-weight: 700;
-            color: #07c160;
-        }
-        .airdrop-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-        .airdrop-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: white;
-            border-radius: 8px;
-        }
-        .airdrop-item .icon {
-            font-size: 24px;
-        }
-        .airdrop-item .info {
-            flex: 1;
-        }
-        .airdrop-item .info .name {
-            font-size: 14px;
-            font-weight: 500;
-            color: #333;
-        }
-        .airdrop-item .info .desc {
-            font-size: 12px;
-            color: #999;
-        }
-        .airdrop-item .amount {
-            font-size: 16px;
-            font-weight: 600;
             color: #07c160;
         }
         .airdrop-actions {
@@ -1411,8 +1274,6 @@
             padding: 10px;
             border: none;
             border-radius: 12px;
-            font-size: 14px;
-            font-weight: 500;
             cursor: pointer;
         }
         .airdrop-actions .btn-claim {
@@ -1432,7 +1293,6 @@
             .emoji-grid { gap: 4px 2px; }
             .emoji-item { font-size: 24px; padding: 3px 1px; min-height: 34px; }
             .header-address { font-size: 11px; padding: 2px 8px; }
-            .header-right { gap: 10px; }
             .chat-title { font-size: 14px; }
             .toolbar-btn { font-size: 11px; padding: 4px 10px; }
             .msg-bubble .image-wrapper { max-width: 160px; max-height: 160px; }
@@ -1529,8 +1389,8 @@
     <input type="file" class="file-input-hidden" id="videoInput" accept="video/*">
 
     <div class="fullscreen-player" id="fullscreenPlayer">
-        <button class="close-btn" onclick="event.stopPropagation();closeFullscreen();">✕</button>
-        <div class="media-content" id="fullscreenContent" onclick="event.stopPropagation();"></div>
+        <button class="close-btn" onclick="closeFullscreen()">✕</button>
+        <div class="media-content" id="fullscreenContent"></div>
         <div class="pause-overlay" id="pauseOverlay">
             <svg width="64" height="64" viewBox="0 0 48 48">
                 <circle cx="24" cy="24" r="24" fill="rgba(0,0,0,0.5)"/>
@@ -1573,7 +1433,7 @@
             <button class="modal-close-btn" onclick="closeModal('tokenModal')">✕</button>
             <div class="modal-title">🪙 代币发行信息</div>
             <div class="token-grid">
-                <div class="token-item"><span class="label">代币名称</span><span class="value highlight">CryptoCommunity (CC)</span></div>
+                <div class="token-item"><span class="label">代币名称</span><span class="value">CryptoCommunity (CC)</span></div>
                 <div class="token-item"><span class="label">代币符号</span><span class="value">$CC</span></div>
                 <div class="token-item"><span class="label">发行总量</span><span class="value">1,000,000,000 CC</span></div>
                 <div class="token-item"><span class="label">发行链</span><span class="value">Ethereum (ERC-20)</span></div>
@@ -1585,19 +1445,17 @@
     </div>
 
     <div class="modal-overlay" id="economyModal">
-        <div class="modal-content" style="max-width:560px;">
+        <div class="modal-content">
             <button class="modal-close-btn" onclick="closeModal('economyModal')">✕</button>
             <div class="article-content">
                 <div class="article-title">📈 经济模式</div>
-                <div class="article-body">
-                    <p>代币通缩与质押激励机制。</p>
-                </div>
+                <div class="article-body"><p>代币通缩与质押激励机制。</p></div>
             </div>
         </div>
     </div>
 
     <div class="modal-overlay" id="airdropModal">
-        <div class="modal-content" style="max-width:560px;">
+        <div class="modal-content">
             <button class="modal-close-btn" onclick="closeModal('airdropModal')">✕</button>
             <div class="article-content">
                 <div class="article-title">🎁 私募与空投计划</div>
@@ -1607,7 +1465,7 @@
     </div>
 
     <div class="modal-overlay" id="officialModal">
-        <div class="modal-content" style="max-width:560px;">
+        <div class="modal-content">
             <button class="modal-close-btn" onclick="closeModal('officialModal')">✕</button>
             <div class="article-content">
                 <div class="article-title">🌐 官网公告</div>
@@ -1640,22 +1498,11 @@
         <div class="more-panel">
             <div class="more-grid">
                 <div class="more-item" onclick="handleMoreAction('图片')">
-                    <div class="icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="2" y="2" width="20" height="20" rx="2"/>
-                            <circle cx="9" cy="9" r="2"/>
-                            <path d="M22 15l-5-5-6 6"/>
-                        </svg>
-                    </div>
+                    <div class="icon"><span class="emoji-icon">🖼️</span></div>
                     <span class="label">图片</span>
                 </div>
                 <div class="more-item" onclick="handleMoreAction('视频')">
-                    <div class="icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="2" y="4" width="20" height="16" rx="3"/>
-                            <polygon points="9 7 17 12 9 17 9 7"/>
-                        </svg>
-                    </div>
+                    <div class="icon"><span class="emoji-icon">🎬</span></div>
                     <span class="label">视频</span>
                 </div>
                 <div class="more-item" onclick="handleMoreAction('转账')">
@@ -1701,25 +1548,21 @@
         let pointerStartY = 0;
         let currentAudio = null;
         let currentPlayingId = null;
-        let speechRecognition = null;
-        let isRecognizing = false;
-        let recognizedText = '';
         let airdropClaimed = false;
         let airdropSkipped = false;
         let countdownSeconds = 300;
         let countdownInterval = null;
         let fullscreenVideo = null;
+        let isPolling = false;
 
         const emojiList = ['😀','😁','😂','🤣','😃','😄','😅','😆','😉','😊','😋','😎','😍','🥰','😘','😗','😙','😚','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🥴','😵','🤯','🥳','🥺','😡','😠','🤬','😈','💀','☠️','💩','🤡','👹','👺','👻','💋','💌','💘','💝','💖','💗','💓','💔','❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💕','💞','💯','🔥','⭐','🌟','✨','💫','🌈','☀️','🌙','☁️','⛅','🌊','🌸','🌺','🌻','🌹','🍀','🌿','☘️','🍁','🍂','🍃','🍄'];
 
-        // ===== 文件大小格式化 =====
         function formatFileSize(bytes) {
             if (bytes < 1024) return bytes + ' B';
             if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
             return (bytes / 1024 / 1024).toFixed(1) + ' MB';
         }
 
-        // ===== GitHub API =====
         async function fetchMessages() {
             try {
                 const response = await fetch(
@@ -1753,16 +1596,7 @@
         function promptForToken() {
             const overlay = document.createElement('div');
             overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:5000;display:flex;align-items:center;justify-content:center;padding:20px;';
-            overlay.innerHTML = `
-                <div style="background:white;border-radius:12px;padding:24px;max-width:400px;width:100%;">
-                    <h3 style="margin:0 0 16px;font-size:18px;color:#333;">🔑 设置 GitHub Token</h3>
-                    <p style="margin:0 0 12px;font-size:13px;color:#666;">访问 <a href="https://github.com/settings/tokens" target="_blank" style="color:#07c160;">github.com/settings/tokens</a> 生成Token，勾选 public_repo 权限。</p>
-                    <input type="password" id="tokenInput" placeholder="ghp_..." style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:12px;box-sizing:border-box;">
-                    <div style="display:flex;gap:10px;">
-                        <button id="tokenCancel" style="flex:1;padding:12px;background:#f0f0f0;border:none;border-radius:8px;cursor:pointer;">取消</button>
-                        <button id="tokenSave" style="flex:1;padding:12px;background:#07c160;border:none;border-radius:8px;cursor:pointer;color:white;font-weight:500;">保存</button>
-                    </div>
-                </div>`;
+            overlay.innerHTML = '<div style="background:white;border-radius:12px;padding:24px;max-width:400px;width:100%;"><h3 style="margin:0 0 16px;font-size:18px;color:#333;">🔑 设置 GitHub Token</h3><p style="margin:0 0 12px;font-size:13px;color:#666;">访问 <a href="https://github.com/settings/tokens" target="_blank" style="color:#07c160;">github.com/settings/tokens</a> 生成Token，勾选 public_repo 权限。</p><input type="password" id="tokenInput" placeholder="ghp_..." style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:12px;box-sizing:border-box;"><div style="display:flex;gap:10px;"><button id="tokenCancel" style="flex:1;padding:12px;background:#f0f0f0;border:none;border-radius:8px;cursor:pointer;">取消</button><button id="tokenSave" style="flex:1;padding:12px;background:#07c160;border:none;border-radius:8px;cursor:pointer;color:white;font-weight:500;">保存</button></div></div>';
             document.body.appendChild(overlay);
             const tokenInput = document.getElementById('tokenInput');
             tokenInput.focus();
@@ -1787,20 +1621,25 @@
         }
 
         async function pollMessages() {
-            const comments = await fetchMessages();
-            if (comments.length > 0) {
-                const lastComment = comments[comments.length - 1];
-                if (lastComment.id !== GITHUB_CONFIG.lastCommentId) {
-                    comments.forEach(comment => {
-                        if (!GITHUB_CONFIG.processedMessages.has(comment.id) && comment.id > GITHUB_CONFIG.lastCommentId) {
-                            GITHUB_CONFIG.processedMessages.add(comment.id);
-                            const message = parseMessage(comment);
-                            if (message && message.address !== currentUserAddress) displayIncomingMessage(message);
-                        }
-                    });
-                    GITHUB_CONFIG.lastCommentId = lastComment.id;
+            if (isPolling) return;
+            isPolling = true;
+            try {
+                const comments = await fetchMessages();
+                if (comments.length > 0) {
+                    const lastComment = comments[comments.length - 1];
+                    if (lastComment.id !== GITHUB_CONFIG.lastCommentId) {
+                        comments.forEach(comment => {
+                            if (!GITHUB_CONFIG.processedMessages.has(comment.id) && comment.id > GITHUB_CONFIG.lastCommentId) {
+                                GITHUB_CONFIG.processedMessages.add(comment.id);
+                                const message = parseMessage(comment);
+                                if (message && message.address !== currentUserAddress) displayIncomingMessage(message);
+                            }
+                        });
+                        GITHUB_CONFIG.lastCommentId = lastComment.id;
+                    }
                 }
-            }
+            } catch (error) { console.error('轮询错误:', error); }
+            finally { isPolling = false; }
         }
 
         function displayIncomingMessage(message) {
@@ -1832,7 +1671,6 @@
 
         function startPolling() { loadHistoryMessages(); setInterval(pollMessages, GITHUB_CONFIG.pollInterval); }
 
-        // ===== 钱包连接 =====
         async function connectWallet() {
             if (window.ethereum) {
                 try {
@@ -1845,6 +1683,7 @@
                     document.getElementById('walletStatus').textContent = '✅ ' + accounts[0].slice(0, 8) + '...' + accounts[0].slice(-6);
                     document.getElementById('walletStatus').style.color = '#07c160';
                     document.getElementById('connectBanner').classList.add('hidden');
+                    updateCountdownPosition();
                     document.getElementById('headerAddress').textContent = accounts[0].slice(0, 4) + '...' + accounts[0].slice(-4);
                     startPolling();
                     if (messageCount === 0) {
@@ -1859,7 +1698,6 @@
             } else { alert('请安装MetaMask钱包'); }
         }
 
-        // ===== 消息发送 =====
         function sendMessage() {
             const input = document.getElementById('msgInput');
             const text = input.value.trim();
@@ -2006,7 +1844,7 @@
         function updateSendBtn() { const input = document.getElementById('msgInput'); const sendBtn = document.getElementById('sendBtn'); input.value.trim() ? sendBtn.classList.add('show') : sendBtn.classList.remove('show'); }
         document.getElementById('msgInput').addEventListener('input', updateSendBtn);
 
-        // ===== 图片上传（Catbox.moe，支持200MB） =====
+        // ===== 图片上传（Catbox.moe） =====
         function handleImageUpload() { document.getElementById('imageInput').click(); }
         document.getElementById('imageInput').addEventListener('change', async function(e) {
             const files = e.target.files;
@@ -2033,7 +1871,7 @@
             toggleMorePanel();
         });
 
-        // ===== 视频上传（Catbox.moe，支持200MB） =====
+        // ===== 视频上传（Catbox.moe） =====
         function handleVideoUpload() { document.getElementById('videoInput').click(); }
         document.getElementById('videoInput').addEventListener('change', async function(e) {
             const files = e.target.files;
@@ -2060,15 +1898,10 @@
             toggleMorePanel();
         });
 
-        // ===== 全屏播放器 =====
         function openFullscreen(mediaUrl, type) {
             const player = document.getElementById('fullscreenPlayer');
             const content = document.getElementById('fullscreenContent');
-            const controls = document.getElementById('fullscreenControls');
-            const pauseOverlay = document.getElementById('pauseOverlay');
             content.innerHTML = '';
-            controls.style.display = 'none';
-            if (pauseOverlay) pauseOverlay.classList.remove('show');
             if (type === 'image') {
                 const img = document.createElement('img');
                 img.src = mediaUrl;
@@ -2076,7 +1909,6 @@
                 content.appendChild(img);
                 player.classList.add('active');
                 document.body.style.overflow = 'hidden';
-                return;
             }
             if (type === 'video') {
                 const video = document.createElement('video');
@@ -2096,7 +1928,6 @@
             if (fullscreenVideo) { try { fullscreenVideo.pause(); } catch(e) {} fullscreenVideo = null; }
         }
 
-        // ===== 语音模式 =====
         function toggleVoiceMode() {
             const input = document.getElementById('msgInput');
             const voiceBtn = document.getElementById('voiceBtn');
@@ -2169,7 +2000,6 @@
             audioChunks = [];
         }
 
-        // ===== 表情包 =====
         function toggleEmojiPanel() {
             const overlay = document.getElementById('emojiOverlay');
             overlay.classList.toggle('active');
@@ -2193,7 +2023,6 @@
             updateSendBtn();
         }
 
-        // ===== 加号弹窗 =====
         function toggleMorePanel() { document.getElementById('moreOverlay').classList.toggle('active'); }
         function handleMoreAction(action) {
             if (action === '图片') { handleImageUpload(); return; }
@@ -2202,7 +2031,6 @@
             addSystemMessage('📌 发起「' + action + '」功能');
         }
 
-        // ===== 弹窗控制 =====
         function openModal(id) { document.getElementById(id).classList.add('active'); document.body.style.overflow = 'hidden'; }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); document.body.style.overflow = ''; }
         function openTokenModal() { openModal('tokenModal'); }
@@ -2213,19 +2041,14 @@
         function claimAirdrop() { airdropClaimed = true; closeModal('airdropClaimModal'); addSystemMessage('🎉 已领取 1,500 CC 空投！'); }
         function skipAirdrop() { airdropSkipped = true; closeModal('airdropClaimModal'); }
 
-        // ===== 会议 =====
         function handleEnterMeeting() { openModal('meetingModal'); }
-        function joinMeeting() {
-            window.open('https://meeting.tencent.com/dm/hIbayciQ5BHJ', '_blank');
-            closeModal('meetingModal');
-        }
+        function joinMeeting() { window.open('https://meeting.tencent.com/dm/hIbayciQ5BHJ', '_blank'); closeModal('meetingModal'); }
         function copyMeetingInfo() {
             const info = '腾讯会议：945-379-565\nhttps://meeting.tencent.com/dm/hIbayciQ5BHJ';
             if (navigator.clipboard) navigator.clipboard.writeText(info).then(function() { addSystemMessage('✅ 已复制'); });
             closeModal('meetingModal');
         }
 
-        // ===== 倒计时 =====
         function startCountdown() {
             if (countdownInterval) clearInterval(countdownInterval);
             countdownSeconds = 300;
@@ -2242,10 +2065,15 @@
         function updateCountdownPosition() {
             const banner = document.getElementById('connectBanner');
             const countdown = document.getElementById('countdownBanner');
-            if (banner && countdown) countdown.style.top = banner.classList.contains('hidden') ? '58px' : '98px';
+            if (banner && countdown) {
+                if (banner.classList.contains('hidden')) {
+                    countdown.classList.add('moved-up');
+                } else {
+                    countdown.classList.remove('moved-up');
+                }
+            }
         }
 
-        // ===== 时间 =====
         function setTime() {
             const now = new Date();
             document.getElementById('timeDivider').textContent = now.toLocaleDateString('zh-CN') + ' ' + now.toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'});
