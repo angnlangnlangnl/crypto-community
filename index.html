@@ -1859,7 +1859,129 @@
         </div>
     </div>
 
+    <!-- Socket.io 客户端 -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
     <script>
+        // ===== Socket.io 连接 =====
+        let socket = null;
+        let currentUserAddress = '';
+        let currentUsername = '';
+        const SERVER_URL = 'https://crypto-community-server.onrender.com'; // 替换为你的服务器地址
+
+        // 初始化Socket连接
+        function initSocket() {
+            if (socket && socket.connected) return;
+            
+            socket = io(SERVER_URL, {
+                transports: ['websocket', 'polling']
+            });
+            
+            socket.on('connect', () => {
+                console.log('✅ 已连接到聊天服务器');
+                addSystemMessage('✅ 已连接到聊天服务器');
+                
+                // 注册用户
+                if (currentUserAddress) {
+                    socket.emit('register', {
+                        address: currentUserAddress,
+                        username: currentUsername
+                    });
+                }
+            });
+            
+            socket.on('disconnect', () => {
+                console.log('❌ 与服务器断开连接');
+                addSystemMessage('❌ 与服务器断开连接');
+            });
+            
+            socket.on('connect_error', (error) => {
+                console.log('⚠️ 连接服务器失败，使用本地模式');
+                addSystemMessage('⚠️ 服务器未连接，使用本地模拟模式');
+            });
+            
+            // 接收新消息
+            socket.on('new-message', (message) => {
+                if (message.address !== currentUserAddress) {
+                    addOtherMessage(message.content, message.username);
+                }
+            });
+            
+            // 接收历史消息
+            socket.on('message-history', (history) => {
+                if (history && history.length > 0) {
+                    history.forEach(msg => {
+                        if (msg.address === currentUserAddress) {
+                            addOwnMessage(msg.content, msg.username);
+                        } else {
+                            addOtherMessage(msg.content, msg.username);
+                        }
+                    });
+                }
+            });
+            
+            // 用户上线通知
+            socket.on('user-online', (data) => {
+                if (data.address !== currentUserAddress) {
+                    addSystemMessage(`🟢 ${data.username} 上线了 (${data.onlineCount}人在线)`);
+                }
+                updateOnlineBadge(data.onlineCount);
+            });
+            
+            // 用户下线通知
+            socket.on('user-offline', (data) => {
+                if (data.address !== currentUserAddress) {
+                    addSystemMessage(`🔴 用户下线了 (${data.onlineCount}人在线)`);
+                }
+                updateOnlineBadge(data.onlineCount);
+            });
+            
+            // 私聊消息
+            socket.on('private-message', (message) => {
+                addSystemMessage(`📩 私聊消息来自 ${message.from.slice(0,6)}...: ${message.content}`);
+            });
+            
+            socket.on('private-message-sent', (message) => {
+                addSystemMessage(`📤 私聊消息已发送给 ${message.to.slice(0,6)}...`);
+            });
+            
+            socket.on('private-message-failed', (data) => {
+                addSystemMessage(`⚠️ ${data.error}`);
+            });
+        }
+
+        // 更新在线人数徽章
+        function updateOnlineBadge(count) {
+            const badge = document.querySelector('.online-badge');
+            if (badge && count > 0) {
+                badge.textContent = count;
+            }
+        }
+
+        // 发送消息（通过Socket）
+        function sendMessageViaSocket(text) {
+            if (socket && socket.connected) {
+                socket.emit('send-message', {
+                    address: currentUserAddress,
+                    username: currentUsername,
+                    content: text,
+                    channelId: 1,
+                    type: 'text'
+                });
+            }
+        }
+
+        // 发送私聊消息
+        function sendPrivateMessage(toAddress, content) {
+            if (socket && socket.connected) {
+                socket.emit('private-message', {
+                    from: currentUserAddress,
+                    to: toAddress,
+                    content: content
+                });
+            }
+        }
+
         // ===== 存储Object URL引用，防止GC =====
         if (!window._videoBlobUrls) window._videoBlobUrls = {};
         
@@ -2387,12 +2509,18 @@
                     await window.ethereum.request({ method: 'eth_requestAccounts' });
                     var accounts = await window.ethereum.request({ method: 'eth_accounts' });
                     userAddress = accounts[0];
+                    currentUserAddress = accounts[0];
+                    currentUsername = '用户' + accounts[0].slice(0, 6);
                     isConnected = true;
-                    document.getElementById('walletStatus').textContent = '✅ ' + userAddress.slice(0, 8) + '...' + userAddress.slice(-6);
+                    document.getElementById('walletStatus').textContent = '✅ ' + accounts[0].slice(0, 8) + '...' + accounts[0].slice(-6);
                     document.getElementById('walletStatus').style.color = '#07c160';
                     document.getElementById('connectBanner').classList.add('hidden');
                     updateCountdownPosition();
-                    document.getElementById('headerAddress').textContent = userAddress.slice(0, 4) + '...' + userAddress.slice(-4);
+                    document.getElementById('headerAddress').textContent = accounts[0].slice(0, 4) + '...' + accounts[0].slice(-4);
+                    
+                    // 初始化Socket连接
+                    initSocket();
+                    
                     if (messageCount === 0) {
                         document.getElementById('emptyState').style.display = 'none';
                         addSystemMessage('🎉 欢迎来到币圈社区！');
@@ -2411,10 +2539,17 @@
             addOwnMessage(text, userAddress || '我');
             input.value = '';
             updateSendBtn();
-            setTimeout(function() {
-                var replies = ['收到！👍', '同意', '有道理', '关注一下', '好项目！', '学习了', '支持！', '已关注'];
-                addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
-            }, 800 + Math.random() * 2000);
+            
+            // 通过Socket发送消息
+            sendMessageViaSocket(text);
+            
+            // 如果Socket未连接，使用本地模拟回复
+            if (!socket || !socket.connected) {
+                setTimeout(function() {
+                    var replies = ['收到！👍', '同意', '有道理', '关注一下', '好项目！', '学习了', '支持！', '已关注'];
+                    addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手');
+                }, 800 + Math.random() * 2000);
+            }
         }
         function addOwnMessage(text, sender) {
             messageCount++;
@@ -2496,7 +2631,6 @@
             }
         }
         
-        // ✅ 语音消息：根据时长计算宽度
         function getVoiceWidth(duration) {
             var minWidth = 60;
             var maxWidth = 200;
@@ -2719,7 +2853,6 @@
                 input.classList.add('recording');
                 input.value = '录音中 0s';
                 
-                // 启动语音识别
                 if (!speechRecognition) { speechRecognition = initSpeechRecognition(); }
                 if (speechRecognition && !isRecognizing) {
                     try { speechRecognition.start(); isRecognizing = true; } catch(e) {}
@@ -2752,7 +2885,6 @@
             if (recordingTimer) { clearInterval(recordingTimer); recordingTimer = null; }
             if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
             
-            // 停止语音识别
             if (speechRecognition && isRecognizing) {
                 try { speechRecognition.stop(); } catch(e) {}
                 isRecognizing = false;
@@ -2812,8 +2944,6 @@
             addSystemMessage('📌 发起「' + action + '」功能 (演示)');
             setTimeout(function() { var replies = ['支持 ' + action + '！', '我也要参与 ' + action, action + ' 功能不错', '已收到 ' + action + ' 请求']; addOtherMessage(replies[Math.floor(Math.random() * replies.length)], '币圈助手'); }, 500 + Math.random() * 1000);
         }
-        
-        // ===== 通知点击（已移除） =====
         
         document.getElementById('chatTitle').textContent = '币圈社区 (719)';
         setTimeout(updateCountdownPosition, 100);
