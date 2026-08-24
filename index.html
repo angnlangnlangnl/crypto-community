@@ -308,9 +308,12 @@
                 transform: translateY(0);
             }
         }
-        /* 隐藏主应用直到启动页关闭 */
+        /* 主应用默认隐藏，由JS控制显示 */
         #app {
             display: none;
+            flex-direction: column;
+            height: 100vh;
+            background: #0a0a0f;
         }
         #app.show {
             display: flex;
@@ -354,10 +357,10 @@
                 <div class="splash-badge">🚀 支持 Ethereum · Solana · Arbitrum 等</div>
             </div>
 
-            <!-- 第3页：行动号召 -->
+            <!-- 第3页：行动号召（已移除“开始你的睡后收益之旅”文字） -->
             <div class="splash-slide" data-index="2" style="display:none;">
                 <div class="splash-icon">🚀</div>
-                <div class="splash-title">开始你的「睡后收入」之旅</div>
+                <div class="splash-title">立即开启智能管理</div>
                 <div class="splash-desc">
                     3 分钟设置，AI 即刻为你工作。<br>
                     <span class="splash-highlight">首周免费体验</span>，不满意随时取消。
@@ -445,7 +448,7 @@
 
     <script>
         // ============================================================
-        //  启动页逻辑
+        //  启动页逻辑（已修复进入主应用的逻辑）
         // ============================================================
         (function() {
             const container = document.getElementById('splashContainer');
@@ -453,6 +456,7 @@
             const dots = document.querySelectorAll('.dot');
             const btn = document.getElementById('splashBtn');
             const skipBtn = document.getElementById('splashSkip');
+            const app = document.getElementById('app');
             let current = 0;
             const total = slides.length;
 
@@ -461,7 +465,6 @@
                     el.style.display = i === index ? 'flex' : 'none';
                     el.classList.remove('slide-enter');
                     if (i === index) {
-                        // 触发重绘后添加动画
                         requestAnimationFrame(() => {
                             el.classList.add('slide-enter');
                         });
@@ -470,13 +473,22 @@
                 dots.forEach((dot, i) => {
                     dot.classList.toggle('active', i === index);
                 });
-                // 更新按钮文字
                 if (index === total - 1) {
                     btn.textContent = '🚀 立即开始';
                 } else {
                     btn.textContent = '下一步';
                 }
                 current = index;
+            }
+
+            function enterApp() {
+                container.classList.add('hide');
+                setTimeout(() => {
+                    container.style.display = 'none';
+                    app.classList.add('show');
+                    // 确保主应用正确显示
+                    app.style.display = 'flex';
+                }, 600);
             }
 
             function nextSlide() {
@@ -500,12 +512,7 @@
             // 按钮点击
             btn.addEventListener('click', function() {
                 if (current === total - 1) {
-                    // 最后一页：关闭启动页，显示主应用
-                    container.classList.add('hide');
-                    setTimeout(() => {
-                        container.style.display = 'none';
-                        document.getElementById('app').classList.add('show');
-                    }, 600);
+                    enterApp();
                 } else {
                     nextSlide();
                 }
@@ -513,11 +520,7 @@
 
             // 跳过
             skipBtn.addEventListener('click', function() {
-                container.classList.add('hide');
-                setTimeout(() => {
-                    container.style.display = 'none';
-                    document.getElementById('app').classList.add('show');
-                }, 600);
+                enterApp();
             });
 
             // 触摸滑动支持
@@ -533,7 +536,6 @@
                 const endY = e.changedTouches[0].clientY;
                 const diffX = startX - endX;
                 const diffY = startY - endY;
-                // 水平滑动优先，且滑动距离大于40px
                 if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
                     if (diffX > 0) nextSlide();
                     else prevSlide();
