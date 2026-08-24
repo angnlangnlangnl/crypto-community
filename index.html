@@ -77,13 +77,24 @@
             opacity: 0;
             pointer-events: none;
         }
-        /* 输入框高度缩小30% (从 min-height:32px 降至 22px) */
+        /* 输入框高度 */
         #chatInput {
             min-height: 22px;
             max-height: 60px;
             font-size: 13px;
             padding-top: 4px;
             padding-bottom: 4px;
+            transition: all 0.2s ease;
+        }
+        #chatInput.recording {
+            background: #1a3a2a !important;
+            color: #4ade80 !important;
+            border-color: #4ade80 !important;
+        }
+        #chatInput.cancel-mode {
+            background: #3a1a1a !important;
+            color: #f87171 !important;
+            border-color: #f87171 !important;
         }
         .quick-scroll {
             scrollbar-width: none;
@@ -159,6 +170,92 @@
         }
         .report-btn:active {
             background: #2a4a3a;
+        }
+
+        /* ===== 语音样式 ===== */
+        .voice-msg-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px 6px 8px;
+            background: #1a2a3a;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+            min-width: 60px;
+            max-width: 200px;
+        }
+        .voice-msg-wrapper:active {
+            background: #2a4a5a;
+        }
+        .voice-msg-wrapper .voice-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+        .voice-msg-wrapper .voice-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: #60a5fa;
+        }
+        .voice-msg-wrapper .voice-icon.playing svg {
+            fill: #4ade80;
+        }
+        .voice-msg-wrapper .duration {
+            font-size: 13px;
+            color: #c8c8d8;
+            font-weight: 500;
+            min-width: 32px;
+            text-align: center;
+        }
+        .voice-msg-wrapper .duration.playing {
+            color: #4ade80;
+        }
+        .voice-msg-wrapper .duration .wave {
+            display: inline-block;
+            animation: wave 1.2s ease-in-out infinite;
+        }
+        @keyframes wave {
+            0%,
+            100% {
+                transform: scaleY(0.4);
+            }
+            50% {
+                transform: scaleY(1);
+            }
+        }
+        /* 取消提示浮层 */
+        #cancelTip {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #dc2626;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            pointer-events: none;
+            z-index: 100;
+            box-shadow: 0 8px 30px rgba(220, 38, 38, 0.4);
+        }
+        #cancelTip.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-10px);
+        }
+        /* 语音按钮激活样式 */
+        #voiceBtn.active {
+            background: #1a3a2a !important;
+            border-color: #4ade80 !important;
+        }
+        #voiceBtn.active svg {
+            stroke: #4ade80 !important;
         }
 
         /* ===== 启动页样式 ===== */
@@ -244,7 +341,6 @@
             font-size: 12px;
             color: #6b7280;
         }
-        /* 底部指示器 & 按钮 */
         .splash-footer {
             padding: 20px 32px 40px;
             display: flex;
@@ -298,7 +394,6 @@
         .splash-skip:active {
             color: #9ca3af;
         }
-        /* 启动页切换动画 */
         .slide-enter {
             animation: slideUp 0.5s ease forwards;
         }
@@ -312,7 +407,6 @@
                 transform: translateY(0);
             }
         }
-        /* 主应用默认隐藏，由JS控制显示 */
         #app {
             display: none;
             flex-direction: column;
@@ -322,7 +416,6 @@
         #app.show {
             display: flex;
         }
-        /* 顶部导航高度缩小30% (从 py-2 约8px 降至 5px) */
         .top-nav {
             padding-top: 5px !important;
             padding-bottom: 5px !important;
@@ -330,7 +423,6 @@
         .top-nav-border {
             border-bottom-width: 1px;
         }
-        /* 对话标题+安全提示行 */
         .chat-header {
             display: flex;
             align-items: center;
@@ -350,6 +442,49 @@
         .chat-header .label .highlight {
             color: #4a9a5a;
         }
+        /* 语音波纹动画 */
+        .wave-bars {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            height: 20px;
+        }
+        .wave-bars span {
+            display: block;
+            width: 3px;
+            height: 100%;
+            background: #4ade80;
+            border-radius: 2px;
+            animation: waveAnim 0.8s ease-in-out infinite alternate;
+        }
+        .wave-bars span:nth-child(1) {
+            animation-delay: 0s;
+            height: 40%;
+        }
+        .wave-bars span:nth-child(2) {
+            animation-delay: 0.2s;
+            height: 70%;
+        }
+        .wave-bars span:nth-child(3) {
+            animation-delay: 0.4s;
+            height: 100%;
+        }
+        .wave-bars span:nth-child(4) {
+            animation-delay: 0.6s;
+            height: 60%;
+        }
+        .wave-bars span:nth-child(5) {
+            animation-delay: 0.3s;
+            height: 80%;
+        }
+        @keyframes waveAnim {
+            0% {
+                transform: scaleY(0.3);
+            }
+            100% {
+                transform: scaleY(1);
+            }
+        }
     </style>
 </head>
 <body>
@@ -358,9 +493,7 @@
     <!-- 启动页容器 -->
     <!-- ============================================================ -->
     <div id="splashContainer">
-        <!-- 轮播内容 -->
         <div id="splashSlides" class="flex-1 relative overflow-hidden">
-            <!-- 第1页：核心价值 -->
             <div class="splash-slide slide-enter" data-index="0">
                 <div class="splash-icon">🧠</div>
                 <div class="splash-title">你的 AI 金融管家</div>
@@ -375,8 +508,6 @@
                 </div>
                 <div class="splash-badge">⚡ 已保护 12,000+ 钱包</div>
             </div>
-
-            <!-- 第2页：核心能力 -->
             <div class="splash-slide" data-index="1" style="display:none;">
                 <div class="splash-icon">⚡</div>
                 <div class="splash-title">能力全开，一键搞定</div>
@@ -388,8 +519,6 @@
                 </div>
                 <div class="splash-badge">🚀 支持 Ethereum · Solana · Arbitrum 等</div>
             </div>
-
-            <!-- 第3页：行动号召 -->
             <div class="splash-slide" data-index="2" style="display:none;">
                 <div class="splash-icon">🚀</div>
                 <div class="splash-title">立即开启智能管理</div>
@@ -404,8 +533,6 @@
                 <div class="splash-badge">💎 7 天免费试用 · 随时取消</div>
             </div>
         </div>
-
-        <!-- 底部 -->
         <div class="splash-footer">
             <div class="splash-dots" id="splashDots">
                 <span class="dot active" data-index="0"></span>
@@ -446,12 +573,11 @@
             </div>
         </div>
 
-        <!-- 顶部导航（高度缩小30%） -->
+        <!-- 顶部导航 -->
         <div class="top-nav flex items-center justify-between px-4 border-b border-[#1a1a2a] bg-[#0a0a0f] z-10 flex-shrink-0 top-nav-border">
             <button onclick="toggleDrawer()" class="p-1.5 -ml-2 tap-active" aria-label="打开菜单">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
-            <!-- 💬 对话 + 下方居中安全提示 -->
             <div class="flex flex-col items-center">
                 <span class="text-sm font-medium text-[#8a8a9a]">💬 对话</span>
                 <div class="chat-header">
@@ -469,15 +595,23 @@
         <!-- 消息列表 -->
         <div id="messageList" class="flex-1 overflow-y-auto px-4 py-3 space-y-3"></div>
 
-        <!-- 输入区域（输入框高度缩小30%） -->
+        <!-- ===== 输入区域（语音按钮已移到左侧） ===== -->
         <div class="border-t border-[#1a1a2a] p-2 bg-[#0a0a0f] flex-shrink-0 safe-area-bottom">
             <div class="flex items-end gap-2 bg-[#12121f] rounded-2xl border border-[#1a1a2a] p-1 focus-within:border-blue-500/50 transition-colors">
+                <!-- 语音按钮 → 移到最左边 -->
+                <button id="voiceBtn" class="p-1.5 rounded-xl transition-all flex-shrink-0 bg-[#1a1a2a] text-[#4a4a5a] hover:bg-[#2a2a3a] tap-active" title="语音输入">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                </button>
+                <!-- 输入框 -->
                 <textarea id="chatInput" rows="1" placeholder="输入指令..." class="flex-1 bg-transparent outline-none resize-none text-sm min-h-[22px] max-h-[60px] px-2 py-1 text-[#e8e8f0] placeholder-[#4a4a5a] leading-4"></textarea>
+                <!-- 发送按钮 → 移到最右边 -->
                 <button id="sendBtn" class="p-1.5 rounded-xl transition-all flex-shrink-0 bg-[#1a1a2a] text-[#4a4a5a] cursor-not-allowed tap-active">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4 20-7z"/><path d="M22 2 11 13"/></svg>
                 </button>
             </div>
         </div>
+        <!-- 取消提示浮层 -->
+        <div id="cancelTip">⬆ 松开取消</div>
     </div>
 
     <script>
@@ -597,6 +731,299 @@
         let isProcessing = false;
 
         // ============================================================
+        //  语音模式相关变量
+        // ============================================================
+        let isVoiceMode = false;
+        let isRecording = false;
+        let isCancelMode = false;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recordingDuration = 0;
+        let recordingTimer = null;
+        let pointerStartY = 0;
+        let currentAudio = null;
+        let currentPlayingId = null;
+        let _voiceData = {};
+
+        // ============================================================
+        //  语音功能函数
+        // ============================================================
+
+        // 切换语音模式
+        function toggleVoiceMode() {
+            const input = document.getElementById('chatInput');
+            const voiceBtn = document.getElementById('voiceBtn');
+
+            if (!isVoiceMode) {
+                // 开启语音模式
+                isVoiceMode = true;
+                input.placeholder = ' 按住录音，松开发送';
+                input.readOnly = true;
+                input.style.textAlign = 'center';
+                input.style.userSelect = 'none';
+                input.style.background = '#1a1a2a';
+                input.style.borderColor = '#4ade80';
+                input.style.color = '#4ade80';
+                voiceBtn.classList.add('active');
+                voiceBtn.style.background = '#1a3a2a';
+                voiceBtn.style.borderColor = '#4ade80';
+
+                input.addEventListener('pointerdown', onPointerDown);
+                input.addEventListener('pointerup', onPointerUp);
+                input.addEventListener('pointermove', onPointerMove);
+                input.addEventListener('pointerleave', onPointerLeave);
+
+                addSystemMessage(' 语音模式已开启，按住输入框录音');
+            } else {
+                // 关闭语音模式
+                isVoiceMode = false;
+                input.placeholder = '输入指令...';
+                input.readOnly = false;
+                input.textAlign = 'left';
+                input.userSelect = 'auto';
+                input.background = 'transparent';
+                input.borderColor = '#1a1a2a';
+                input.color = '#e8e8f0';
+                voiceBtn.classList.remove('active');
+                voiceBtn.style.background = '';
+                voiceBtn.style.borderColor = '';
+
+                input.removeEventListener('pointerdown', onPointerDown);
+                input.removeEventListener('pointerup', onPointerUp);
+                input.removeEventListener('pointermove', onPointerMove);
+                input.removeEventListener('pointerleave', onPointerLeave);
+
+                if (isRecording) stopRecording(false);
+                document.getElementById('cancelTip').classList.remove('show');
+
+                addSystemMessage('⌨️ 已切换回键盘模式');
+            }
+        }
+
+        function onPointerDown(e) {
+            e.preventDefault();
+            if (!isVoiceMode || isRecording) return;
+            pointerStartY = e.clientY;
+            isCancelMode = false;
+            startRecording();
+        }
+
+        function onPointerUp(e) {
+            if (isRecording) {
+                stopRecording(!isCancelMode);
+            }
+            isCancelMode = false;
+            document.getElementById('cancelTip').classList.remove('show');
+            const input = document.getElementById('chatInput');
+            input.classList.remove('cancel-mode');
+        }
+
+        function onPointerMove(e) {
+            if (!isRecording) return;
+            const input = document.getElementById('chatInput');
+            const diff = pointerStartY - e.clientY;
+            isCancelMode = diff > 60;
+            if (isCancelMode) {
+                input.classList.add('cancel-mode');
+                document.getElementById('cancelTip').classList.add('show');
+            } else {
+                input.classList.remove('cancel-mode');
+                document.getElementById('cancelTip').classList.remove('show');
+            }
+        }
+
+        function onPointerLeave(e) {
+            if (isRecording) {
+                // 手指移出输入框，自动取消
+                isCancelMode = true;
+                stopRecording(false);
+                document.getElementById('cancelTip').classList.remove('show');
+                const input = document.getElementById('chatInput');
+                input.classList.remove('cancel-mode', 'recording');
+                input.value = '';
+            }
+        }
+
+        // 开始录音
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                isRecording = true;
+                audioChunks = [];
+                recordingDuration = 0;
+
+                const input = document.getElementById('chatInput');
+                input.classList.add('recording');
+                input.value = '🎤 录音中 0s';
+
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = function(event) {
+                    if (event.data.size > 0) audioChunks.push(event.data);
+                };
+                mediaRecorder.onstop = function() {
+                    stream.getTracks().forEach(function(track) { track.stop(); });
+                };
+                mediaRecorder.start(100);
+
+                recordingTimer = setInterval(function() {
+                    recordingDuration++;
+                    const inputEl = document.getElementById('chatInput');
+                    if (inputEl && isRecording) {
+                        inputEl.value = '🎤 录音中 ' + recordingDuration + 's';
+                    }
+                    if (recordingDuration >= 60) {
+                        stopRecording(true);
+                    }
+                }, 1000);
+
+            } catch (err) {
+                isRecording = false;
+                const input = document.getElementById('chatInput');
+                input.classList.remove('recording');
+                input.value = '';
+                input.placeholder = '🎤 按住录音，松开发送';
+                addSystemMessage('⚠️ 无法访问麦克风，请检查权限设置');
+            }
+        }
+
+        // 停止录音
+        function stopRecording(send) {
+            if (!isRecording) return;
+            isRecording = false;
+
+            if (recordingTimer) {
+                clearInterval(recordingTimer);
+                recordingTimer = null;
+            }
+
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+            }
+
+            const input = document.getElementById('chatInput');
+            input.classList.remove('recording', 'cancel-mode');
+            input.value = '';
+            input.placeholder = '🎤 按住录音，松开发送';
+            document.getElementById('cancelTip').classList.remove('show');
+
+            const duration = recordingDuration;
+
+            if (send && duration >= 1 && audioChunks.length > 0) {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                addVoiceMessage(duration, audioBlob);
+            } else if (duration < 1 && send) {
+                addSystemMessage('⏳ 录音太短，请按住久一点再发送');
+            }
+
+            audioChunks = [];
+        }
+
+        // 添加语音消息
+        function addVoiceMessage(duration, audioBlob) {
+            const msgId = 'voice_' + Date.now();
+            _voiceData[msgId] = audioBlob;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'flex items-start gap-2.5 flex-row-reverse';
+
+            const durationStr = formatDuration(duration);
+            const voiceWidth = getVoiceWidth(duration);
+
+            wrapper.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-xs font-bold flex-shrink-0 text-white">我</div>
+                <div class="max-w-[82%] bg-blue-500 rounded-2xl rounded-tr-none px-3 py-2.5">
+                    <div class="voice-msg-wrapper" onclick="playVoiceMessage('${msgId}')" style="width:${voiceWidth}px; background:rgba(255,255,255,0.15);">
+                        <span class="voice-icon" id="voiceIcon_${msgId}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a1 1 0 0 1 1 1v16a1 1 0 0 1-2 0V4a1 1 0 0 1 1-1zm-4 3a1 1 0 0 0-1 1v10a1 1 0 0 0 2 0V7a1 1 0 0 0-1-1zm8 0a1 1 0 0 0-1 1v10a1 1 0 0 0 2 0V7a1 1 0 0 0-1-1z"/></svg>
+                        </span>
+                        <span class="duration" id="duration_${msgId}">${durationStr}</span>
+                    </div>
+                    <div class="text-[10px] mt-1 text-blue-200/60">${new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</div>
+                </div>
+            `;
+
+            document.getElementById('messageList').appendChild(wrapper);
+            const container = document.getElementById('messageList');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // 播放语音消息
+        function playVoiceMessage(msgId) {
+            const data = _voiceData;
+            if (!data || !data[msgId]) return;
+
+            if (currentAudio) {
+                currentAudio.pause();
+                if (currentPlayingId) updateSpeakerIcon(currentPlayingId, 'idle');
+            }
+
+            const audioBlob = data[msgId];
+            const url = URL.createObjectURL(audioBlob);
+            const audio = new Audio(url);
+
+            currentAudio = audio;
+            currentPlayingId = msgId;
+            updateSpeakerIcon(msgId, 'playing');
+
+            audio.onended = function() {
+                updateSpeakerIcon(msgId, 'idle');
+                currentAudio = null;
+                currentPlayingId = null;
+                URL.revokeObjectURL(url);
+            };
+
+            audio.play().catch(function() {});
+        }
+
+        function updateSpeakerIcon(msgId, state) {
+            const icon = document.getElementById('voiceIcon_' + msgId);
+            const duration = document.getElementById('duration_' + msgId);
+            if (!icon) return;
+
+            if (state === 'playing') {
+                icon.classList.add('playing');
+                icon.innerHTML = `
+                    <div class="wave-bars">
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                `;
+                if (duration) duration.classList.add('playing');
+            } else {
+                icon.classList.remove('playing');
+                icon.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a1 1 0 0 1 1 1v16a1 1 0 0 1-2 0V4a1 1 0 0 1 1-1zm-4 3a1 1 0 0 0-1 1v10a1 1 0 0 0 2 0V7a1 1 0 0 0-1-1zm8 0a1 1 0 0 0-1 1v10a1 1 0 0 0 2 0V7a1 1 0 0 0-1-1z"/></svg>
+                `;
+                if (duration) duration.classList.remove('playing');
+            }
+        }
+
+        function formatDuration(seconds) {
+            const s = Math.floor(seconds);
+            const m = Math.floor(s / 60);
+            const secs = s % 60;
+            return m > 0 ? m + ':' + String(secs).padStart(2, '0') : '0:' + String(secs).padStart(2, '0');
+        }
+
+        function getVoiceWidth(duration) {
+            const minWidth = 60;
+            const maxWidth = 200;
+            const minDuration = 1;
+            const maxDuration = 60;
+            const width = minWidth + (maxWidth - minWidth) * Math.min(duration - minDuration, maxDuration - minDuration) / (
+                maxDuration - minDuration);
+            return Math.max(minWidth, Math.min(maxWidth, Math.round(width)));
+        }
+
+        function addSystemMessage(text) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'flex justify-center';
+            wrapper.innerHTML = `<div class="bg-[#12121f] text-xs text-[#5a5a6a] px-4 py-1.5 rounded-full border border-[#1a1a2a]">${text}</div>`;
+            document.getElementById('messageList').appendChild(wrapper);
+            const container = document.getElementById('messageList');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // ============================================================
         //  抽屉控制
         // ============================================================
         function toggleDrawer() {
@@ -670,7 +1097,6 @@
                 { label: '📈 收益', prompt: '帮我优化闲置资产的收益' },
                 { label: '🛡️ 风险', prompt: '帮我分析当前持仓风险' },
                 { label: '📊 持仓', prompt: '查看我的完整持仓' },
-                { label: '🥇 黄金', prompt: '黄金' },
                 { label: '⚡ 智能', prompt: '根据当前市场自动调整配置' },
                 { label: '📄 报告', prompt: '查看项目报告' },
             ];
@@ -919,7 +1345,8 @@
             setTimeout(() => {
                 let response;
                 const lower = text.trim().toLowerCase();
-                if (lower.includes('报告') || lower.includes('项目') || lower.includes('市场') || lower.includes('亮点') && !lower.includes('风险')) {
+                if (lower.includes('报告') || lower.includes('项目') || lower.includes('市场') || lower.includes('亮点') && !lower
+                    .includes('风险')) {
                     response = {
                         id: `ai-${Date.now()}`,
                         role: 'assistant',
@@ -943,6 +1370,16 @@
 
         function renderMessages() {
             const container = document.getElementById('messageList');
+            const children = container.children;
+            const toRemove = [];
+            for (let i = 0; i < children.length; i++) {
+                const child = children[i];
+                if (!child.querySelector('.voice-msg-wrapper')) {
+                    toRemove.push(child);
+                }
+            }
+            toRemove.forEach(el => el.remove());
+
             let html = '';
             messages.forEach(msg => {
                 const isUser = msg.role === 'user';
@@ -968,8 +1405,9 @@
                     return;
                 }
 
-                const contentHtml = (msg.content || '').replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>').replace(
-                    /\n/g, '<br>');
+                const contentHtml = (msg.content || '').replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
+                    .replace(
+                        /\n/g, '<br>');
                 let typeLabel = '',
                     typeIcon = '';
                 if (msg.type === 'transaction_preview') { typeLabel = '交易预览 · 待确认';
@@ -1004,7 +1442,7 @@
                     </div>
                 `;
             }
-            container.innerHTML = html;
+            container.insertAdjacentHTML('beforeend', html);
             container.scrollTop = container.scrollHeight;
         }
 
@@ -1016,7 +1454,7 @@
             const input = document.getElementById('chatInput');
             const btn = document.getElementById('sendBtn');
             const hasText = input.value.trim() !== '';
-            if (hasText && !isProcessing) {
+            if (hasText && !isProcessing && !isVoiceMode) {
                 btn.disabled = false;
                 btn.className = 'p-1.5 rounded-xl transition-all flex-shrink-0 bg-blue-500 text-white active:bg-blue-600 tap-active';
                 btn.innerHTML =
@@ -1036,12 +1474,25 @@
         document.addEventListener('DOMContentLoaded', function() {
             const input = document.getElementById('chatInput');
             const sendBtn = document.getElementById('sendBtn');
+            const voiceBtn = document.getElementById('voiceBtn');
+
+            // 语音按钮
+            voiceBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleVoiceMode();
+            });
+
             input.addEventListener('input', function() {
                 this.style.height = 'auto';
                 this.style.height = Math.min(this.scrollHeight, 60) + 'px';
                 updateSendButton();
             });
+
             sendBtn.addEventListener('click', function() {
+                if (isVoiceMode) {
+                    // 语音模式下，点击发送按钮无效（由按住录音控制）
+                    return;
+                }
                 const text = input.value.trim();
                 if (text && !isProcessing) {
                     sendMessage(text);
@@ -1050,19 +1501,26 @@
                     updateSendButton();
                 }
             });
+
             input.addEventListener('keydown', function(e) {
+                if (isVoiceMode) return; // 语音模式下键盘输入无效
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     sendBtn.click();
                 }
             });
+
             renderAssetOverview();
             renderQuickActions();
             renderMessages();
             updateSendButton();
+
             window.sendMessage = sendMessage;
             window.toggleDrawer = toggleDrawer;
             window.closeDrawer = closeDrawer;
+            window.toggleVoiceMode = toggleVoiceMode;
+            window.playVoiceMessage = playVoiceMessage;
+
             document.getElementById('overlay').addEventListener('click', closeDrawer);
         });
     </script>
