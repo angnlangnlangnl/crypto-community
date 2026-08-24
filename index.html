@@ -738,7 +738,7 @@
         let messages = [{
             id: 'welcome',
             role: 'assistant',
-            content: '你好！我是你的 AI 金融管家。\n\n你目前在 4 条链上持有约 **$38,174** 的资产。\n\n试试说：\n• "优化收益"\n• "分析风险"\n• "查看持仓"\n• "市场需求有多大"\n• "抢占市场"',
+            content: '你好！我是你的 AI 金融管家。\n\n你目前在 4 条链上持有约 **$38,174** 的资产。\n\n试试说：\n• "优化收益"\n• "分析风险"\n• "查看持仓"\n• "分析黄金"\n• "你能做什么"\n• "市场需求有多大"\n• "抢占市场"',
             timestamp: new Date(),
             type: 'text',
         }];
@@ -1105,7 +1105,7 @@
         }
 
         // ============================================================
-        //  快捷操作渲染（已移除黄金按钮）
+        //  快捷操作渲染
         // ============================================================
         function renderQuickActions() {
             const container = document.getElementById('quickActions');
@@ -1182,7 +1182,137 @@
         }
 
         // ============================================================
-        //  市场需求量化分析（新增）
+        //  黄金分析（完整版）
+        // ============================================================
+        function generateGoldContent() {
+            return `
+                <div class="report-card">
+                    <h3>黄金市场趋势分析</h3>
+                    <p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:10px;">实时数据模拟 · 仅供分析参考</p>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
+                        <strong style="color:#e8e8f0;">当前价格</strong>
+                        <ul>
+                            <li>现货黄金：<b style="color:#fbbf24;">$2,546.30</b> ⬆️ +0.42%</li>
+                            <li>黄金期货（12月）：<b style="color:#fbbf24;">$2,568.20</b> ⬆️ +0.38%</li>
+                            <li>今日波动区间：$2,528.50 ~ $2,552.80</li>
+                        </ul>
+                    </div>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
+                        <strong style="color:#e8e8f0;">短期趋势（24h）</strong>
+                        <p>黄金今日震荡上行，受美元指数小幅走弱及地缘政治不确定性支撑。亚盘时段突破 $2,540 阻力位后加速上行，目前测试 $2,555 附近压力。</p>
+                    </div>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
+                        <strong style="color:#e8e8f0;">中期趋势（周线）</strong>
+                        <ul>
+                            <li>周线级别：<b style="color:#4ade80;">多头排列</b>，MA5 上穿 MA10 形成金叉</li>
+                            <li>关键支撑：$2,480</li>
+                            <li>关键阻力：$2,580</li>
+                            <li>RSI（14）：<b style="color:#fbbf24;">62.5</b>（中性偏强，未超买）</li>
+                        </ul>
+                    </div>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
+                        <strong style="color:#e8e8f0;">核心驱动因素</strong>
+                        <ul>
+                            <li>美联储降息预期升温（9月降息概率 68%）</li>
+                            <li>全球央行持续增持黄金（中国连续 18 个月增持）</li>
+                            <li>中东局势紧张，避险资金流入</li>
+                            <li>美元指数反弹可能短期压制金价</li>
+                        </ul>
+                    </div>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
+                        <strong style="color:#e8e8f0;">今日关注数据</strong>
+                        <ul>
+                            <li>20:30 美国初请失业金人数</li>
+                            <li>22:00 美国成屋销售数据</li>
+                        </ul>
+                    </div>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;">
+                        <strong style="color:#e8e8f0;">短期操作参考</strong>
+                        <p style="margin-top:4px;background:#0a0a12;padding:10px;border-radius:12px;border-left:3px solid #fbbf24;">
+                            当前金价处于上升通道中，短期偏向<b style="color:#fbbf24;">逢低做多</b>。<br>
+                            关键入场区间 <b style="color:#4ade80;">$2,530~$2,540</b>，止损 $2,510，目标 $2,580。
+                        </p>
+                        <p style="margin-top:6px;font-size:0.75rem;color:#6a6a7a;">以上为市场数据分析，不构成投资建议，请结合自身风险承受能力决策。</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================================
+        //  你能做什么（完整版）
+        // ============================================================
+        function generateWhatCanDoContent() {
+            return `
+                <div class="report-card">
+                    <h3>我能帮你把「加密资产」变成「睡后收入」</h3>
+                    <p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:10px;">我不是普通的聊天机器人，而是你口袋里的 AI 金融管家</p>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
+                        <strong style="color:#60a5fa;">智能收益优化</strong>
+                        <ul>
+                            <li>自动扫描你所有链上的闲置资产（比如 USDC、USDT）</li>
+                            <li>实时对比 Aave、Compound、Ethena 等 20+ 协议的 APY</li>
+                            <li><b style="color:#fbbf24;">一键将资金存入当前收益最高的地方</b> — 收益可能提升 2~3 倍</li>
+                        </ul>
+                    </div>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
+                        <strong style="color:#60a5fa;">24/7 风险守护</strong>
+                        <ul>
+                            <li>深夜市场暴跌时，自动提醒并给出防御方案</li>
+                            <li>拦截钓鱼网站和恶意合约签名请求</li>
+                            <li>监控你的借款仓位，在清算前主动预警</li>
+                        </ul>
+                    </div>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
+                        <strong style="color:#60a5fa;">持仓全景分析</strong>
+                        <ul>
+                            <li>跨链汇总你的所有资产（ETH/BTC/SOL/ARB 等）</li>
+                            <li>清晰展示仓位占比、月度收益、风险敞口</li>
+                            <li>一句话就能问："我的 SOL 仓位健康吗？"</li>
+                        </ul>
+                    </div>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
+                        <strong style="color:#60a5fa;">AI 自动化执行</strong>
+                        <ul>
+                            <li>设定策略：比如"当 ETH 跌破 3000 时买入 10%"</li>
+                            <li>我替你盯盘并自动执行 — <b style="color:#fbbf24;">你睡觉，我打工</b></li>
+                        </ul>
+                    </div>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
+                        <strong style="color:#e8e8f0;">为什么你应该现在开始用？</strong>
+                        <p style="margin-top:4px;background:#0a0a12;padding:10px;border-radius:12px;border-left:3px solid #fbbf24;">
+                            "过去 3 个月，使用 AI 管家的用户平均收益提升 <b style="color:#fbbf24;">47%</b>，风险事件拦截率 <b style="color:#fbbf24;">99.6%</b>。"
+                        </p>
+                    </div>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:8px;">
+                        <strong style="color:#e8e8f0;">立即体验：</strong>
+                        <ul>
+                            <li>试试说："优化我的 USDC 收益"</li>
+                            <li>或者："分析我的持仓风险"</li>
+                            <li>或者："分析黄金"</li>
+                            <li>或者："市场需求有多大"</li>
+                            <li>或者："抢占市场"</li>
+                        </ul>
+                    </div>
+
+                    <div class="tag" style="background:#1a2a3a;color:#60a5fa;">付费用户专享（7 天免费试用）</div>
+                </div>
+            `;
+        }
+
+        // ============================================================
+        //  市场需求量化分析
         // ============================================================
         function generateMarketDemandContent() {
             return `
@@ -1234,13 +1364,13 @@
         }
 
         // ============================================================
-        //  收费策略分析（新增）
+        //  收费策略 + 推广内容（原始完整版）
         // ============================================================
         function generatePricingContent() {
             return `
                 <div class="report-card">
                     <h3>怎么收费更容易抢占市场</h3>
-                    <p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:10px;">AI驱动的个人金融助手 · 定价策略</p>
+                    <p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:10px;">AI驱动的个人金融助手 · 定价与增长策略</p>
 
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#e8e8f0;">核心策略：先用免费建立信任，再用付费放大价值</strong>
@@ -1248,26 +1378,34 @@
                     </div>
 
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
-                        <strong style="color:#e8e8f0;">阶段一：上线前6个月 → 免费 + 口碑裂变</strong>
-                        <ul>
-                            <li>完全免费，0门槛使用</li>
-                            <li>邀请3个好友解锁无限次AI策略执行</li>
-                            <li>积累用户和口碑，建立品牌信任</li>
-                        </ul>
-                    </div>
-
-                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
-                        <strong style="color:#e8e8f0;">阶段二：6~12个月 → 分层定价</strong>
-                        <div style="background:#0a0a12;border-radius:12px;padding:10px;margin-top:6px;">
-                            <div style="display:flex;justify-content:space-between;border-bottom:1px solid #1a1a2a;padding:4px 0;"><span style="color:#6a6a7a;">免费版</span><span style="color:#4ade80;">¥0</span><span style="font-size:0.7rem;color:#6a6a7a;">限3次/月策略执行</span></div>
-                            <div style="display:flex;justify-content:space-between;border-bottom:1px solid #1a1a2a;padding:4px 0;"><span style="color:#6a6a7a;">Pro版</span><span style="color:#fbbf24;">¥99/月</span><span style="font-size:0.7rem;color:#6a6a7a;">无限次执行 + 实时推送</span></div>
-                            <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:#6a6a7a;">Elite版</span><span style="color:#fbbf24;">¥299/月</span><span style="font-size:0.7rem;color:#6a6a7a;">1对1私人管家</span></div>
+                        <strong style="color:#e8e8f0;">一、定价逻辑：用户为什么愿意付钱？</strong>
+                        <div style="background:#0a0a12;border-radius:12px;padding:8px;margin-top:4px;font-size:0.75rem;">
+                            <div style="display:flex;justify-content:space-between;border-bottom:1px solid #1a1a2a;padding:4px 0;"><span style="color:#6a6a7a;">"我不懂DeFi，怕操作错"</span><span style="color:#4ade80;">免费试用 + 安全守护</span></div>
+                            <div style="display:flex;justify-content:space-between;border-bottom:1px solid #1a1a2a;padding:4px 0;"><span style="color:#6a6a7a;">"我资产不多，但想增值"</span><span style="color:#4ade80;">按资产规模收费</span></div>
+                            <div style="display:flex;justify-content:space-between;border-bottom:1px solid #1a1a2a;padding:4px 0;"><span style="color:#6a6a7a;">"我已经有收益了，愿意分你一点"</span><span style="color:#4ade80;">收益分成模式</span></div>
+                            <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:#6a6a7a;">"我需要更高级的功能"</span><span style="color:#4ade80;">功能分级</span></div>
                         </div>
-                        <p style="margin-top:4px;font-size:0.75rem;color:#6a6a7a;">邀请裂变：每邀请1人+1次免费执行，满10人免费升级1个月Pro</p>
                     </div>
 
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
-                        <strong style="color:#e8e8f0;">阶段三：12个月后 → 收益分成 + 增值服务</strong>
+                        <strong style="color:#e8e8f0;">二、推荐定价策略：三段式</strong>
+
+                        <p style="margin-top:6px;font-weight:500;color:#60a5fa;">阶段一：上线前6个月 → 免费 + 口碑裂变</p>
+                        <ul style="margin-bottom:6px;">
+                            <li><b style="color:#fbbf24;">完全免费</b>，0门槛使用</li>
+                            <li>所有核心功能全部开放</li>
+                            <li>邀请3个好友解锁"无限次AI策略执行"</li>
+                        </ul>
+
+                        <p style="margin-top:6px;font-weight:500;color:#60a5fa;">阶段二：6~12个月 → 分层定价 + 免费裂变</p>
+                        <div style="background:#0a0a12;border-radius:12px;padding:8px;margin-top:4px;font-size:0.75rem;">
+                            <div style="display:flex;justify-content:space-between;border-bottom:1px solid #1a1a2a;padding:4px 0;"><span style="color:#6a6a7a;">免费版</span><span style="color:#4ade80;">¥0</span><span style="font-size:0.65rem;color:#6a6a7a;">限3次/月策略执行</span></div>
+                            <div style="display:flex;justify-content:space-between;border-bottom:1px solid #1a1a2a;padding:4px 0;"><span style="color:#6a6a7a;">Pro版</span><span style="color:#fbbf24;">¥99/月</span><span style="font-size:0.65rem;color:#6a6a7a;">无限次执行 + 实时推送</span></div>
+                            <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:#6a6a7a;">Elite版</span><span style="color:#fbbf24;">¥299/月</span><span style="font-size:0.65rem;color:#6a6a7a;">1对1私人管家</span></div>
+                        </div>
+                        <p style="margin-top:4px;font-size:0.7rem;color:#6a6a7a;">邀请裂变：每邀请1人+1次免费执行，满10人免费升级1个月Pro</p>
+
+                        <p style="margin-top:6px;font-weight:500;color:#60a5fa;">阶段三：12个月后 → 收益分成 + 差异化增值</p>
                         <ul>
                             <li>基础订阅继续保留（稳定现金流）</li>
                             <li><b style="color:#fbbf24;">收益分成</b>：超额收益的 10%~20%，用户无痛付费</li>
@@ -1275,8 +1413,19 @@
                         </ul>
                     </div>
 
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
+                        <strong style="color:#e8e8f0;">三、为什么这套策略能抢占市场？</strong>
+                        <ul>
+                            <li><b style="color:#60a5fa;">免费版功能足够强大</b> — 用户真正在用，形成习惯后付费转化率更高</li>
+                            <li><b style="color:#60a5fa;">裂变机制驱动增长</b> — 用户主动传播，降低获客成本</li>
+                            <li><b style="color:#60a5fa;">订阅 + 分成双模式</b> — 订阅保现金流，分成实现共赢</li>
+                            <li><b style="color:#60a5fa;">价格锚定"省心"</b> — ¥99/月 vs 自己操作可能踩坑损失几百上千刀</li>
+                            <li><b style="color:#60a5fa;">先免费后付费</b> — 用户已信任AI管家，付费决策更轻松</li>
+                        </ul>
+                    </div>
+
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:8px;">
-                        <strong style="color:#e8e8f0;">关键数据预估（用户量100万时）</strong>
+                        <strong style="color:#e8e8f0;">四、关键数据预估（用户量100万时）</strong>
                         <ul>
                             <li>免费用户：85万（85%）</li>
                             <li>Pro用户（¥99/月）：12万（12%）</li>
@@ -1298,6 +1447,30 @@
         function generateAIResponse(userInput) {
             const lower = userInput.toLowerCase();
 
+            // 分析黄金
+            if (lower.includes('黄金') || lower.includes('gold') || lower.includes('金价') || lower.includes('贵金属') || lower
+                .includes('分析黄金')) {
+                return {
+                    id: `ai-${Date.now()}`,
+                    role: 'assistant',
+                    content: generateGoldContent(),
+                    timestamp: new Date(),
+                    type: 'report',
+                };
+            }
+
+            // 你能做什么
+            if (lower.includes('你能做什么') || lower.includes('你会什么') || lower.includes('功能介绍') || lower.includes('有什么用') ||
+                lower.includes('帮助')) {
+                return {
+                    id: `ai-${Date.now()}`,
+                    role: 'assistant',
+                    content: generateWhatCanDoContent(),
+                    timestamp: new Date(),
+                    type: 'report',
+                };
+            }
+
             // 市场需求有多大
             if (lower.includes('市场需求') || lower.includes('市场有多大') || lower.includes('规模') || lower.includes('tam') || lower
                 .includes('市场空间')) {
@@ -1312,68 +1485,13 @@
 
             // 抢占市场 / 收费
             if (lower.includes('抢占市场') || lower.includes('收费') || lower.includes('定价') || lower.includes('怎么赚钱') || lower
-                .includes('商业模式') || lower.includes('付费')) {
+                .includes('商业模式') || lower.includes('付费') || lower.includes('推广') || lower.includes('裂变')) {
                 return {
                     id: `ai-${Date.now()}`,
                     role: 'assistant',
                     content: generatePricingContent(),
                     timestamp: new Date(),
                     type: 'report',
-                };
-            }
-
-            // 你能做什么
-            if (lower.includes('你能做什么') || lower.includes('你会什么') || lower.includes('功能介绍') || lower.includes('有什么用') ||
-                lower.includes('帮助')) {
-                return {
-                    id: `ai-${Date.now()}`,
-                    role: 'assistant',
-                    content: `
-        我能帮你把「加密资产」变成「睡后收入」
-
-        我不是普通的聊天机器人，而是你口袋里的 AI 金融管家。以下是我能为你做的 —— 每一件都直接关系到你的钱袋子：
-
-        ---
-
-        智能收益优化
-        • 自动扫描你所有链上的闲置资产（比如 USDC、USDT）
-        • 实时对比 Aave、Compound、Ethena 等 20+ 协议的 APY
-        • 一键将资金存入当前收益最高的地方 — 收益可能提升 2~3 倍
-
-        24/7 风险守护
-        • 深夜市场暴跌时，自动提醒并给出防御方案
-        • 拦截钓鱼网站和恶意合约签名请求
-        • 监控你的借款仓位，在清算前主动预警
-
-        持仓全景分析
-        • 跨链汇总你的所有资产（ETH/BTC/SOL/ARB 等）
-        • 清晰展示仓位占比、月度收益、风险敞口
-        • 一句话就能问："我的 SOL 仓位健康吗？"
-
-        AI 自动化执行
-        • 设定策略：比如"当 ETH 跌破 3000 时买入 10%"
-        • 我替你盯盘并自动执行 — 你睡觉，我打工
-
-        ---
-
-        为什么你应该现在开始用？
-        "过去 3 个月，使用 AI 管家的用户平均收益提升 47%，风险事件拦截率 99.6%。"
-
-        立即体验：
-        • 试试说："优化我的 USDC 收益"
-        • 或者："分析我的持仓风险"
-        • 或者："市场需求有多大"
-        • 或者："抢占市场"
-
-        ---
-
-        付费用户专享（7 天免费试用）
-        • 无限次 AI 策略执行
-        • 实时市场异动推送
-        • 优先享受新功能（如 AI 定投、跨链套利）
-                    `,
-                    timestamp: new Date(),
-                    type: 'text',
                 };
             }
 
@@ -1414,7 +1532,7 @@
             return {
                 id: `ai-${Date.now()}`,
                 role: 'assistant',
-                content: `收到："${userInput}"\n\n你可以问我这些，直接帮你赚钱或省钱：\n\n• **"优化收益"** — 让闲置资产赚更多\n• **"分析风险"** — 守护你的仓位安全\n• **"查看持仓"** — 跨链资产一目了然\n• **"市场需求有多大"** — 市场规模量化分析\n• **"抢占市场"** — 定价与收费策略\n\n或者直接告诉我你的需求，我会给出最佳方案。\n\n*付费用户平均收益提升 47%，试试看？*`,
+                content: `收到："${userInput}"\n\n你可以问我这些，直接帮你赚钱或省钱：\n\n• **"优化收益"** — 让闲置资产赚更多\n• **"分析风险"** — 守护你的仓位安全\n• **"查看持仓"** — 跨链资产一目了然\n• **"分析黄金"** — 黄金趋势分析\n• **"你能做什么"** — 了解我的全部能力\n• **"市场需求有多大"** — 市场规模量化分析\n• **"抢占市场"** — 定价与增长策略\n\n或者直接告诉我你的需求，我会给出最佳方案。`,
                 timestamp: new Date(),
                 type: 'text',
             };
