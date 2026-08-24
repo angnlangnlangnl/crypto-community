@@ -119,6 +119,10 @@
         .input-container:focus-within {
             border-color: #3b82f6;
         }
+        /* 移除输入框右边多余的竖杠 */
+        .input-container::after {
+            display: none !important;
+        }
 
         .quick-scroll {
             scrollbar-width: none;
@@ -513,43 +517,60 @@
             }
         }
 
-        /* ===== 消息布局重构 ===== */
+        /* ===== 消息布局重构：头像在上方，信息框在下方，尽量宽 ===== */
         .msg-wrapper {
             display: flex;
             flex-direction: column;
             width: 100%;
             padding: 4px 0;
         }
-        .msg-wrapper .msg-row {
+        /* AI消息：头像上方，信息框下方 */
+        .msg-wrapper .msg-row-ai {
             display: flex;
+            flex-direction: column;
             align-items: flex-start;
-            gap: 10px;
             width: 100%;
         }
-        .msg-wrapper .msg-row.user {
-            flex-direction: row-reverse;
+        .msg-wrapper .msg-row-ai .msg-avatar {
+            margin-bottom: 4px;
+            margin-left: 2px;
         }
-        /* AI消息尽量宽 */
-        .msg-wrapper .msg-row .msg-bubble {
-            max-width: 92%;
+        .msg-wrapper .msg-row-ai .msg-bubble {
+            max-width: 96%;
             padding: 10px 14px;
             border-radius: 16px;
             font-size: 14px;
             line-height: 1.6;
             word-wrap: break-word;
             overflow-wrap: break-word;
-        }
-        .msg-wrapper .msg-row .msg-bubble.ai {
             background: #12121f;
             border: 1px solid #1a1a2a;
             border-top-left-radius: 4px;
         }
-        .msg-wrapper .msg-row .msg-bubble.user {
+        /* 用户消息：头像在右上，信息框在右 */
+        .msg-wrapper .msg-row-user {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            width: 100%;
+        }
+        .msg-wrapper .msg-row-user .msg-avatar {
+            margin-bottom: 4px;
+            margin-right: 2px;
+        }
+        .msg-wrapper .msg-row-user .msg-bubble {
+            max-width: 82%;
+            padding: 10px 14px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.6;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
             background: #3b82f6;
             border-top-right-radius: 4px;
             color: #fff;
         }
-        /* AI头像 */
+        /* 头像样式 */
         .msg-wrapper .msg-avatar {
             width: 32px;
             height: 32px;
@@ -567,18 +588,21 @@
             background: #3b82f6;
             color: #fff;
         }
-        /* 时间戳 - 在信息框正下方 */
+        /* 时间戳 - 在每条信息框正下方 */
         .msg-wrapper .msg-time {
             font-size: 10px;
             color: #4a4a5a;
             text-align: center;
             padding-top: 3px;
-            padding-left: 42px;
-            padding-right: 42px;
             width: 100%;
         }
+        .msg-wrapper .msg-time.ai-time {
+            text-align: left;
+            padding-left: 2px;
+        }
         .msg-wrapper .msg-time.user-time {
-            text-align: center;
+            text-align: right;
+            padding-right: 2px;
         }
         /* 报告卡片在消息中自适应宽度 */
         .msg-wrapper .msg-bubble .report-card {
@@ -710,7 +734,7 @@
         <!-- 消息列表 -->
         <div id="messageList" class="flex-1 overflow-y-auto px-4 py-3 space-y-3"></div>
 
-        <!-- ===== 输入区域（完美适配） ===== -->
+        <!-- ===== 输入区域（完美适配，无竖杠） ===== -->
         <div class="border-t border-[#1a1a2a] p-2 bg-[#0a0a0f] flex-shrink-0 safe-area-bottom">
             <div class="input-wrapper">
                 <!-- 语音按钮 -->
@@ -1040,9 +1064,9 @@
             const wrapper = document.createElement('div');
             wrapper.className = 'msg-wrapper';
             wrapper.innerHTML = `
-                <div class="msg-row user">
+                <div class="msg-row-user">
                     <div class="msg-avatar user">我</div>
-                    <div class="msg-bubble user" style="padding:6px 12px;">
+                    <div class="msg-bubble" style="background:#3b82f6;color:#fff;border-top-right-radius:4px;max-width:82%;padding:6px 12px;">
                         <div class="voice-msg-wrapper" onclick="playVoiceMessage('${msgId}')" style="width:${voiceWidth}px; background:rgba(255,255,255,0.15);">
                             <span class="voice-icon" id="voiceIcon_${msgId}">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a1 1 0 0 1 1 1v16a1 1 0 0 1-2 0V4a1 1 0 0 1 1-1zm-4 3a1 1 0 0 0-1 1v10a1 1 0 0 0 2 0V7a1 1 0 0 0-1-1zm8 0a1 1 0 0 0-1 1v10a1 1 0 0 0 2 0V7a1 1 0 0 0-1-1z"/></svg>
@@ -1652,7 +1676,7 @@
         }
 
         // ============================================================
-        //  渲染消息（新布局：AI头像在上方，时间在正下方）
+        //  渲染消息（新布局：AI头像在上方，信息框在下方，尽量宽）
         // ============================================================
 
         function renderMessages() {
@@ -1687,20 +1711,17 @@
                 const contentHtml = (msg.content || '').replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
                     .replace(/\n/g, '<br>');
 
-                // 检测是否为报告卡片内容（包含 report-card 类）
-                const isReportContent = msg.content && msg.content.includes('report-card');
-
                 if (isReport) {
-                    // 报告卡片 - AI消息
+                    // 报告卡片 - AI消息：头像在上方，信息框在下方，尽量宽
                     html += `
                         <div class="msg-wrapper">
-                            <div class="msg-row">
+                            <div class="msg-row-ai">
                                 <div class="msg-avatar">AI</div>
-                                <div class="msg-bubble ai" style="max-width:95%;">
+                                <div class="msg-bubble" style="max-width:96%;">
                                     ${msg.content}
                                 </div>
                             </div>
-                            <div class="msg-time">${timeStr}</div>
+                            <div class="msg-time ai-time">${timeStr}</div>
                         </div>
                     `;
                     return;
@@ -1714,13 +1735,13 @@
                     typeColor = 'text-amber-400'; } else if (isAssetSummary) { typeLabel = '持仓分析';
                     typeColor = 'text-blue-400'; }
 
-                // 如果是用户消息
+                // 如果是用户消息：头像在右上，信息框在右
                 if (isUser) {
                     html += `
                         <div class="msg-wrapper">
-                            <div class="msg-row user">
+                            <div class="msg-row-user">
                                 <div class="msg-avatar user">我</div>
-                                <div class="msg-bubble user">${contentHtml}</div>
+                                <div class="msg-bubble" style="background:#3b82f6;color:#fff;border-top-right-radius:4px;max-width:82%;">${contentHtml}</div>
                             </div>
                             <div class="msg-time user-time">${timeStr}</div>
                         </div>
@@ -1728,12 +1749,12 @@
                     return;
                 }
 
-                // AI 普通消息（尽量宽）
+                // AI 普通消息：头像在上方，信息框在下方，尽量宽（96%）
                 html += `
                     <div class="msg-wrapper">
-                        <div class="msg-row">
+                        <div class="msg-row-ai">
                             <div class="msg-avatar">AI</div>
-                            <div class="msg-bubble ai" style="max-width:95%;">
+                            <div class="msg-bubble" style="max-width:96%;">
                                 ${typeLabel ? `<div class="text-xs ${typeColor} mb-1">${typeLabel}</div>` : ''}
                                 <div class="text-[#d0d0e0] text-sm leading-relaxed">${contentHtml}</div>
                                 ${isTransaction ? `
@@ -1744,7 +1765,7 @@
                                 ` : ''}
                             </div>
                         </div>
-                        <div class="msg-time">${timeStr}</div>
+                        <div class="msg-time ai-time">${timeStr}</div>
                     </div>
                 `;
             });
@@ -1752,9 +1773,9 @@
             if (isProcessing) {
                 html += `
                     <div class="msg-wrapper">
-                        <div class="msg-row">
+                        <div class="msg-row-ai">
                             <div class="msg-avatar">AI</div>
-                            <div class="msg-bubble ai" style="max-width:95%;">
+                            <div class="msg-bubble" style="max-width:96%;">
                                 <div class="typing-cursor text-[#4a4a5a] text-sm">思考中</div>
                             </div>
                         </div>
