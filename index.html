@@ -149,6 +149,7 @@
             font-size: 0.65rem;
             color: #6a6a7a;
         }
+        /* 帮助按钮样式微调 */
         .help-btn {
             background: #1a2a3a;
             border-color: #2a4a6a;
@@ -235,7 +236,7 @@
         let messages = [{
             id: 'welcome',
             role: 'assistant',
-            content: '👋 你好！我是你的 AI 金融管家。\n\n你目前在 4 条链上持有约 **$38,174** 的资产。\n\n试试说：\n• "优化收益"\n• "分析风险"\n• "查看持仓"\n• "你能做什么"',
+            content: '👋 你好！我是你的 AI 金融管家。\n\n你目前在 4 条链上持有约 **$38,174** 的资产。\n\n试试说：\n• "优化收益"\n• "分析风险"\n• "查看持仓"\n• "帮助" 或 "项目报告"',
             timestamp: new Date(),
             type: 'text',
         }];
@@ -310,7 +311,7 @@
         }
 
         // ============================================================
-        //  快捷操作渲染
+        //  快捷操作渲染（已调整顺序 + 更换为 ❓ 帮助）
         // ============================================================
         function renderQuickActions() {
             const container = document.getElementById('quickActions');
@@ -319,13 +320,16 @@
                 { label: '🛡️ 风险', prompt: '帮我分析当前持仓风险' },
                 { label: '📊 持仓', prompt: '查看我的完整持仓' },
                 { label: '⚡ 智能', prompt: '根据当前市场自动调整配置' },
-                { label: '❓ 帮助', prompt: '你能做什么' },
+                // 将“报告”按钮移动到“智能”之后，并改为“❓ 帮助”
+                { label: '❓ 帮助', prompt: '查看项目报告' },
             ];
             container.innerHTML = actions.map((a, index) => {
+                // 为“帮助”按钮添加特殊样式（可选）
                 const isHelp = index === actions.length - 1;
                 return `<button onclick="sendMessage('${a.prompt}')" class="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full border border-[#1a1a2a] text-[#8a8a9a] active:bg-[#1a1a2a] active:text-[#e8e8f0] transition-all whitespace-nowrap tap-active ${isHelp ? 'help-btn' : 'bg-[#12121f]'}">${a.label}</button>`;
             }).join('');
         }
+
 
         // ============================================================
         //  报告生成函数（核心植入内容）
@@ -387,67 +391,46 @@
         }
 
         // ============================================================
-        //  消息生成逻辑（新增“你能做什么”的付费引导文案）
+        //  消息发送逻辑（已调整关键词，支持“帮助”触发报告）
         // ============================================================
+
+        function sendMessage(text) {
+            if (!text || text.trim() === '' || isProcessing) return;
+            messages.push({
+                id: `user-${Date.now()}`,
+                role: 'user',
+                content: text.trim(),
+                timestamp: new Date(),
+                type: 'text',
+            });
+            isProcessing = true;
+            renderMessages();
+            updateSendButton();
+
+            setTimeout(() => {
+                let response;
+                const lower = text.trim().toLowerCase();
+                // 检测报告关键词（加入“帮助”）
+                if (lower.includes('报告') || lower.includes('项目') || lower.includes('市场') || lower.includes('亮点') || lower.includes('分析') || lower.includes('帮助')) {
+                    response = {
+                        id: `ai-${Date.now()}`,
+                        role: 'assistant',
+                        content: generateReportContent(),
+                        timestamp: new Date(),
+                        type: 'report',
+                    };
+                } else {
+                    response = generateAIResponse(text.trim());
+                }
+                messages.push(response);
+                isProcessing = false;
+                renderMessages();
+                updateSendButton();
+            }, 600 + Math.random() * 500);
+        }
+
         function generateAIResponse(userInput) {
             const lower = userInput.toLowerCase();
-
-            // --- 新增：处理“你能做什么”类问题 ---
-            if (lower.includes('你能做什么') || lower.includes('你会什么') || lower.includes('功能介绍') || lower.includes('有什么用') || lower.includes('帮助') && lower.includes('什么')) {
-                return {
-                    id: `ai-${Date.now()}`,
-                    role: 'assistant',
-                    content: `
-        🚀 **我能帮你把「加密资产」变成「睡后收入」**
-
-        我不是普通的聊天机器人，而是你口袋里的 **AI 金融管家**。以下是我能为你做的 —— **每一件都直接关系到你的钱袋子**：
-
-        ---
-
-        💰 **智能收益优化**
-        • 自动扫描你所有链上的闲置资产（比如 USDC、USDT）
-        • 实时对比 Aave、Compound、Ethena 等 20+ 协议的 APY
-        • **一键将资金存入当前收益最高的地方** — 收益可能提升 2~3 倍
-
-        🛡️ **24/7 风险守护**
-        • 深夜市场暴跌时，自动提醒并给出防御方案
-        • 拦截钓鱼网站和恶意合约签名请求
-        • 监控你的借款仓位，在清算前主动预警
-
-        📊 **持仓全景分析**
-        • 跨链汇总你的所有资产（ETH/BTC/SOL/ARB 等）
-        • 清晰展示仓位占比、月度收益、风险敞口
-        • 一句话就能问：“我的 SOL 仓位健康吗？”
-
-        🧠 **AI 自动化执行**
-        • 设定策略：比如“当 ETH 跌破 3000 时买入 10%”
-        • 我替你盯盘并自动执行 — **你睡觉，我打工**
-
-        ---
-
-        🔥 **为什么你应该现在开始用？**
-        > “过去 3 个月，使用 AI 管家的用户平均收益提升 **47%**，风险事件拦截率 **99.6%**。”
-
-        🎯 **立即体验：**
-        • 试试说：“优化我的 USDC 收益”
-        • 或者：“分析我的持仓风险”
-        • 或者直接说：“开始自动化”
-
-        ---
-
-        💎 **付费用户专享（7 天免费试用）**
-        • 无限次 AI 策略执行
-        • 实时市场异动推送
-        • 优先享受新功能（如 AI 定投、跨链套利）
-
-        **👇 点击下方按钮，开启你的「睡后收入」之旅**
-                    `,
-                    timestamp: new Date(),
-                    type: 'text',
-                };
-            }
-
-            // --- 原有的其他判断逻辑（收益、风险、持仓等）保持不变 ---
             if (lower.includes('收益') || lower.includes('apy') || lower.includes('利息') || lower.includes('优化')) {
                 return {
                     id: `ai-${Date.now()}`,
@@ -478,53 +461,13 @@
                     type: 'asset_summary',
                 };
             }
-            // --- 默认回复也加入引导 ---
             return {
                 id: `ai-${Date.now()}`,
                 role: 'assistant',
-                content: `🔍 收到："${userInput}"\n\n你可以问我这些，**直接帮你赚钱或省钱**：\n\n• **"优化收益"** — 让闲置资产赚更多\n• **"分析风险"** — 守护你的仓位安全\n• **"查看持仓"** — 跨链资产一目了然\n• **"你能做什么"** — 了解我的全部能力\n\n或者直接告诉我你的需求，我会给出最佳方案。\n\n💡 *付费用户平均收益提升 47%，试试看？*`,
+                content: `🔍 收到："${userInput}"\n\n请更具体地告诉我：\n• 查询某个资产？\n• 执行交易？\n• 优化收益？\n• 分析风险？\n• 查看项目报告或帮助？\n\n我会给出更精准的建议。`,
                 timestamp: new Date(),
                 type: 'text',
             };
-        }
-
-        // ============================================================
-        //  消息发送逻辑
-        // ============================================================
-
-        function sendMessage(text) {
-            if (!text || text.trim() === '' || isProcessing) return;
-            messages.push({
-                id: `user-${Date.now()}`,
-                role: 'user',
-                content: text.trim(),
-                timestamp: new Date(),
-                type: 'text',
-            });
-            isProcessing = true;
-            renderMessages();
-            updateSendButton();
-
-            setTimeout(() => {
-                let response;
-                const lower = text.trim().toLowerCase();
-                // 检测报告关键词
-                if (lower.includes('报告') || lower.includes('项目') || lower.includes('市场') || lower.includes('亮点') || lower.includes('分析') && !lower.includes('风险')) {
-                    response = {
-                        id: `ai-${Date.now()}`,
-                        role: 'assistant',
-                        content: generateReportContent(),
-                        timestamp: new Date(),
-                        type: 'report',
-                    };
-                } else {
-                    response = generateAIResponse(text.trim());
-                }
-                messages.push(response);
-                isProcessing = false;
-                renderMessages();
-                updateSendButton();
-            }, 600 + Math.random() * 500);
         }
 
         // ============================================================
