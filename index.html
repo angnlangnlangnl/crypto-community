@@ -115,12 +115,23 @@
             gap: 4px;
             transition: border-color 0.2s;
             flex: 1;
+            position: relative;
         }
         .input-container:focus-within {
             border-color: #3b82f6;
         }
-        .input-container::after {
+        /* ===== 强制移除输入框右侧多余的丨 ===== */
+        .input-container::after,
+        .input-container::before,
+        #chatInput::after,
+        #chatInput::before {
             display: none !important;
+            content: none !important;
+            opacity: 0 !important;
+            width: 0 !important;
+            height: 0 !important;
+            position: absolute !important;
+            pointer-events: none !important;
         }
 
         .quick-scroll {
@@ -636,12 +647,13 @@
             width: 100%;
             padding: 4px 0;
         }
-        /* AI消息：头像上方，信息框下方，尽量宽 */
+        /* AI消息：头像上方，信息框下方，尽量宽 - 新增 padding-left:12px 整体右移 */
         .msg-wrapper .msg-row-ai {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
             width: 100%;
+            padding-left: 12px;   /* 整体向右移动12px */
         }
         .msg-wrapper .msg-row-ai .msg-avatar {
             margin-bottom: 4px;
@@ -712,7 +724,7 @@
         }
         .msg-wrapper .msg-time.ai-time {
             text-align: left;
-            padding-left: 2px;
+            padding-left: 14px;   /* 与AI消息的padding-left保持一致 */
         }
         .msg-wrapper .msg-time.user-time {
             text-align: right;
@@ -916,7 +928,7 @@
             </div>
         </div>
 
-        <!-- ===== 顶部导航（右侧新增分享按钮） ===== -->
+        <!-- ===== 顶部导航 ===== -->
         <div class="top-nav flex items-center justify-between px-4 border-b border-[#1a1a2a] bg-[#0a0a0f] z-10 flex-shrink-0 top-nav-border">
             <button onclick="toggleDrawer()" class="p-1.5 -ml-2 tap-active" aria-label="打开菜单">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -1094,7 +1106,6 @@
                     navigator.clipboard.writeText(url + '?ref=share').then(() => {
                         alert('✅ 链接已复制！分享给好友吧');
                     }).catch(() => {
-                        // 降级方案
                         const input = document.createElement('input');
                         input.value = url + '?ref=share';
                         document.body.appendChild(input);
@@ -1122,7 +1133,6 @@
 
             if (shareMap[platform]) {
                 shareMap[platform]();
-                // 不自动关闭分享面板，让用户自己关闭
             }
         }
 
