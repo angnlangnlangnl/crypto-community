@@ -449,7 +449,7 @@
             display: flex;
         }
 
-        /* ===== 顶部导航高度缩小20%（从4.5px → 3.6px） ===== */
+        /* ===== 顶部导航高度缩小20% ===== */
         .top-nav {
             padding-top: 3.6px !important;
             padding-bottom: 3.6px !important;
@@ -470,6 +470,119 @@
         }
         .chat-header .label .highlight {
             color: #4a9a5a;
+        }
+
+        /* ===== 分享面板样式 ===== */
+        .share-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .share-overlay.show {
+            display: flex;
+        }
+        .share-panel {
+            background: #12121f;
+            border-radius: 24px 24px 0 0;
+            padding: 20px 24px 34px;
+            width: 100%;
+            max-width: 420px;
+            max-height: 80vh;
+            animation: slideUp 0.35s ease;
+            border-top: 1px solid #1a1a2a;
+        }
+        .share-panel .handle {
+            width: 40px;
+            height: 4px;
+            background: #2a2a3a;
+            border-radius: 4px;
+            margin: 0 auto 16px;
+        }
+        .share-panel .title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #e8e8f0;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .share-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .share-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 8px 0;
+            border-radius: 12px;
+            transition: background 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .share-item:active {
+            background: #1a1a2a;
+            transform: scale(0.95);
+        }
+        .share-item .icon-wrap {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            transition: transform 0.2s;
+        }
+        .share-item .icon-wrap svg {
+            width: 26px;
+            height: 26px;
+        }
+        .share-item .label {
+            font-size: 10px;
+            color: #8a8a9a;
+        }
+        .share-cancel {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #1a1a2a;
+            border: none;
+            border-radius: 12px;
+            color: #8a8a9a;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-align: center;
+        }
+        .share-cancel:active {
+            background: #2a2a3a;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0.5;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         /* 语音波纹动画 */
@@ -625,6 +738,32 @@
         #sendBtn {
             flex-shrink: 0;
         }
+        /* 分享按钮样式 */
+        .share-trigger {
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #8a8a9a;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .share-trigger:active {
+            background: #1a1a2a;
+        }
+        .share-trigger svg {
+            width: 20px;
+            height: 20px;
+            stroke: #8a8a9a;
+            fill: none;
+            stroke-width: 2;
+        }
+        .share-trigger .label {
+            font-size: 11px;
+            color: #8a8a9a;
+        }
     </style>
 </head>
 <body>
@@ -685,6 +824,70 @@
     </div>
 
     <!-- ============================================================ -->
+    <!-- 分享面板 -->
+    <!-- ============================================================ -->
+    <div class="share-overlay" id="shareOverlay" onclick="closeShare(event)">
+        <div class="share-panel" onclick="event.stopPropagation()">
+            <div class="handle"></div>
+            <div class="title">分享 AI 金融助手</div>
+            <div class="share-grid">
+                <!-- 复制链接 -->
+                <div class="share-item" onclick="shareTo('link')">
+                    <div class="icon-wrap" style="background:#1a1a2a;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#8a8a9a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                        </svg>
+                    </div>
+                    <span class="label">复制链接</span>
+                </div>
+                <!-- Telegram -->
+                <div class="share-item" onclick="shareTo('telegram')">
+                    <div class="icon-wrap" style="background:#1a3a3a;">
+                        <svg viewBox="0 0 24 24" fill="#26A5E4">
+                            <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                        </svg>
+                    </div>
+                    <span class="label">Telegram</span>
+                </div>
+                <!-- Twitter/X -->
+                <div class="share-item" onclick="shareTo('twitter')">
+                    <div class="icon-wrap" style="background:#1a2a3a;">
+                        <svg viewBox="0 0 24 24" fill="#1DA1F2">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                    </div>
+                    <span class="label">Twitter/X</span>
+                </div>
+                <!-- 微信 -->
+                <div class="share-item" onclick="shareTo('wechat')">
+                    <div class="icon-wrap" style="background:#1a2a1a;">
+                        <svg viewBox="0 0 24 24" fill="#07C160">
+                            <path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178A1.17 1.17 0 0 1 4.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178 1.17 1.17 0 0 1-1.162-1.178c0-.651.52-1.18 1.162-1.18zm7.361 2.528c-3.68 0-6.662 2.63-6.662 5.872 0 3.242 2.982 5.872 6.662 5.872.658 0 1.292-.1 1.888-.269a.577.577 0 0 1 .478.065l1.267.742c.086.049.178.036.236-.036a.292.292 0 0 0 .027-.27l-.26-.986a.39.39 0 0 1 .057-.373c1.222-1.311 1.928-2.902 1.928-4.745 0-3.242-2.982-5.872-6.662-5.872zm-3.297 3.717c.428 0 .774.353.774.787a.78.78 0 0 1-.774.785.78.78 0 0 1-.774-.785c0-.434.346-.787.774-.787zm2.997 0c.428 0 .774.353.774.787a.78.78 0 0 1-.774.785.78.78 0 0 1-.774-.785c0-.434.346-.787.774-.787z"/>
+                        </svg>
+                    </div>
+                    <span class="label">微信</span>
+                </div>
+                <!-- 二维码 -->
+                <div class="share-item" onclick="shareTo('qrcode')">
+                    <div class="icon-wrap" style="background:#1a1a2a;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#8a8a9a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7" rx="1"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1"/>
+                            <line x1="14" y1="14" x2="18" y2="18"/>
+                            <line x1="18" y1="14" x2="14" y2="18"/>
+                            <rect x="14" y="14" width="4" height="4" rx="0" stroke-dasharray="2,2"/>
+                        </svg>
+                    </div>
+                    <span class="label">二维码</span>
+                </div>
+            </div>
+            <button class="share-cancel" onclick="closeShare()">取消</button>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
     <!-- 主应用 -->
     <!-- ============================================================ -->
     <div id="app">
@@ -713,7 +916,7 @@
             </div>
         </div>
 
-        <!-- ===== 顶部导航（高度已缩小20%） ===== -->
+        <!-- ===== 顶部导航（右侧新增分享按钮） ===== -->
         <div class="top-nav flex items-center justify-between px-4 border-b border-[#1a1a2a] bg-[#0a0a0f] z-10 flex-shrink-0 top-nav-border">
             <button onclick="toggleDrawer()" class="p-1.5 -ml-2 tap-active" aria-label="打开菜单">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -724,7 +927,15 @@
                     <span class="label"><span class="highlight">●</span> AI 可读持仓，执行需确认</span>
                 </div>
             </div>
-            <div class="w-8"></div>
+            <!-- 分享按钮（顶部右侧） -->
+            <div class="share-trigger" onclick="openShare()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                    <polyline points="16 6 12 2 8 6"/>
+                    <line x1="12" y1="2" x2="12" y2="15"/>
+                </svg>
+                <span class="label">分享</span>
+            </div>
         </div>
 
         <!-- 快捷操作 -->
@@ -850,6 +1061,70 @@
 
             showSlide(0);
         })();
+
+        // ============================================================
+        //  分享功能
+        // ============================================================
+        function openShare() {
+            document.getElementById('shareOverlay').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeShare(e) {
+            if (e && e.target && !e.target.closest('.share-panel')) {
+                // 点击遮罩关闭
+            }
+            document.getElementById('shareOverlay').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // 支持点击遮罩关闭
+        document.getElementById('shareOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeShare();
+            }
+        });
+
+        function shareTo(platform) {
+            const url = 'https://angnlangnlangnl.github.io/ai-finance-assistant/';
+            const text = '🚀 发现一个超好用的 AI 金融管家！自动优化收益、守护资产安全，来试试吧！';
+
+            const shareMap = {
+                'link': function() {
+                    navigator.clipboard.writeText(url + '?ref=share').then(() => {
+                        alert('✅ 链接已复制！分享给好友吧');
+                    }).catch(() => {
+                        // 降级方案
+                        const input = document.createElement('input');
+                        input.value = url + '?ref=share';
+                        document.body.appendChild(input);
+                        input.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(input);
+                        alert('✅ 链接已复制！分享给好友吧');
+                    });
+                },
+                'telegram': function() {
+                    window.open('https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(
+                        text), '_blank');
+                },
+                'twitter': function() {
+                    window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' +
+                        encodeURIComponent(url), '_blank');
+                },
+                'wechat': function() {
+                    alert('📱 请打开微信扫一扫或搜索"AI金融助手"小程序');
+                },
+                'qrcode': function() {
+                    alert('📱 二维码功能：\n\n请访问 ' + url + ' 或扫描应用内二维码下载');
+                }
+            };
+
+            if (shareMap[platform]) {
+                shareMap[platform]();
+                // 不自动关闭分享面板，让用户自己关闭
+            }
+        }
 
         // ============================================================
         //  主应用数据
@@ -1855,6 +2130,9 @@
             window.closeDrawer = closeDrawer;
             window.toggleVoiceMode = toggleVoiceMode;
             window.playVoiceMessage = playVoiceMessage;
+            window.openShare = openShare;
+            window.closeShare = closeShare;
+            window.shareTo = shareTo;
 
             document.getElementById('overlay').addEventListener('click', closeDrawer);
         });
