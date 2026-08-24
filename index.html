@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com">
     </script>
     <style>
+        /* ===== 全局重置 & 主应用样式 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -87,7 +88,6 @@
         .quick-scroll::-webkit-scrollbar {
             display: none;
         }
-        /* 报告卡片样式 */
         .report-card {
             background: linear-gradient(145deg, #12121f, #0d0d18);
             border: 1px solid #1a1a2a;
@@ -149,7 +149,6 @@
             font-size: 0.65rem;
             color: #6a6a7a;
         }
-        /* 报告按钮样式（与原帮助按钮区分） */
         .report-btn {
             background: #1a2a3a;
             border-color: #2a6a4a;
@@ -157,12 +156,236 @@
         .report-btn:active {
             background: #2a4a3a;
         }
+
+        /* ===== 启动页样式 ===== */
+        #splashContainer {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #0a0a0f;
+            display: flex;
+            flex-direction: column;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        #splashContainer.hide {
+            opacity: 0;
+            transform: scale(1.05);
+            pointer-events: none;
+        }
+        .splash-slide {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 32px;
+            text-align: center;
+            min-height: 70vh;
+        }
+        .splash-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 28px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin-bottom: 28px;
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.3);
+        }
+        .splash-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .splash-desc {
+            font-size: 16px;
+            color: #9ca3af;
+            line-height: 1.7;
+            max-width: 320px;
+        }
+        .splash-highlight {
+            color: #fbbf24;
+            font-weight: 600;
+        }
+        .splash-badge {
+            display: inline-block;
+            background: #1e293b;
+            color: #94a3b8;
+            font-size: 12px;
+            padding: 4px 16px;
+            border-radius: 20px;
+            margin-top: 16px;
+            border: 1px solid #334155;
+        }
+        .splash-stats {
+            display: flex;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .splash-stats .stat {
+            text-align: center;
+        }
+        .splash-stats .stat .num {
+            font-size: 24px;
+            font-weight: 700;
+            color: #e8e8f0;
+        }
+        .splash-stats .stat .label {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        /* 底部指示器 & 按钮 */
+        .splash-footer {
+            padding: 20px 32px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            background: linear-gradient(to top, #0a0a0f 60%, transparent);
+        }
+        .splash-dots {
+            display: flex;
+            gap: 10px;
+        }
+        .splash-dots .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #2a2a3a;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .splash-dots .dot.active {
+            background: #3b82f6;
+            width: 28px;
+            border-radius: 6px;
+        }
+        .splash-btn {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: #fff;
+            font-weight: 600;
+            font-size: 18px;
+            padding: 14px 48px;
+            border-radius: 40px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+            width: 100%;
+            max-width: 300px;
+        }
+        .splash-btn:active {
+            transform: scale(0.96);
+        }
+        .splash-skip {
+            color: #6b7280;
+            font-size: 14px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 12px;
+        }
+        .splash-skip:active {
+            color: #9ca3af;
+        }
+        /* 启动页切换动画 */
+        .slide-enter {
+            animation: slideUp 0.5s ease forwards;
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* 隐藏主应用直到启动页关闭 */
+        #app {
+            display: none;
+        }
+        #app.show {
+            display: flex;
+        }
     </style>
 </head>
 <body>
 
-    <div id="app" class="flex flex-col h-screen bg-[#0a0a0f] text-[#e8e8f0] relative">
+    <!-- ============================================================ -->
+    <!-- 启动页容器 -->
+    <!-- ============================================================ -->
+    <div id="splashContainer">
+        <!-- 轮播内容 -->
+        <div id="splashSlides" class="flex-1 relative overflow-hidden">
+            <!-- 第1页：核心价值 -->
+            <div class="splash-slide slide-enter" data-index="0">
+                <div class="splash-icon">🧠</div>
+                <div class="splash-title">你的 AI 金融管家</div>
+                <div class="splash-desc">
+                    把你的加密资产交给 AI，<br>
+                    它替你 <span class="splash-highlight">24/7 智能管理</span>，<br>
+                    让你真正实现 <span class="splash-highlight">「睡后收入」</span>
+                </div>
+                <div class="splash-stats">
+                    <div class="stat"><div class="num">47%</div><div class="label">平均收益提升</div></div>
+                    <div class="stat"><div class="num">99.6%</div><div class="label">风险拦截率</div></div>
+                </div>
+                <div class="splash-badge">⚡ 已保护 12,000+ 钱包</div>
+            </div>
 
+            <!-- 第2页：核心能力 -->
+            <div class="splash-slide" data-index="1" style="display:none;">
+                <div class="splash-icon">⚡</div>
+                <div class="splash-title">能力全开，一键搞定</div>
+                <div class="splash-desc" style="max-width:340px;">
+                    <strong style="color:#60a5fa;">收益优化</strong> · 自动扫链，存入最高 APY 协议<br>
+                    <strong style="color:#60a5fa;">风险守护</strong> · 拦截钓鱼，预警清算<br>
+                    <strong style="color:#60a5fa;">持仓分析</strong> · 跨链汇总，一目了然<br>
+                    <strong style="color:#60a5fa;">AI 自动化</strong> · 你睡觉，它打工
+                </div>
+                <div class="splash-badge">🚀 支持 Ethereum · Solana · Arbitrum 等</div>
+            </div>
+
+            <!-- 第3页：行动号召 -->
+            <div class="splash-slide" data-index="2" style="display:none;">
+                <div class="splash-icon">🚀</div>
+                <div class="splash-title">开始你的「睡后收入」之旅</div>
+                <div class="splash-desc">
+                    3 分钟设置，AI 即刻为你工作。<br>
+                    <span class="splash-highlight">首周免费体验</span>，不满意随时取消。
+                </div>
+                <div style="margin-top:24px; display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
+                    <span style="background:#1e293b; padding:6px 18px; border-radius:30px; font-size:13px; color:#94a3b8;">🔒 非托管 · 私钥自持</span>
+                    <span style="background:#1e293b; padding:6px 18px; border-radius:30px; font-size:13px; color:#94a3b8;">📱 手机 / 网页 通用</span>
+                </div>
+                <div class="splash-badge">💎 7 天免费试用 · 随时取消</div>
+            </div>
+        </div>
+
+        <!-- 底部 -->
+        <div class="splash-footer">
+            <div class="splash-dots" id="splashDots">
+                <span class="dot active" data-index="0"></span>
+                <span class="dot" data-index="1"></span>
+                <span class="dot" data-index="2"></span>
+            </div>
+            <button class="splash-btn" id="splashBtn">开始使用</button>
+            <button class="splash-skip" id="splashSkip">跳过介绍</button>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 主应用 -->
+    <!-- ============================================================ -->
+    <div id="app">
         <!-- 遮罩层 -->
         <div id="overlay" class="overlay closed fixed inset-0 bg-black/60 z-40" onclick="closeDrawer()"></div>
 
@@ -222,7 +445,108 @@
 
     <script>
         // ============================================================
-        //  数据
+        //  启动页逻辑
+        // ============================================================
+        (function() {
+            const container = document.getElementById('splashContainer');
+            const slides = document.querySelectorAll('.splash-slide');
+            const dots = document.querySelectorAll('.dot');
+            const btn = document.getElementById('splashBtn');
+            const skipBtn = document.getElementById('splashSkip');
+            let current = 0;
+            const total = slides.length;
+
+            function showSlide(index) {
+                slides.forEach((el, i) => {
+                    el.style.display = i === index ? 'flex' : 'none';
+                    el.classList.remove('slide-enter');
+                    if (i === index) {
+                        // 触发重绘后添加动画
+                        requestAnimationFrame(() => {
+                            el.classList.add('slide-enter');
+                        });
+                    }
+                });
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === index);
+                });
+                // 更新按钮文字
+                if (index === total - 1) {
+                    btn.textContent = '🚀 立即开始';
+                } else {
+                    btn.textContent = '下一步';
+                }
+                current = index;
+            }
+
+            function nextSlide() {
+                const next = (current + 1) % total;
+                showSlide(next);
+            }
+
+            function prevSlide() {
+                const prev = (current - 1 + total) % total;
+                showSlide(prev);
+            }
+
+            // 点击指示器跳转
+            dots.forEach((dot) => {
+                dot.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.index);
+                    if (idx !== current) showSlide(idx);
+                });
+            });
+
+            // 按钮点击
+            btn.addEventListener('click', function() {
+                if (current === total - 1) {
+                    // 最后一页：关闭启动页，显示主应用
+                    container.classList.add('hide');
+                    setTimeout(() => {
+                        container.style.display = 'none';
+                        document.getElementById('app').classList.add('show');
+                    }, 600);
+                } else {
+                    nextSlide();
+                }
+            });
+
+            // 跳过
+            skipBtn.addEventListener('click', function() {
+                container.classList.add('hide');
+                setTimeout(() => {
+                    container.style.display = 'none';
+                    document.getElementById('app').classList.add('show');
+                }, 600);
+            });
+
+            // 触摸滑动支持
+            let startX = 0;
+            let startY = 0;
+            container.addEventListener('touchstart', function(e) {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            });
+            container.addEventListener('touchend', function(e) {
+                if (startX === 0) return;
+                const endX = e.changedTouches[0].clientX;
+                const endY = e.changedTouches[0].clientY;
+                const diffX = startX - endX;
+                const diffY = startY - endY;
+                // 水平滑动优先，且滑动距离大于40px
+                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+                    if (diffX > 0) nextSlide();
+                    else prevSlide();
+                }
+                startX = 0;
+            });
+
+            // 初始化：显示第一页
+            showSlide(0);
+        })();
+
+        // ============================================================
+        //  主应用数据
         // ============================================================
         const mockAssets = [
             { symbol: 'ETH', name: 'Ethereum', balance: 3.42, usdValue: 8243.22, chain: 'Ethereum' },
@@ -310,9 +634,6 @@
             container.innerHTML = html;
         }
 
-        // ============================================================
-        //  快捷操作渲染（恢复“📄 报告”按钮）
-        // ============================================================
         function renderQuickActions() {
             const container = document.getElementById('quickActions');
             const actions = [
@@ -320,7 +641,7 @@
                 { label: '🛡️ 风险', prompt: '帮我分析当前持仓风险' },
                 { label: '📊 持仓', prompt: '查看我的完整持仓' },
                 { label: '⚡ 智能', prompt: '根据当前市场自动调整配置' },
-                { label: '📄 报告', prompt: '查看项目报告' },  // 改回“报告”
+                { label: '📄 报告', prompt: '查看项目报告' },
             ];
             container.innerHTML = actions.map((a, index) => {
                 const isReport = index === actions.length - 1;
@@ -328,21 +649,15 @@
             }).join('');
         }
 
-
-        // ============================================================
-        //  报告生成函数（完整的项目市场需求报告）
-        // ============================================================
         function generateReportContent() {
             return `
                 <div class="report-card">
                     <h3>📄 项目市场需求报告</h3>
                     <p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:10px;">AI驱动的个人金融助手 · 市场分析</p>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#e8e8f0;">市场背景</strong><br>
                         当前加密市场正从"早期探索"转向"大规模应用"，核心矛盾在于<b style="color:#fbbf24;">日益复杂的链上生态</b>与用户有限认知能力的巨大鸿沟。
                     </div>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#e8e8f0;">核心痛点</strong>
                         <ul>
@@ -352,7 +667,6 @@
                             <li>🔹 安全风险：钓鱼攻击、恶意合约防不胜防</li>
                         </ul>
                     </div>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#e8e8f0;">目标用户</strong>
                         <div class="report-grid">
@@ -362,7 +676,6 @@
                             <div class="item"><div class="num">📈</div><div class="label">市场规模</div><div style="font-size:0.6rem;color:#6a6a7a;">数亿用户 · 蓝海</div></div>
                         </div>
                     </div>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:8px;">
                         <strong style="color:#e8e8f0;">竞争定位</strong>
                         <ul>
@@ -373,7 +686,6 @@
                     </div>
                     <div class="tag">🚀 蓝海市场 · 差异化明显</div>
                 </div>
-
                 <div class="report-card" style="margin-top:12px;">
                     <h3>✨ 应用亮点</h3>
                     <ul>
@@ -389,12 +701,10 @@
         }
 
         // ============================================================
-        //  消息生成逻辑（保留“你能做什么”付费引导文案）
+        //  消息生成逻辑
         // ============================================================
         function generateAIResponse(userInput) {
             const lower = userInput.toLowerCase();
-
-            // --- 处理“你能做什么”类问题（付费引导文案） ---
             if (lower.includes('你能做什么') || lower.includes('你会什么') || lower.includes('功能介绍') || lower.includes('有什么用') || lower.includes('帮助') && lower.includes('什么')) {
                 return {
                     id: `ai-${Date.now()}`,
@@ -448,8 +758,6 @@
                     type: 'text',
                 };
             }
-
-            // --- 原有的其他判断逻辑（收益、风险、持仓等）保持不变 ---
             if (lower.includes('收益') || lower.includes('apy') || lower.includes('利息') || lower.includes('优化')) {
                 return {
                     id: `ai-${Date.now()}`,
@@ -480,7 +788,6 @@
                     type: 'asset_summary',
                 };
             }
-            // --- 默认回复也加入引导 ---
             return {
                 id: `ai-${Date.now()}`,
                 role: 'assistant',
@@ -491,7 +798,7 @@
         }
 
         // ============================================================
-        //  消息发送逻辑（恢复“报告”触发）
+        //  消息发送逻辑
         // ============================================================
 
         function sendMessage(text) {
@@ -510,7 +817,6 @@
             setTimeout(() => {
                 let response;
                 const lower = text.trim().toLowerCase();
-                // 检测报告关键词（恢复“报告”触发）
                 if (lower.includes('报告') || lower.includes('项目') || lower.includes('市场') || lower.includes('亮点') && !lower.includes('风险')) {
                     response = {
                         id: `ai-${Date.now()}`,
@@ -530,7 +836,7 @@
         }
 
         // ============================================================
-        //  渲染消息（支持报告类型）
+        //  渲染消息
         // ============================================================
 
         function renderMessages() {
