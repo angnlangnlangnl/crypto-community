@@ -77,25 +77,57 @@
             opacity: 0;
             pointer-events: none;
         }
-        /* 输入框高度 */
+
+        /* ===== 输入框完全适配 ===== */
         #chatInput {
-            min-height: 24px;
-            max-height: 66px;
-            font-size: 13px;
-            padding-top: 4px;
-            padding-bottom: 4px;
+            min-height: 28px;
+            max-height: 80px;
+            font-size: 14px;
+            padding: 6px 10px;
             transition: all 0.2s ease;
+            background: transparent !important;
+            color: #e8e8f0 !important;
+            width: 100%;
+            line-height: 1.5;
+            border: none !important;
+            outline: none !important;
+        }
+        #chatInput::placeholder {
+            color: #4a4a5a;
         }
         #chatInput.recording {
-            background: #1a3a2a !important;
             color: #4ade80 !important;
-            border-color: #4ade80 !important;
+        }
+        #chatInput.recording::placeholder {
+            color: #4ade80;
         }
         #chatInput.cancel-mode {
-            background: #3a1a1a !important;
             color: #f87171 !important;
-            border-color: #f87171 !important;
         }
+        /* 输入框容器适配 */
+        .input-inner {
+            flex: 1;
+            background: #12121f;
+            border-radius: 16px;
+            border: 1px solid #1a1a2a;
+            transition: border-color 0.2s;
+            min-height: 38px;
+            display: flex;
+            align-items: flex-end;
+            overflow: hidden;
+        }
+        .input-inner:focus-within {
+            border-color: #3b82f6;
+        }
+        .input-inner.recording-mode {
+            border-color: #4ade80 !important;
+            background: #1a2a1a !important;
+        }
+        .input-inner.cancel-mode {
+            border-color: #f87171 !important;
+            background: #2a1a1a !important;
+        }
+
         .quick-scroll {
             scrollbar-width: none;
             -ms-overflow-style: none;
@@ -103,12 +135,18 @@
         .quick-scroll::-webkit-scrollbar {
             display: none;
         }
+
+        /* ===== 报告卡片样式（最大程度适配宽度） ===== */
         .report-card {
             background: linear-gradient(145deg, #12121f, #0d0d18);
             border: 1px solid #1a1a2a;
             border-radius: 16px;
             padding: 16px;
-            margin: 8px 0;
+            margin: 4px 0 8px 0;
+            width: 100%;
+            max-width: 100%;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
         .report-card h3 {
             color: #60a5fa;
@@ -214,19 +252,7 @@
         .voice-msg-wrapper .duration.playing {
             color: #4ade80;
         }
-        .voice-msg-wrapper .duration .wave {
-            display: inline-block;
-            animation: wave 1.2s ease-in-out infinite;
-        }
-        @keyframes wave {
-            0%,
-            100% {
-                transform: scaleY(0.4);
-            }
-            50% {
-                transform: scaleY(1);
-            }
-        }
+
         /* 取消提示浮层 */
         #cancelTip {
             position: fixed;
@@ -249,6 +275,7 @@
             opacity: 1;
             transform: translateX(-50%) translateY(-10px);
         }
+
         /* 语音按钮激活样式 */
         #voiceBtn.active {
             background: #1a3a2a !important;
@@ -416,7 +443,7 @@
         #app.show {
             display: flex;
         }
-        /* 顶部导航高度 */
+
         .top-nav {
             padding-top: 4.5px !important;
             padding-bottom: 4.5px !important;
@@ -431,12 +458,6 @@
             gap: 12px;
             padding: 4px 0;
         }
-        .chat-header .divider {
-            width: 1px;
-            height: 14px;
-            background: #2a2a3a;
-        }
-        /* 安全提示文字缩小 */
         .chat-header .label {
             font-size: 10px;
             color: #5a5a6a;
@@ -444,6 +465,7 @@
         .chat-header .label .highlight {
             color: #4a9a5a;
         }
+
         /* 语音波纹动画 */
         .wave-bars {
             display: flex;
@@ -487,6 +509,7 @@
                 transform: scaleY(1);
             }
         }
+
         /* 输入框外部左侧语音按钮样式 */
         .input-wrapper {
             display: flex;
@@ -496,6 +519,99 @@
         .input-wrapper #voiceBtn {
             margin-bottom: 0;
             align-self: flex-end;
+            flex-shrink: 0;
+        }
+
+        /* ===== 消息容器最大适配宽度 ===== */
+        .msg-container {
+            max-width: 92%;
+            width: auto;
+            min-width: 0;
+        }
+        .msg-container .msg-bubble {
+            width: 100%;
+            max-width: 100%;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+        /* AI消息气泡最大宽度 */
+        .msg-bubble-ai {
+            background: #12121f;
+            border: 1px solid #1a1a2a;
+            border-radius: 16px 16px 16px 4px;
+            padding: 12px 14px;
+            width: 100%;
+            max-width: 100%;
+        }
+        .msg-bubble-user {
+            background: #3b82f6;
+            border-radius: 16px 16px 4px 16px;
+            padding: 10px 14px;
+            max-width: 100%;
+        }
+        /* 时间戳放在气泡外部 */
+        .msg-time {
+            font-size: 10px;
+            color: #4a4a5a;
+            margin-top: 2px;
+            padding: 0 4px;
+            flex-shrink: 0;
+        }
+        .msg-time-user {
+            color: #6a8aba;
+        }
+        .msg-time-ai {
+            color: #4a4a5a;
+        }
+        /* 消息行布局 */
+        .msg-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .msg-row-user {
+            flex-direction: row-reverse;
+        }
+        .msg-row-ai {
+            flex-direction: row;
+        }
+        /* 时间戳在消息行中靠外 */
+        .msg-row-user .msg-time {
+            order: 1;
+        }
+        .msg-row-ai .msg-time {
+            order: 3;
+        }
+        .msg-row-user .msg-content-wrapper {
+            order: 2;
+        }
+        .msg-row-ai .msg-content-wrapper {
+            order: 2;
+        }
+        .msg-content-wrapper {
+            max-width: 82%;
+            min-width: 0;
+        }
+        /* avatar */
+        .msg-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .msg-avatar-user {
+            background: #3b82f6;
+            color: #fff;
+        }
+        .msg-avatar-ai {
+            background: #1a1a2a;
+            color: #6a6a7a;
         }
     </style>
 </head>
@@ -607,16 +723,16 @@
         <!-- 消息列表 -->
         <div id="messageList" class="flex-1 overflow-y-auto px-4 py-3 space-y-3"></div>
 
-        <!-- ===== 输入区域（语音按钮在输入框外部左侧） ===== -->
+        <!-- ===== 输入区域（完全适配） ===== -->
         <div class="border-t border-[#1a1a2a] p-2 bg-[#0a0a0f] flex-shrink-0 safe-area-bottom">
             <div class="input-wrapper">
-                <!-- 语音按钮（输入框外部左侧） -->
+                <!-- 语音按钮 -->
                 <button id="voiceBtn" class="p-1.5 rounded-xl transition-all flex-shrink-0 bg-[#1a1a2a] text-[#4a4a5a] hover:bg-[#2a2a3a] tap-active" title="语音输入">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
                 </button>
-                <!-- 输入框容器 -->
-                <div class="flex-1 bg-[#12121f] rounded-2xl border border-[#1a1a2a] p-1 focus-within:border-blue-500/50 transition-colors">
-                    <textarea id="chatInput" rows="1" placeholder="输入指令..." class="w-full bg-transparent outline-none resize-none text-sm min-h-[24px] max-h-[66px] px-2 py-1 text-[#e8e8f0] placeholder-[#4a4a5a] leading-4"></textarea>
+                <!-- 输入框容器（完全适配） -->
+                <div class="input-inner" id="inputInner">
+                    <textarea id="chatInput" rows="1" placeholder="输入指令..." class="bg-transparent outline-none resize-none text-sm min-h-[28px] max-h-[80px] px-3 py-1.5 text-[#e8e8f0] placeholder-[#4a4a5a] leading-5 w-full"></textarea>
                 </div>
                 <!-- 发送按钮 -->
                 <button id="sendBtn" class="p-1.5 rounded-xl transition-all flex-shrink-0 bg-[#1a1a2a] text-[#4a4a5a] cursor-not-allowed tap-active">
@@ -763,21 +879,19 @@
         //  语音功能函数
         // ============================================================
 
-        // 切换语音模式
         function toggleVoiceMode() {
             const input = document.getElementById('chatInput');
             const voiceBtn = document.getElementById('voiceBtn');
+            const inner = document.getElementById('inputInner');
 
             if (!isVoiceMode) {
-                // 开启语音模式
                 isVoiceMode = true;
                 input.placeholder = '按住录音，松开发送';
                 input.readOnly = true;
                 input.style.textAlign = 'center';
                 input.style.userSelect = 'none';
-                input.style.background = '#1a1a2a';
-                input.style.borderColor = '#4ade80';
-                input.style.color = '#4ade80';
+                inner.classList.add('recording-mode');
+
                 voiceBtn.classList.add('active');
                 voiceBtn.style.background = '#1a3a2a';
                 voiceBtn.style.borderColor = '#4ade80';
@@ -789,15 +903,13 @@
 
                 addSystemMessage('语音模式已开启，按住输入框录音');
             } else {
-                // 关闭语音模式
                 isVoiceMode = false;
                 input.placeholder = '输入指令...';
                 input.readOnly = false;
                 input.textAlign = 'left';
                 input.userSelect = 'auto';
-                input.background = 'transparent';
-                input.borderColor = '#1a1a2a';
-                input.color = '#e8e8f0';
+                inner.classList.remove('recording-mode', 'cancel-mode');
+
                 voiceBtn.classList.remove('active');
                 voiceBtn.style.background = '';
                 voiceBtn.style.borderColor = '';
@@ -828,20 +940,20 @@
             }
             isCancelMode = false;
             document.getElementById('cancelTip').classList.remove('show');
-            const input = document.getElementById('chatInput');
-            input.classList.remove('cancel-mode');
+            const inner = document.getElementById('inputInner');
+            inner.classList.remove('cancel-mode');
         }
 
         function onPointerMove(e) {
             if (!isRecording) return;
-            const input = document.getElementById('chatInput');
+            const inner = document.getElementById('inputInner');
             const diff = pointerStartY - e.clientY;
             isCancelMode = diff > 60;
             if (isCancelMode) {
-                input.classList.add('cancel-mode');
+                inner.classList.add('cancel-mode');
                 document.getElementById('cancelTip').classList.add('show');
             } else {
-                input.classList.remove('cancel-mode');
+                inner.classList.remove('cancel-mode');
                 document.getElementById('cancelTip').classList.remove('show');
             }
         }
@@ -851,13 +963,14 @@
                 isCancelMode = true;
                 stopRecording(false);
                 document.getElementById('cancelTip').classList.remove('show');
+                const inner = document.getElementById('inputInner');
+                inner.classList.remove('cancel-mode', 'recording-mode');
                 const input = document.getElementById('chatInput');
-                input.classList.remove('cancel-mode', 'recording');
                 input.value = '';
+                input.classList.remove('recording');
             }
         }
 
-        // 开始录音
         async function startRecording() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -868,6 +981,8 @@
                 const input = document.getElementById('chatInput');
                 input.classList.add('recording');
                 input.value = '录音中 0s';
+                const inner = document.getElementById('inputInner');
+                inner.classList.add('recording-mode');
 
                 mediaRecorder = new MediaRecorder(stream);
                 mediaRecorder.ondataavailable = function(event) {
@@ -899,7 +1014,6 @@
             }
         }
 
-        // 停止录音
         function stopRecording(send) {
             if (!isRecording) return;
             isRecording = false;
@@ -914,7 +1028,9 @@
             }
 
             const input = document.getElementById('chatInput');
-            input.classList.remove('recording', 'cancel-mode');
+            const inner = document.getElementById('inputInner');
+            input.classList.remove('recording');
+            inner.classList.remove('recording-mode', 'cancel-mode');
             input.value = '';
             input.placeholder = '按住录音，松开发送';
             document.getElementById('cancelTip').classList.remove('show');
@@ -931,60 +1047,55 @@
             audioChunks = [];
         }
 
-        // 添加语音消息
         function addVoiceMessage(duration, audioBlob) {
             const msgId = 'voice_' + Date.now();
             _voiceData[msgId] = audioBlob;
-
-            const wrapper = document.createElement('div');
-            wrapper.className = 'flex items-start gap-2.5 flex-row-reverse';
-
             const durationStr = formatDuration(duration);
             const voiceWidth = getVoiceWidth(duration);
+            const timeStr = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
 
+            const wrapper = document.createElement('div');
+            wrapper.className = 'msg-row msg-row-user';
             wrapper.innerHTML = `
-                <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-xs font-bold flex-shrink-0 text-white">我</div>
-                <div class="max-w-[82%] bg-blue-500 rounded-2xl rounded-tr-none px-3 py-2.5">
-                    <div class="voice-msg-wrapper" onclick="playVoiceMessage('${msgId}')" style="width:${voiceWidth}px; background:rgba(255,255,255,0.15);">
-                        <span class="voice-icon" id="voiceIcon_${msgId}">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a1 1 0 0 1 1 1v16a1 1 0 0 1-2 0V4a1 1 0 0 1 1-1zm-4 3a1 1 0 0 0-1 1v10a1 1 0 0 0 2 0V7a1 1 0 0 0-1-1zm8 0a1 1 0 0 0-1 1v10a1 1 0 0 0 2 0V7a1 1 0 0 0-1-1z"/></svg>
-                        </span>
-                        <span class="duration" id="duration_${msgId}">${durationStr}</span>
+                <div class="msg-time msg-time-user">${timeStr}</div>
+                <div class="msg-content-wrapper" style="max-width:82%;">
+                    <div class="flex items-start gap-2.5 flex-row-reverse">
+                        <div class="msg-avatar msg-avatar-user">我</div>
+                        <div class="msg-bubble-user" style="padding:6px 12px; background:#3b82f6; border-radius:16px 16px 4px 16px;">
+                            <div class="voice-msg-wrapper" onclick="playVoiceMessage('${msgId}')" style="width:${voiceWidth}px; background:rgba(255,255,255,0.15);">
+                                <span class="voice-icon" id="voiceIcon_${msgId}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a1 1 0 0 1 1 1v16a1 1 0 0 1-2 0V4a1 1 0 0 1 1-1zm-4 3a1 1 0 0 0-1 1v10a1 1 0 0 0 2 0V7a1 1 0 0 0-1-1zm8 0a1 1 0 0 0-1 1v10a1 1 0 0 0 2 0V7a1 1 0 0 0-1-1z"/></svg>
+                                </span>
+                                <span class="duration" id="duration_${msgId}" style="color:#fff;">${durationStr}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="text-[10px] mt-1 text-blue-200/60">${new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</div>
                 </div>
             `;
-
             document.getElementById('messageList').appendChild(wrapper);
             const container = document.getElementById('messageList');
             container.scrollTop = container.scrollHeight;
         }
 
-        // 播放语音消息
         function playVoiceMessage(msgId) {
             const data = _voiceData;
             if (!data || !data[msgId]) return;
-
             if (currentAudio) {
                 currentAudio.pause();
                 if (currentPlayingId) updateSpeakerIcon(currentPlayingId, 'idle');
             }
-
             const audioBlob = data[msgId];
             const url = URL.createObjectURL(audioBlob);
             const audio = new Audio(url);
-
             currentAudio = audio;
             currentPlayingId = msgId;
             updateSpeakerIcon(msgId, 'playing');
-
             audio.onended = function() {
                 updateSpeakerIcon(msgId, 'idle');
                 currentAudio = null;
                 currentPlayingId = null;
                 URL.revokeObjectURL(url);
             };
-
             audio.play().catch(function() {});
         }
 
@@ -992,7 +1103,6 @@
             const icon = document.getElementById('voiceIcon_' + msgId);
             const duration = document.getElementById('duration_' + msgId);
             if (!icon) return;
-
             if (state === 'playing') {
                 icon.classList.add('playing');
                 icon.innerHTML = `
@@ -1123,19 +1233,17 @@
         }
 
         // ============================================================
-        //  报告生成函数（市场分析报告）
+        //  报告生成函数
         // ============================================================
         function generateReportContent() {
             return `
                 <div class="report-card">
                     <h3>项目市场需求报告</h3>
                     <p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:10px;">AI驱动的个人金融助手 · 市场分析</p>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#e8e8f0;">市场背景</strong><br>
                         当前加密市场正从"早期探索"转向"大规模应用"，核心矛盾在于<b style="color:#fbbf24;">日益复杂的链上生态</b>与用户有限认知能力的巨大鸿沟。
                     </div>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#e8e8f0;">核心痛点</strong>
                         <ul>
@@ -1145,7 +1253,6 @@
                             <li>安全风险：钓鱼攻击、恶意合约防不胜防</li>
                         </ul>
                     </div>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#e8e8f0;">目标用户</strong>
                         <div class="report-grid">
@@ -1155,7 +1262,6 @@
                             <div class="item"><div class="num">📈</div><div class="label">市场规模</div><div style="font-size:0.6rem;color:#6a6a7a;">数亿用户 · 蓝海</div></div>
                         </div>
                     </div>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:8px;">
                         <strong style="color:#e8e8f0;">竞争定位</strong>
                         <ul>
@@ -1166,7 +1272,6 @@
                     </div>
                     <div class="tag">蓝海市场 · 差异化明显</div>
                 </div>
-
                 <div class="report-card" style="margin-top:12px;">
                     <h3>应用亮点</h3>
                     <ul>
@@ -1182,14 +1287,13 @@
         }
 
         // ============================================================
-        //  黄金分析（完整版）
+        //  黄金分析
         // ============================================================
         function generateGoldContent() {
             return `
                 <div class="report-card">
                     <h3>黄金市场趋势分析</h3>
                     <p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:10px;">实时数据模拟 · 仅供分析参考</p>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#e8e8f0;">当前价格</strong>
                         <ul>
@@ -1198,115 +1302,83 @@
                             <li>今日波动区间：$2,528.50 ~ $2,552.80</li>
                         </ul>
                     </div>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#e8e8f0;">短期趋势（24h）</strong>
-                        <p>黄金今日震荡上行，受美元指数小幅走弱及地缘政治不确定性支撑。亚盘时段突破 $2,540 阻力位后加速上行，目前测试 $2,555 附近压力。</p>
+                        <p>黄金今日震荡上行，受美元指数小幅走弱及地缘政治不确定性支撑。</p>
                     </div>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#e8e8f0;">中期趋势（周线）</strong>
                         <ul>
                             <li>周线级别：<b style="color:#4ade80;">多头排列</b>，MA5 上穿 MA10 形成金叉</li>
                             <li>关键支撑：$2,480</li>
                             <li>关键阻力：$2,580</li>
-                            <li>RSI（14）：<b style="color:#fbbf24;">62.5</b>（中性偏强，未超买）</li>
+                            <li>RSI（14）：<b style="color:#fbbf24;">62.5</b>（中性偏强）</li>
                         </ul>
                     </div>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#e8e8f0;">核心驱动因素</strong>
                         <ul>
                             <li>美联储降息预期升温（9月降息概率 68%）</li>
-                            <li>全球央行持续增持黄金（中国连续 18 个月增持）</li>
+                            <li>全球央行持续增持黄金</li>
                             <li>中东局势紧张，避险资金流入</li>
-                            <li>美元指数反弹可能短期压制金价</li>
                         </ul>
                     </div>
-
-                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
-                        <strong style="color:#e8e8f0;">今日关注数据</strong>
-                        <ul>
-                            <li>20:30 美国初请失业金人数</li>
-                            <li>22:00 美国成屋销售数据</li>
-                        </ul>
-                    </div>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;">
                         <strong style="color:#e8e8f0;">短期操作参考</strong>
                         <p style="margin-top:4px;background:#0a0a12;padding:10px;border-radius:12px;border-left:3px solid #fbbf24;">
                             当前金价处于上升通道中，短期偏向<b style="color:#fbbf24;">逢低做多</b>。<br>
                             关键入场区间 <b style="color:#4ade80;">$2,530~$2,540</b>，止损 $2,510，目标 $2,580。
                         </p>
-                        <p style="margin-top:6px;font-size:0.75rem;color:#6a6a7a;">以上为市场数据分析，不构成投资建议，请结合自身风险承受能力决策。</p>
+                        <p style="margin-top:6px;font-size:0.75rem;color:#6a6a7a;">以上为市场数据分析，不构成投资建议。</p>
                     </div>
                 </div>
             `;
         }
 
         // ============================================================
-        //  你能做什么（完整版）
+        //  你能做什么
         // ============================================================
         function generateWhatCanDoContent() {
             return `
                 <div class="report-card">
                     <h3>我能帮你把「加密资产」变成「睡后收入」</h3>
-                    <p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:10px;">我不是普通的聊天机器人，而是你口袋里的 AI 金融管家</p>
-
+                    <p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:10px;">我是你口袋里的 AI 金融管家</p>
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#60a5fa;">智能收益优化</strong>
                         <ul>
-                            <li>自动扫描你所有链上的闲置资产（比如 USDC、USDT）</li>
-                            <li>实时对比 Aave、Compound、Ethena 等 20+ 协议的 APY</li>
-                            <li><b style="color:#fbbf24;">一键将资金存入当前收益最高的地方</b> — 收益可能提升 2~3 倍</li>
+                            <li>自动扫描闲置资产，实时对比 20+ 协议 APY</li>
+                            <li><b style="color:#fbbf24;">一键存入收益最高处</b> — 收益可能提升 2~3 倍</li>
                         </ul>
                     </div>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#60a5fa;">24/7 风险守护</strong>
                         <ul>
-                            <li>深夜市场暴跌时，自动提醒并给出防御方案</li>
-                            <li>拦截钓鱼网站和恶意合约签名请求</li>
-                            <li>监控你的借款仓位，在清算前主动预警</li>
+                            <li>深夜暴跌自动提醒，给出防御方案</li>
+                            <li>拦截钓鱼网站和恶意合约签名</li>
+                            <li>借款仓位清算前主动预警</li>
                         </ul>
                     </div>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#60a5fa;">持仓全景分析</strong>
                         <ul>
-                            <li>跨链汇总你的所有资产（ETH/BTC/SOL/ARB 等）</li>
-                            <li>清晰展示仓位占比、月度收益、风险敞口</li>
-                            <li>一句话就能问："我的 SOL 仓位健康吗？"</li>
+                            <li>跨链汇总所有资产（ETH/BTC/SOL/ARB 等）</li>
+                            <li>展示仓位占比、月度收益、风险敞口</li>
                         </ul>
                     </div>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#60a5fa;">AI 自动化执行</strong>
                         <ul>
-                            <li>设定策略：比如"当 ETH 跌破 3000 时买入 10%"</li>
-                            <li>我替你盯盘并自动执行 — <b style="color:#fbbf24;">你睡觉，我打工</b></li>
+                            <li>设定策略："当 ETH 跌破 3000 时买入 10%"</li>
+                            <li><b style="color:#fbbf24;">你睡觉，我打工</b></li>
                         </ul>
                     </div>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
-                        <strong style="color:#e8e8f0;">为什么你应该现在开始用？</strong>
+                        <strong style="color:#e8e8f0;">数据背书</strong>
                         <p style="margin-top:4px;background:#0a0a12;padding:10px;border-radius:12px;border-left:3px solid #fbbf24;">
-                            "过去 3 个月，使用 AI 管家的用户平均收益提升 <b style="color:#fbbf24;">47%</b>，风险事件拦截率 <b style="color:#fbbf24;">99.6%</b>。"
+                            "用户平均收益提升 <b style="color:#fbbf24;">47%</b>，风险拦截率 <b style="color:#fbbf24;">99.6%</b>"
                         </p>
                     </div>
-
-                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:8px;">
-                        <strong style="color:#e8e8f0;">立即体验：</strong>
-                        <ul>
-                            <li>试试说："优化我的 USDC 收益"</li>
-                            <li>或者："分析我的持仓风险"</li>
-                            <li>或者："分析黄金"</li>
-                            <li>或者："市场需求有多大"</li>
-                            <li>或者："抢占市场"</li>
-                        </ul>
-                    </div>
-
-                    <div class="tag" style="background:#1a2a3a;color:#60a5fa;">付费用户专享（7 天免费试用）</div>
+                    <div class="tag" style="background:#1a2a3a;color:#60a5fa;">7 天免费试用 · 付费用户专享</div>
                 </div>
             `;
         }
@@ -1319,52 +1391,47 @@
                 <div class="report-card">
                     <h3>项目市场需求量化分析</h3>
                     <p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:10px;">AI驱动的个人金融助手 · 市场规模测算</p>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#e8e8f0;">一、总市场规模（TAM）</strong>
                         <ul>
                             <li>全球加密货币用户：约 <b style="color:#fbbf24;">5.6亿</b> 人</li>
-                            <li>其中持有稳定币用户：约 <b style="color:#fbbf24;">1.8亿</b> 人</li>
+                            <li>持有稳定币用户：约 <b style="color:#fbbf24;">1.8亿</b> 人</li>
                             <li>DeFi活跃用户：约 <b style="color:#fbbf24;">1,200万</b> 人</li>
                             <li>跨链资产用户：约 <b style="color:#fbbf24;">3,500万</b> 人</li>
                         </ul>
                     </div>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#e8e8f0;">二、可触达市场（SAM）</strong>
                         <ul>
                             <li>"有资产、少精力"持币者：约 <b style="color:#fbbf24;">8,000万</b> 人</li>
                             <li>"想参与、怕麻烦"观望者：约 <b style="color:#fbbf24;">1.2亿</b> 人</li>
                             <li>"跨链多、难打理"活跃用户：约 <b style="color:#fbbf24;">2,500万</b> 人</li>
-                            <li style="margin-top:6px;color:#60a5fa;"><b>合计可触达用户：约 2.25亿 人</b></li>
+                            <li style="margin-top:6px;color:#60a5fa;"><b>合计可触达：约 2.25亿 人</b></li>
                         </ul>
                     </div>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#e8e8f0;">三、可获得市场（SOM）</strong>
                         <ul>
-                            <li>加密货币用户渗透率 0.5%：约 <b style="color:#fbbf24;">280万</b> 人</li>
-                            <li>加密货币用户渗透率 2%：约 <b style="color:#fbbf24;">1,120万</b> 人</li>
-                            <li style="margin-top:6px;color:#60a5fa;"><b>初期（12个月内）目标：50万~100万 注册用户</b></li>
+                            <li>渗透率 0.5%：约 <b style="color:#fbbf24;">280万</b> 人</li>
+                            <li>渗透率 2%：约 <b style="color:#fbbf24;">1,120万</b> 人</li>
+                            <li style="margin-top:6px;color:#60a5fa;"><b>初期目标（12个月）：50万~100万 用户</b></li>
                         </ul>
                     </div>
-
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
-                        <strong style="color:#e8e8f0;">四、商业化空间估算</strong>
+                        <strong style="color:#e8e8f0;">四、商业化估算</strong>
                         <ul>
-                            <li>订阅制（100万用户 × 5%付费率 × $15/月）：<b style="color:#fbbf24;">$9,000万/年</b></li>
-                            <li>策略跟单分成（50万活跃用户 × 10%参与 × 月均$100 × 10%）：<b style="color:#fbbf24;">$6,000万/年</b></li>
+                            <li>订阅制：<b style="color:#fbbf24;">$9,000万/年</b></li>
+                            <li>策略跟单分成：<b style="color:#fbbf24;">$6,000万/年</b></li>
                             <li style="margin-top:6px;color:#60a5fa;"><b>综合年收入潜力：$1.5亿 ~ $2亿</b></li>
                         </ul>
                     </div>
-
                     <div class="tag" style="background:#1a2a3a;color:#60a5fa;">面向 2.25亿 潜在用户的千亿级蓝海市场</div>
                 </div>
             `;
         }
 
         // ============================================================
-        //  收费策略 + 推广内容（原始完整版）
+        //  收费策略（原始完整版）
         // ============================================================
         function generatePricingContent() {
             return `
@@ -1408,7 +1475,7 @@
                         <p style="margin-top:6px;font-weight:500;color:#60a5fa;">阶段三：12个月后 → 收益分成 + 差异化增值</p>
                         <ul>
                             <li>基础订阅继续保留（稳定现金流）</li>
-                            <li><b style="color:#fbbf24;">收益分成</b>：超额收益的 10%~20%，用户无痛付费</li>
+                            <li><b style="color:#fbbf24;">收益分成</b>：超额收益的 10%~20%</li>
                             <li>机构/团队版：¥999/月起</li>
                         </ul>
                     </div>
@@ -1416,11 +1483,11 @@
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#e8e8f0;">三、为什么这套策略能抢占市场？</strong>
                         <ul>
-                            <li><b style="color:#60a5fa;">免费版功能足够强大</b> — 用户真正在用，形成习惯后付费转化率更高</li>
+                            <li><b style="color:#60a5fa;">免费版功能足够强大</b> — 用户真正在用，习惯后付费转化率更高</li>
                             <li><b style="color:#60a5fa;">裂变机制驱动增长</b> — 用户主动传播，降低获客成本</li>
                             <li><b style="color:#60a5fa;">订阅 + 分成双模式</b> — 订阅保现金流，分成实现共赢</li>
-                            <li><b style="color:#60a5fa;">价格锚定"省心"</b> — ¥99/月 vs 自己操作可能踩坑损失几百上千刀</li>
-                            <li><b style="color:#60a5fa;">先免费后付费</b> — 用户已信任AI管家，付费决策更轻松</li>
+                            <li><b style="color:#60a5fa;">价格锚定"省心"</b> — ¥99/月 vs 自己操作可能踩坑</li>
+                            <li><b style="color:#60a5fa;">先免费后付费</b> — 用户已信任，付费决策更轻松</li>
                         </ul>
                     </div>
 
@@ -1447,7 +1514,6 @@
         function generateAIResponse(userInput) {
             const lower = userInput.toLowerCase();
 
-            // 分析黄金
             if (lower.includes('黄金') || lower.includes('gold') || lower.includes('金价') || lower.includes('贵金属') || lower
                 .includes('分析黄金')) {
                 return {
@@ -1459,7 +1525,6 @@
                 };
             }
 
-            // 你能做什么
             if (lower.includes('你能做什么') || lower.includes('你会什么') || lower.includes('功能介绍') || lower.includes('有什么用') ||
                 lower.includes('帮助')) {
                 return {
@@ -1471,7 +1536,6 @@
                 };
             }
 
-            // 市场需求有多大
             if (lower.includes('市场需求') || lower.includes('市场有多大') || lower.includes('规模') || lower.includes('tam') || lower
                 .includes('市场空间')) {
                 return {
@@ -1483,7 +1547,6 @@
                 };
             }
 
-            // 抢占市场 / 收费
             if (lower.includes('抢占市场') || lower.includes('收费') || lower.includes('定价') || lower.includes('怎么赚钱') || lower
                 .includes('商业模式') || lower.includes('付费') || lower.includes('推广') || lower.includes('裂变')) {
                 return {
@@ -1495,7 +1558,6 @@
                 };
             }
 
-            // 收益
             if (lower.includes('收益') || lower.includes('apy') || lower.includes('利息') || lower.includes('优化')) {
                 return {
                     id: `ai-${Date.now()}`,
@@ -1505,7 +1567,6 @@
                     type: 'transaction_preview',
                 };
             }
-            // 风险
             if (lower.includes('风险') || lower.includes('波动') || lower.includes('调整')) {
                 return {
                     id: `ai-${Date.now()}`,
@@ -1515,7 +1576,6 @@
                     type: 'alert',
                 };
             }
-            // 持仓
             if (lower.includes('持仓') || lower.includes('资产') || lower.includes('多少钱') || lower.includes('总览')) {
                 const assetLines = mockAssets.map(a =>
                     `• ${a.symbol}: $${a.usdValue.toLocaleString()} (${((a.usdValue / totalValue) * 100).toFixed(1)}%)`
@@ -1528,7 +1588,6 @@
                     type: 'asset_summary',
                 };
             }
-            // 默认回复
             return {
                 id: `ai-${Date.now()}`,
                 role: 'assistant',
@@ -1577,11 +1636,12 @@
         }
 
         // ============================================================
-        //  渲染消息
+        //  渲染消息（时间戳放在气泡外部）
         // ============================================================
 
         function renderMessages() {
             const container = document.getElementById('messageList');
+            // 保留语音消息，移除其他
             const children = container.children;
             const toRemove = [];
             for (let i = 0; i < children.length; i++) {
@@ -1597,6 +1657,7 @@
                 const isUser = msg.role === 'user';
                 const isSystem = msg.role === 'system';
                 const isReport = msg.type === 'report';
+                const timeStr = msg.timestamp.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
 
                 if (isSystem) {
                     html +=
@@ -1606,54 +1667,92 @@
 
                 if (isReport) {
                     html += `
-                        <div class="flex items-start gap-2.5">
-                            <div class="w-8 h-8 rounded-full bg-[#1a1a2a] flex items-center justify-center text-xs font-bold text-[#6a6a7a]">AI</div>
-                            <div class="max-w-[90%] bg-[#12121f] rounded-2xl rounded-tl-none border border-[#1a1a2a] px-3.5 py-2.5 message-bubble" style="overflow-x:auto;">
-                                ${msg.content}
-                                <div class="text-[10px] mt-2 text-[#4a4a5a]">${msg.timestamp.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</div>
+                        <div class="msg-row msg-row-ai">
+                            <div class="msg-avatar msg-avatar-ai">AI</div>
+                            <div class="msg-content-wrapper" style="max-width:92%;">
+                                <div class="msg-bubble-ai" style="overflow-x:auto;">
+                                    ${msg.content}
+                                </div>
                             </div>
+                            <div class="msg-time msg-time-ai">${timeStr}</div>
                         </div>
                     `;
                     return;
                 }
 
                 const contentHtml = (msg.content || '').replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
-                    .replace(
-                        /\n/g, '<br>');
+                    .replace(/\n/g, '<br>');
+
                 let typeLabel = '',
-                    typeIcon = '';
-                if (msg.type === 'transaction_preview') { typeLabel = '交易预览 · 待确认';
-                    typeIcon = ''; } else if (msg.type === 'alert') { typeLabel = '风险提醒';
-                    typeIcon = ''; } else if (msg.type === 'asset_summary') { typeLabel = '持仓分析';
-                    typeIcon = ''; }
-                const timeStr = msg.timestamp.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-                html += `
-                    <div class="flex items-start gap-2.5 ${isUser ? 'flex-row-reverse' : ''}">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${isUser ? 'bg-blue-500 text-white' : 'bg-[#1a1a2a] text-[#6a6a7a]'}">${isUser ? '我' : 'AI'}</div>
-                        <div class="max-w-[82%] ${isUser ? 'bg-blue-500 rounded-2xl rounded-tr-none' : 'bg-[#12121f] rounded-2xl rounded-tl-none border border-[#1a1a2a]'} px-3.5 py-2.5 message-bubble">
-                            ${typeLabel ? `<div class="flex items-center gap-1 text-xs ${msg.type === 'transaction_preview' ? 'text-emerald-400' : msg.type === 'alert' ? 'text-amber-400' : 'text-blue-400'} mb-1"><span>${typeIcon}</span> ${typeLabel}</div>` : ''}
-                            <div class="text-sm leading-relaxed ${isUser ? 'text-white' : 'text-[#d0d0e0]'}">${contentHtml}</div>
-                            ${msg.type === 'transaction_preview' ? `
-                                <div class="flex gap-2 mt-2.5">
-                                    <button class="text-xs bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg active:bg-emerald-500/30 transition-colors tap-active" onclick="alert('交易已模拟执行（演示版）')">确认执行</button>
-                                    <button class="text-xs bg-[#1a1a2a] text-[#6a6a7a] px-3 py-1.5 rounded-lg active:bg-[#2a2a3a] transition-colors tap-active" onclick="alert('修改参数功能（演示版）')">修改参数</button>
+                    typeClass = '';
+                if (msg.type === 'transaction_preview') {
+                    typeLabel = '交易预览 · 待确认';
+                    typeClass = 'text-emerald-400';
+                } else if (msg.type === 'alert') {
+                    typeLabel = '风险提醒';
+                    typeClass = 'text-amber-400';
+                } else if (msg.type === 'asset_summary') {
+                    typeLabel = '持仓分析';
+                    typeClass = 'text-blue-400';
+                }
+
+                if (isUser) {
+                    html += `
+                        <div class="msg-row msg-row-user">
+                            <div class="msg-time msg-time-user">${timeStr}</div>
+                            <div class="msg-content-wrapper">
+                                <div class="flex items-start gap-2.5 flex-row-reverse">
+                                    <div class="msg-avatar msg-avatar-user">我</div>
+                                    <div class="msg-bubble-user">
+                                        ${typeLabel ? `<div class="text-xs ${typeClass} mb-1">${typeLabel}</div>` : ''}
+                                        <div class="text-sm leading-relaxed text-white">${contentHtml}</div>
+                                        ${msg.type === 'transaction_preview' ? `
+                                            <div class="flex gap-2 mt-2.5">
+                                                <button class="text-xs bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg active:bg-emerald-500/30 transition-colors tap-active" onclick="alert('交易已模拟执行（演示版）')">确认执行</button>
+                                                <button class="text-xs bg-[#1a1a2a] text-[#6a6a7a] px-3 py-1.5 rounded-lg active:bg-[#2a2a3a] transition-colors tap-active" onclick="alert('修改参数功能（演示版）')">修改参数</button>
+                                            </div>
+                                        ` : ''}
+                                    </div>
                                 </div>
-                            ` : ''}
-                            <div class="text-[10px] mt-1.5 ${isUser ? 'text-blue-200/60' : 'text-[#4a4a5a]'}">${timeStr}</div>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                } else {
+                    // AI消息
+                    html += `
+                        <div class="msg-row msg-row-ai">
+                            <div class="msg-avatar msg-avatar-ai">AI</div>
+                            <div class="msg-content-wrapper" style="max-width:92%;">
+                                <div class="msg-bubble-ai">
+                                    ${typeLabel ? `<div class="text-xs ${typeClass} mb-1">${typeLabel}</div>` : ''}
+                                    <div class="text-sm leading-relaxed text-[#d0d0e0]">${contentHtml}</div>
+                                    ${msg.type === 'transaction_preview' ? `
+                                        <div class="flex gap-2 mt-2.5">
+                                            <button class="text-xs bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg active:bg-emerald-500/30 transition-colors tap-active" onclick="alert('交易已模拟执行（演示版）')">确认执行</button>
+                                            <button class="text-xs bg-[#1a1a2a] text-[#6a6a7a] px-3 py-1.5 rounded-lg active:bg-[#2a2a3a] transition-colors tap-active" onclick="alert('修改参数功能（演示版）')">修改参数</button>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            <div class="msg-time msg-time-ai">${timeStr}</div>
+                        </div>
+                    `;
+                }
             });
+
             if (isProcessing) {
                 html += `
-                    <div class="flex items-start gap-2.5">
-                        <div class="w-8 h-8 rounded-full bg-[#1a1a2a] flex items-center justify-center text-xs font-bold text-[#6a6a7a]">AI</div>
-                        <div class="bg-[#12121f] rounded-2xl rounded-tl-none px-4 py-3 border border-[#1a1a2a]">
-                            <div class="typing-cursor text-[#4a4a5a] text-sm">思考中</div>
+                    <div class="msg-row msg-row-ai">
+                        <div class="msg-avatar msg-avatar-ai">AI</div>
+                        <div class="msg-content-wrapper" style="max-width:92%;">
+                            <div class="bg-[#12121f] rounded-2xl rounded-tl-none px-4 py-3 border border-[#1a1a2a]">
+                                <div class="typing-cursor text-[#4a4a5a] text-sm">思考中</div>
+                            </div>
                         </div>
                     </div>
                 `;
             }
+
             container.insertAdjacentHTML('beforeend', html);
             container.scrollTop = container.scrollHeight;
         }
@@ -1688,7 +1787,6 @@
             const sendBtn = document.getElementById('sendBtn');
             const voiceBtn = document.getElementById('voiceBtn');
 
-            // 语音按钮
             voiceBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 toggleVoiceMode();
@@ -1696,14 +1794,12 @@
 
             input.addEventListener('input', function() {
                 this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 66) + 'px';
+                this.style.height = Math.min(this.scrollHeight, 80) + 'px';
                 updateSendButton();
             });
 
             sendBtn.addEventListener('click', function() {
-                if (isVoiceMode) {
-                    return;
-                }
+                if (isVoiceMode) return;
                 const text = input.value.trim();
                 if (text && !isProcessing) {
                     sendMessage(text);
