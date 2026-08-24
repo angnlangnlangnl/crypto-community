@@ -79,8 +79,8 @@
         }
         /* 输入框高度 */
         #chatInput {
-            min-height: 22px;
-            max-height: 60px;
+            min-height: 24px;
+            max-height: 66px;
             font-size: 13px;
             padding-top: 4px;
             padding-bottom: 4px;
@@ -416,9 +416,10 @@
         #app.show {
             display: flex;
         }
+        /* 顶部导航高度 */
         .top-nav {
-            padding-top: 5px !important;
-            padding-bottom: 5px !important;
+            padding-top: 4.5px !important;
+            padding-bottom: 4.5px !important;
         }
         .top-nav-border {
             border-bottom-width: 1px;
@@ -435,8 +436,9 @@
             height: 14px;
             background: #2a2a3a;
         }
+        /* 安全提示文字缩小 */
         .chat-header .label {
-            font-size: 11px;
+            font-size: 10px;
             color: #5a5a6a;
         }
         .chat-header .label .highlight {
@@ -485,6 +487,16 @@
                 transform: scaleY(1);
             }
         }
+        /* 输入框外部左侧语音按钮样式 */
+        .input-wrapper {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+        }
+        .input-wrapper #voiceBtn {
+            margin-bottom: 0;
+            align-self: flex-end;
+        }
     </style>
 </head>
 <body>
@@ -506,7 +518,7 @@
                     <div class="stat"><div class="num">47%</div><div class="label">平均收益提升</div></div>
                     <div class="stat"><div class="num">99.6%</div><div class="label">风险拦截率</div></div>
                 </div>
-                <div class="splash-badge">⚡ 已保护 12,000+ 钱包</div>
+                <div class="splash-badge">已保护 12,000+ 钱包</div>
             </div>
             <div class="splash-slide" data-index="1" style="display:none;">
                 <div class="splash-icon">⚡</div>
@@ -517,7 +529,7 @@
                     <strong style="color:#60a5fa;">持仓分析</strong> · 跨链汇总，一目了然<br>
                     <strong style="color:#60a5fa;">AI 自动化</strong> · 你睡觉，它打工
                 </div>
-                <div class="splash-badge">🚀 支持 Ethereum · Solana · Arbitrum 等</div>
+                <div class="splash-badge">支持 Ethereum · Solana · Arbitrum 等</div>
             </div>
             <div class="splash-slide" data-index="2" style="display:none;">
                 <div class="splash-icon">🚀</div>
@@ -527,10 +539,10 @@
                     <span class="splash-highlight">首周免费体验</span>，不满意随时取消。
                 </div>
                 <div style="margin-top:24px; display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
-                    <span style="background:#1e293b; padding:6px 18px; border-radius:30px; font-size:13px; color:#94a3b8;">🔒 非托管 · 私钥自持</span>
-                    <span style="background:#1e293b; padding:6px 18px; border-radius:30px; font-size:13px; color:#94a3b8;">📱 手机 / 网页 通用</span>
+                    <span style="background:#1e293b; padding:6px 18px; border-radius:30px; font-size:13px; color:#94a3b8;">非托管 · 私钥自持</span>
+                    <span style="background:#1e293b; padding:6px 18px; border-radius:30px; font-size:13px; color:#94a3b8;">手机 / 网页 通用</span>
                 </div>
-                <div class="splash-badge">💎 7 天免费试用 · 随时取消</div>
+                <div class="splash-badge">7 天免费试用 · 随时取消</div>
             </div>
         </div>
         <div class="splash-footer">
@@ -573,13 +585,13 @@
             </div>
         </div>
 
-        <!-- 顶部导航 -->
+        <!-- ===== 顶部导航 ===== -->
         <div class="top-nav flex items-center justify-between px-4 border-b border-[#1a1a2a] bg-[#0a0a0f] z-10 flex-shrink-0 top-nav-border">
             <button onclick="toggleDrawer()" class="p-1.5 -ml-2 tap-active" aria-label="打开菜单">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
             <div class="flex flex-col items-center">
-                <span class="text-sm font-medium text-[#8a8a9a]">💬 对话</span>
+                <span class="text-sm font-medium text-[#8a8a9a]">对话</span>
                 <div class="chat-header">
                     <span class="label"><span class="highlight">●</span> AI 可读持仓，执行需确认</span>
                 </div>
@@ -595,23 +607,25 @@
         <!-- 消息列表 -->
         <div id="messageList" class="flex-1 overflow-y-auto px-4 py-3 space-y-3"></div>
 
-        <!-- ===== 输入区域（语音按钮已移到左侧） ===== -->
+        <!-- ===== 输入区域（语音按钮在输入框外部左侧） ===== -->
         <div class="border-t border-[#1a1a2a] p-2 bg-[#0a0a0f] flex-shrink-0 safe-area-bottom">
-            <div class="flex items-end gap-2 bg-[#12121f] rounded-2xl border border-[#1a1a2a] p-1 focus-within:border-blue-500/50 transition-colors">
-                <!-- 语音按钮 → 移到最左边 -->
+            <div class="input-wrapper">
+                <!-- 语音按钮（输入框外部左侧） -->
                 <button id="voiceBtn" class="p-1.5 rounded-xl transition-all flex-shrink-0 bg-[#1a1a2a] text-[#4a4a5a] hover:bg-[#2a2a3a] tap-active" title="语音输入">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
                 </button>
-                <!-- 输入框 -->
-                <textarea id="chatInput" rows="1" placeholder="输入指令..." class="flex-1 bg-transparent outline-none resize-none text-sm min-h-[22px] max-h-[60px] px-2 py-1 text-[#e8e8f0] placeholder-[#4a4a5a] leading-4"></textarea>
-                <!-- 发送按钮 → 移到最右边 -->
+                <!-- 输入框容器 -->
+                <div class="flex-1 bg-[#12121f] rounded-2xl border border-[#1a1a2a] p-1 focus-within:border-blue-500/50 transition-colors">
+                    <textarea id="chatInput" rows="1" placeholder="输入指令..." class="w-full bg-transparent outline-none resize-none text-sm min-h-[24px] max-h-[66px] px-2 py-1 text-[#e8e8f0] placeholder-[#4a4a5a] leading-4"></textarea>
+                </div>
+                <!-- 发送按钮 -->
                 <button id="sendBtn" class="p-1.5 rounded-xl transition-all flex-shrink-0 bg-[#1a1a2a] text-[#4a4a5a] cursor-not-allowed tap-active">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4 20-7z"/><path d="M22 2 11 13"/></svg>
                 </button>
             </div>
         </div>
         <!-- 取消提示浮层 -->
-        <div id="cancelTip">⬆ 松开取消</div>
+        <div id="cancelTip">松开取消</div>
     </div>
 
     <script>
@@ -642,7 +656,7 @@
                     dot.classList.toggle('active', i === index);
                 });
                 if (index === total - 1) {
-                    btn.textContent = '🚀 立即开始';
+                    btn.textContent = '立即开始';
                 } else {
                     btn.textContent = '下一步';
                 }
@@ -724,7 +738,7 @@
         let messages = [{
             id: 'welcome',
             role: 'assistant',
-            content: '👋 你好！我是你的 AI 金融管家。\n\n你目前在 4 条链上持有约 **$38,174** 的资产。\n\n试试说：\n• "优化收益"\n• "分析风险"\n• "查看持仓"\n• "黄金"\n• "你能做什么"',
+            content: '你好！我是你的 AI 金融管家。\n\n你目前在 4 条链上持有约 **$38,174** 的资产。\n\n试试说：\n• "优化收益"\n• "分析风险"\n• "查看持仓"\n• "市场需求有多大"\n• "抢占市场"',
             timestamp: new Date(),
             type: 'text',
         }];
@@ -757,7 +771,7 @@
             if (!isVoiceMode) {
                 // 开启语音模式
                 isVoiceMode = true;
-                input.placeholder = ' 按住录音，松开发送';
+                input.placeholder = '按住录音，松开发送';
                 input.readOnly = true;
                 input.style.textAlign = 'center';
                 input.style.userSelect = 'none';
@@ -773,7 +787,7 @@
                 input.addEventListener('pointermove', onPointerMove);
                 input.addEventListener('pointerleave', onPointerLeave);
 
-                addSystemMessage(' 语音模式已开启，按住输入框录音');
+                addSystemMessage('语音模式已开启，按住输入框录音');
             } else {
                 // 关闭语音模式
                 isVoiceMode = false;
@@ -796,7 +810,7 @@
                 if (isRecording) stopRecording(false);
                 document.getElementById('cancelTip').classList.remove('show');
 
-                addSystemMessage('⌨️ 已切换回键盘模式');
+                addSystemMessage('已切换回键盘模式');
             }
         }
 
@@ -834,7 +848,6 @@
 
         function onPointerLeave(e) {
             if (isRecording) {
-                // 手指移出输入框，自动取消
                 isCancelMode = true;
                 stopRecording(false);
                 document.getElementById('cancelTip').classList.remove('show');
@@ -854,7 +867,7 @@
 
                 const input = document.getElementById('chatInput');
                 input.classList.add('recording');
-                input.value = '🎤 录音中 0s';
+                input.value = '录音中 0s';
 
                 mediaRecorder = new MediaRecorder(stream);
                 mediaRecorder.ondataavailable = function(event) {
@@ -869,7 +882,7 @@
                     recordingDuration++;
                     const inputEl = document.getElementById('chatInput');
                     if (inputEl && isRecording) {
-                        inputEl.value = '🎤 录音中 ' + recordingDuration + 's';
+                        inputEl.value = '录音中 ' + recordingDuration + 's';
                     }
                     if (recordingDuration >= 60) {
                         stopRecording(true);
@@ -881,8 +894,8 @@
                 const input = document.getElementById('chatInput');
                 input.classList.remove('recording');
                 input.value = '';
-                input.placeholder = '🎤 按住录音，松开发送';
-                addSystemMessage('⚠️ 无法访问麦克风，请检查权限设置');
+                input.placeholder = '按住录音，松开发送';
+                addSystemMessage('无法访问麦克风，请检查权限设置');
             }
         }
 
@@ -903,7 +916,7 @@
             const input = document.getElementById('chatInput');
             input.classList.remove('recording', 'cancel-mode');
             input.value = '';
-            input.placeholder = '🎤 按住录音，松开发送';
+            input.placeholder = '按住录音，松开发送';
             document.getElementById('cancelTip').classList.remove('show');
 
             const duration = recordingDuration;
@@ -912,7 +925,7 @@
                 const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                 addVoiceMessage(duration, audioBlob);
             } else if (duration < 1 && send) {
-                addSystemMessage('⏳ 录音太短，请按住久一点再发送');
+                addSystemMessage('录音太短，请按住久一点再发送');
             }
 
             audioChunks = [];
@@ -1091,29 +1104,31 @@
             container.innerHTML = html;
         }
 
+        // ============================================================
+        //  快捷操作渲染（已移除黄金按钮）
+        // ============================================================
         function renderQuickActions() {
             const container = document.getElementById('quickActions');
             const actions = [
-                { label: '📈 收益', prompt: '帮我优化闲置资产的收益' },
-                { label: '🛡️ 风险', prompt: '帮我分析当前持仓风险' },
-                { label: '📊 持仓', prompt: '查看我的完整持仓' },
-                { label: '⚡ 智能', prompt: '根据当前市场自动调整配置' },
-                { label: '📄 报告', prompt: '查看项目报告' },
+                { label: '收益', prompt: '帮我优化闲置资产的收益' },
+                { label: '风险', prompt: '帮我分析当前持仓风险' },
+                { label: '持仓', prompt: '查看我的完整持仓' },
+                { label: '智能', prompt: '根据当前市场自动调整配置' },
+                { label: '报告', prompt: '查看项目报告' },
             ];
             container.innerHTML = actions.map((a, index) => {
                 const isReport = index === actions.length - 1;
-                const isGold = index === 3;
-                return `<button onclick="sendMessage('${a.prompt}')" class="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full border border-[#1a1a2a] text-[#8a8a9a] active:bg-[#1a1a2a] active:text-[#e8e8f0] transition-all whitespace-nowrap tap-active ${isReport ? 'report-btn' : isGold ? 'bg-[#1a2a1a] border-[#2a5a2a]' : 'bg-[#12121f]'}">${a.label}</button>`;
+                return `<button onclick="sendMessage('${a.prompt}')" class="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full border border-[#1a1a2a] text-[#8a8a9a] active:bg-[#1a1a2a] active:text-[#e8e8f0] transition-all whitespace-nowrap tap-active ${isReport ? 'report-btn' : 'bg-[#12121f]'}">${a.label}</button>`;
             }).join('');
         }
 
         // ============================================================
-        //  报告生成函数
+        //  报告生成函数（市场分析报告）
         // ============================================================
         function generateReportContent() {
             return `
                 <div class="report-card">
-                    <h3>📄 项目市场需求报告</h3>
+                    <h3>项目市场需求报告</h3>
                     <p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:10px;">AI驱动的个人金融助手 · 市场分析</p>
 
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
@@ -1124,10 +1139,10 @@
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#e8e8f0;">核心痛点</strong>
                         <ul>
-                            <li>🔹 操作门槛极高：Gas费、跨链、授权签名等概念复杂</li>
-                            <li>🔹 信息过载：海量协议和APY，难以决策</li>
-                            <li>🔹 资产分散：多链多钱包，缺乏统一管理</li>
-                            <li>🔹 安全风险：钓鱼攻击、恶意合约防不胜防</li>
+                            <li>操作门槛极高：Gas费、跨链、授权签名等概念复杂</li>
+                            <li>信息过载：海量协议和APY，难以决策</li>
+                            <li>资产分散：多链多钱包，缺乏统一管理</li>
+                            <li>安全风险：钓鱼攻击、恶意合约防不胜防</li>
                         </ul>
                     </div>
 
@@ -1144,24 +1159,135 @@
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:8px;">
                         <strong style="color:#e8e8f0;">竞争定位</strong>
                         <ul>
-                            <li>✅ 传统钱包：<span class="highlight">复杂菜单</span> → 我们：<span class="highlight">自然语言对话</span></li>
-                            <li>✅ DeFi聚合器：<span class="highlight">数据看板</span> → 我们：<span class="highlight">AI个性化策略</span></li>
-                            <li>✅ 被动安全 → 我们：<span class="highlight">主动风险守护</span></li>
+                            <li>传统钱包：<span class="highlight">复杂菜单</span> → 我们：<span class="highlight">自然语言对话</span></li>
+                            <li>DeFi聚合器：<span class="highlight">数据看板</span> → 我们：<span class="highlight">AI个性化策略</span></li>
+                            <li>被动安全 → 我们：<span class="highlight">主动风险守护</span></li>
                         </ul>
                     </div>
-                    <div class="tag">🚀 蓝海市场 · 差异化明显</div>
+                    <div class="tag">蓝海市场 · 差异化明显</div>
                 </div>
 
                 <div class="report-card" style="margin-top:12px;">
-                    <h3>✨ 应用亮点</h3>
+                    <h3>应用亮点</h3>
                     <ul>
-                        <li><strong style="color:#60a5fa;">🗣️ 自然语言交互</strong> — 说出需求即可操作，零门槛</li>
-                        <li><strong style="color:#60a5fa;">🧠 AI Agent自动化</strong> — 夜间自动优化收益，实现"懒人理财"</li>
-                        <li><strong style="color:#60a5fa;">🛡️ 主动式守护</strong> — 拦截钓鱼攻击，预警清算风险</li>
-                        <li><strong style="color:#60a5fa;">👤 个性化服务</strong> — 越用越懂你，千人千面建议</li>
-                        <li><strong style="color:#60a5fa;">🔒 非托管透明</strong> — AI不碰私钥，资产由你全权控制</li>
+                        <li><strong style="color:#60a5fa;">自然语言交互</strong> — 说出需求即可操作，零门槛</li>
+                        <li><strong style="color:#60a5fa;">AI Agent自动化</strong> — 夜间自动优化收益，实现"懒人理财"</li>
+                        <li><strong style="color:#60a5fa;">主动式守护</strong> — 拦截钓鱼攻击，预警清算风险</li>
+                        <li><strong style="color:#60a5fa;">个性化服务</strong> — 越用越懂你，千人千面建议</li>
+                        <li><strong style="color:#60a5fa;">非托管透明</strong> — AI不碰私钥，资产由你全权控制</li>
                     </ul>
-                    <div class="tag" style="background:#1a2a3a;color:#60a5fa;">💡 核心价值：让普通人轻松驾驭加密世界</div>
+                    <div class="tag" style="background:#1a2a3a;color:#60a5fa;">核心价值：让普通人轻松驾驭加密世界</div>
+                </div>
+            `;
+        }
+
+        // ============================================================
+        //  市场需求量化分析（新增）
+        // ============================================================
+        function generateMarketDemandContent() {
+            return `
+                <div class="report-card">
+                    <h3>项目市场需求量化分析</h3>
+                    <p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:10px;">AI驱动的个人金融助手 · 市场规模测算</p>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
+                        <strong style="color:#e8e8f0;">一、总市场规模（TAM）</strong>
+                        <ul>
+                            <li>全球加密货币用户：约 <b style="color:#fbbf24;">5.6亿</b> 人</li>
+                            <li>其中持有稳定币用户：约 <b style="color:#fbbf24;">1.8亿</b> 人</li>
+                            <li>DeFi活跃用户：约 <b style="color:#fbbf24;">1,200万</b> 人</li>
+                            <li>跨链资产用户：约 <b style="color:#fbbf24;">3,500万</b> 人</li>
+                        </ul>
+                    </div>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
+                        <strong style="color:#e8e8f0;">二、可触达市场（SAM）</strong>
+                        <ul>
+                            <li>"有资产、少精力"持币者：约 <b style="color:#fbbf24;">8,000万</b> 人</li>
+                            <li>"想参与、怕麻烦"观望者：约 <b style="color:#fbbf24;">1.2亿</b> 人</li>
+                            <li>"跨链多、难打理"活跃用户：约 <b style="color:#fbbf24;">2,500万</b> 人</li>
+                            <li style="margin-top:6px;color:#60a5fa;"><b>合计可触达用户：约 2.25亿 人</b></li>
+                        </ul>
+                    </div>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
+                        <strong style="color:#e8e8f0;">三、可获得市场（SOM）</strong>
+                        <ul>
+                            <li>加密货币用户渗透率 0.5%：约 <b style="color:#fbbf24;">280万</b> 人</li>
+                            <li>加密货币用户渗透率 2%：约 <b style="color:#fbbf24;">1,120万</b> 人</li>
+                            <li style="margin-top:6px;color:#60a5fa;"><b>初期（12个月内）目标：50万~100万 注册用户</b></li>
+                        </ul>
+                    </div>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
+                        <strong style="color:#e8e8f0;">四、商业化空间估算</strong>
+                        <ul>
+                            <li>订阅制（100万用户 × 5%付费率 × $15/月）：<b style="color:#fbbf24;">$9,000万/年</b></li>
+                            <li>策略跟单分成（50万活跃用户 × 10%参与 × 月均$100 × 10%）：<b style="color:#fbbf24;">$6,000万/年</b></li>
+                            <li style="margin-top:6px;color:#60a5fa;"><b>综合年收入潜力：$1.5亿 ~ $2亿</b></li>
+                        </ul>
+                    </div>
+
+                    <div class="tag" style="background:#1a2a3a;color:#60a5fa;">面向 2.25亿 潜在用户的千亿级蓝海市场</div>
+                </div>
+            `;
+        }
+
+        // ============================================================
+        //  收费策略分析（新增）
+        // ============================================================
+        function generatePricingContent() {
+            return `
+                <div class="report-card">
+                    <h3>怎么收费更容易抢占市场</h3>
+                    <p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:10px;">AI驱动的个人金融助手 · 定价策略</p>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
+                        <strong style="color:#e8e8f0;">核心策略：先用免费建立信任，再用付费放大价值</strong>
+                        <p style="margin-top:4px;">定价锚点：<b style="color:#fbbf24;">「省心」</b></p>
+                    </div>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
+                        <strong style="color:#e8e8f0;">阶段一：上线前6个月 → 免费 + 口碑裂变</strong>
+                        <ul>
+                            <li>完全免费，0门槛使用</li>
+                            <li>邀请3个好友解锁无限次AI策略执行</li>
+                            <li>积累用户和口碑，建立品牌信任</li>
+                        </ul>
+                    </div>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
+                        <strong style="color:#e8e8f0;">阶段二：6~12个月 → 分层定价</strong>
+                        <div style="background:#0a0a12;border-radius:12px;padding:10px;margin-top:6px;">
+                            <div style="display:flex;justify-content:space-between;border-bottom:1px solid #1a1a2a;padding:4px 0;"><span style="color:#6a6a7a;">免费版</span><span style="color:#4ade80;">¥0</span><span style="font-size:0.7rem;color:#6a6a7a;">限3次/月策略执行</span></div>
+                            <div style="display:flex;justify-content:space-between;border-bottom:1px solid #1a1a2a;padding:4px 0;"><span style="color:#6a6a7a;">Pro版</span><span style="color:#fbbf24;">¥99/月</span><span style="font-size:0.7rem;color:#6a6a7a;">无限次执行 + 实时推送</span></div>
+                            <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:#6a6a7a;">Elite版</span><span style="color:#fbbf24;">¥299/月</span><span style="font-size:0.7rem;color:#6a6a7a;">1对1私人管家</span></div>
+                        </div>
+                        <p style="margin-top:4px;font-size:0.75rem;color:#6a6a7a;">邀请裂变：每邀请1人+1次免费执行，满10人免费升级1个月Pro</p>
+                    </div>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
+                        <strong style="color:#e8e8f0;">阶段三：12个月后 → 收益分成 + 增值服务</strong>
+                        <ul>
+                            <li>基础订阅继续保留（稳定现金流）</li>
+                            <li><b style="color:#fbbf24;">收益分成</b>：超额收益的 10%~20%，用户无痛付费</li>
+                            <li>机构/团队版：¥999/月起</li>
+                        </ul>
+                    </div>
+
+                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:8px;">
+                        <strong style="color:#e8e8f0;">关键数据预估（用户量100万时）</strong>
+                        <ul>
+                            <li>免费用户：85万（85%）</li>
+                            <li>Pro用户（¥99/月）：12万（12%）</li>
+                            <li>Elite用户（¥299/月）：2万（2%）</li>
+                            <li>收益分成用户：1万（1%）</li>
+                            <li style="margin-top:4px;color:#60a5fa;"><b>月订阅收入：¥1,188万 + 分成收入</b></li>
+                            <li style="color:#60a5fa;"><b>年收入：¥1.5亿 ~ ¥2亿</b></li>
+                        </ul>
+                    </div>
+
+                    <div class="tag" style="background:#1a2a3a;color:#60a5fa;">免费建立信任 · 付费放大价值 · 裂变驱动增长 · 分成实现共赢</div>
                 </div>
             `;
         }
@@ -1172,137 +1298,106 @@
         function generateAIResponse(userInput) {
             const lower = userInput.toLowerCase();
 
-            // --- 黄金分析 ---
-            if (lower.includes('黄金') || lower.includes('gold') || lower.includes('金价') || lower.includes('贵金属')) {
+            // 市场需求有多大
+            if (lower.includes('市场需求') || lower.includes('市场有多大') || lower.includes('规模') || lower.includes('tam') || lower
+                .includes('市场空间')) {
                 return {
                     id: `ai-${Date.now()}`,
                     role: 'assistant',
-                    content: `
-        🥇 **黄金市场趋势分析**（实时数据模拟）
-
-        ---
-
-        📊 **当前价格**
-        • 现货黄金：**$2,546.30** ⬆️ +0.42%
-        • 黄金期货（12月）：**$2,568.20** ⬆️ +0.38%
-        • 今日波动区间：$2,528.50 ~ $2,552.80
-
-        ---
-
-        📈 **短期趋势**（24h）
-        黄金今日震荡上行，受美元指数小幅走弱及地缘政治不确定性支撑。亚盘时段突破 $2,540 阻力位后加速上行，目前测试 $2,555 附近压力。
-
-        📉 **中期趋势**（周线）
-        • 周线级别：**多头排列**，MA5 上穿 MA10 形成金叉
-        • 关键支撑：$2,480
-        • 关键阻力：$2,580
-        • RSI（14）：**62.5**（中性偏强，未超买）
-
-        🔍 **核心驱动因素**
-        ✅ 美联储降息预期升温（9月降息概率 68%）
-        ✅ 全球央行持续增持黄金（中国连续 18 个月增持）
-        ✅ 中东局势紧张，避险资金流入
-        ⚠️ 美元指数反弹可能短期压制金价
-
-        ---
-
-        📅 **今日关注数据**
-        • 20:30 美国初请失业金人数
-        • 22:00 美国成屋销售数据
-
-        ---
-
-        🎯 **短期操作参考**
-        > 当前金价处于上升通道中，短期偏向**逢低做多**。关键入场区间 **$2,530~$2,540**，止损 $2,510，目标 $2,580。
-
-        ⚠️ *以上为市场数据分析，不构成投资建议，请结合自身风险承受能力决策。*
-                    `,
+                    content: generateMarketDemandContent(),
                     timestamp: new Date(),
-                    type: 'text',
+                    type: 'report',
                 };
             }
 
-            // --- “你能做什么” ---
-            if (lower.includes('你能做什么') || lower.includes('你会什么') || lower.includes('功能介绍') || lower.includes('有什么用') || lower.includes('帮助') && lower.includes('什么')) {
+            // 抢占市场 / 收费
+            if (lower.includes('抢占市场') || lower.includes('收费') || lower.includes('定价') || lower.includes('怎么赚钱') || lower
+                .includes('商业模式') || lower.includes('付费')) {
+                return {
+                    id: `ai-${Date.now()}`,
+                    role: 'assistant',
+                    content: generatePricingContent(),
+                    timestamp: new Date(),
+                    type: 'report',
+                };
+            }
+
+            // 你能做什么
+            if (lower.includes('你能做什么') || lower.includes('你会什么') || lower.includes('功能介绍') || lower.includes('有什么用') ||
+                lower.includes('帮助')) {
                 return {
                     id: `ai-${Date.now()}`,
                     role: 'assistant',
                     content: `
-        🚀 **我能帮你把「加密资产」变成「睡后收入」**
+        我能帮你把「加密资产」变成「睡后收入」
 
-        我不是普通的聊天机器人，而是你口袋里的 **AI 金融管家**。以下是我能为你做的 —— **每一件都直接关系到你的钱袋子**：
+        我不是普通的聊天机器人，而是你口袋里的 AI 金融管家。以下是我能为你做的 —— 每一件都直接关系到你的钱袋子：
 
         ---
 
-        💰 **智能收益优化**
+        智能收益优化
         • 自动扫描你所有链上的闲置资产（比如 USDC、USDT）
         • 实时对比 Aave、Compound、Ethena 等 20+ 协议的 APY
-        • **一键将资金存入当前收益最高的地方** — 收益可能提升 2~3 倍
+        • 一键将资金存入当前收益最高的地方 — 收益可能提升 2~3 倍
 
-        🛡️ **24/7 风险守护**
+        24/7 风险守护
         • 深夜市场暴跌时，自动提醒并给出防御方案
         • 拦截钓鱼网站和恶意合约签名请求
         • 监控你的借款仓位，在清算前主动预警
 
-        📊 **持仓全景分析**
+        持仓全景分析
         • 跨链汇总你的所有资产（ETH/BTC/SOL/ARB 等）
         • 清晰展示仓位占比、月度收益、风险敞口
-        • 一句话就能问：“我的 SOL 仓位健康吗？”
+        • 一句话就能问："我的 SOL 仓位健康吗？"
 
-        🧠 **AI 自动化执行**
-        • 设定策略：比如“当 ETH 跌破 3000 时买入 10%”
-        • 我替你盯盘并自动执行 — **你睡觉，我打工**
-
-        🥇 **黄金趋势分析**
-        • 实时金价、技术面分析、核心驱动因素
-        • 短期操作参考
+        AI 自动化执行
+        • 设定策略：比如"当 ETH 跌破 3000 时买入 10%"
+        • 我替你盯盘并自动执行 — 你睡觉，我打工
 
         ---
 
-        🔥 **为什么你应该现在开始用？**
-        > “过去 3 个月，使用 AI 管家的用户平均收益提升 **47%**，风险事件拦截率 **99.6%**。”
+        为什么你应该现在开始用？
+        "过去 3 个月，使用 AI 管家的用户平均收益提升 47%，风险事件拦截率 99.6%。"
 
-        🎯 **立即体验：**
-        • 试试说：“优化我的 USDC 收益”
-        • 或者：“分析我的持仓风险”
-        • 或者：“黄金”
-        • 或者直接说：“开始自动化”
+        立即体验：
+        • 试试说："优化我的 USDC 收益"
+        • 或者："分析我的持仓风险"
+        • 或者："市场需求有多大"
+        • 或者："抢占市场"
 
         ---
 
-        💎 **付费用户专享（7 天免费试用）**
+        付费用户专享（7 天免费试用）
         • 无限次 AI 策略执行
         • 实时市场异动推送
         • 优先享受新功能（如 AI 定投、跨链套利）
-
-        **👇 点击下方按钮，开启你的「睡后收入」之旅**
                     `,
                     timestamp: new Date(),
                     type: 'text',
                 };
             }
 
-            // --- 收益 ---
+            // 收益
             if (lower.includes('收益') || lower.includes('apy') || lower.includes('利息') || lower.includes('优化')) {
                 return {
                     id: `ai-${Date.now()}`,
                     role: 'assistant',
-                    content: `📊 **收益优化建议**\n\n你有 **$12,500 USDC** 在 Ethereum 上闲置。\n\n当前最优收益：\n• **Ethena** — 8.9% APY ⭐\n• **Aave** — 4.8% APY\n• **Compound** — 4.2% APY\n\n建议转入 Ethena 获取更高收益。是否执行？`,
+                    content: `收益优化建议\n\n你有 **$12,500 USDC** 在 Ethereum 上闲置。\n\n当前最优收益：\n• **Ethena** — 8.9% APY\n• **Aave** — 4.8% APY\n• **Compound** — 4.2% APY\n\n建议转入 Ethena 获取更高收益。是否执行？`,
                     timestamp: new Date(),
                     type: 'transaction_preview',
                 };
             }
-            // --- 风险 ---
+            // 风险
             if (lower.includes('风险') || lower.includes('波动') || lower.includes('调整')) {
                 return {
                     id: `ai-${Date.now()}`,
                     role: 'assistant',
-                    content: `🛡️ **风险分析报告**\n\n市场波动率指数处于 **72**（高波动区间）。\n\n持仓风险分布：\n• BTC/ETH — 43% (中等)\n• SOL — 10% (高风险)\n• 稳定币 — 33% (低风险)\n\n⚠️ 建议：SOL 仓位偏高，考虑部分转换为稳定币。`,
+                    content: `风险分析报告\n\n市场波动率指数处于 **72**（高波动区间）。\n\n持仓风险分布：\n• BTC/ETH — 43% (中等)\n• SOL — 10% (高风险)\n• 稳定币 — 33% (低风险)\n\n建议：SOL 仓位偏高，考虑部分转换为稳定币。`,
                     timestamp: new Date(),
                     type: 'alert',
                 };
             }
-            // --- 持仓 ---
+            // 持仓
             if (lower.includes('持仓') || lower.includes('资产') || lower.includes('多少钱') || lower.includes('总览')) {
                 const assetLines = mockAssets.map(a =>
                     `• ${a.symbol}: $${a.usdValue.toLocaleString()} (${((a.usdValue / totalValue) * 100).toFixed(1)}%)`
@@ -1310,16 +1405,16 @@
                 return {
                     id: `ai-${Date.now()}`,
                     role: 'assistant',
-                    content: `📈 **当前持仓总览**\n\n总资产：**$${totalValue.toLocaleString()}**\n\n${assetLines}\n\n24h 浮动：**+2.3%** ✅`,
+                    content: `当前持仓总览\n\n总资产：**$${totalValue.toLocaleString()}**\n\n${assetLines}\n\n24h 浮动：**+2.3%**`,
                     timestamp: new Date(),
                     type: 'asset_summary',
                 };
             }
-            // --- 默认回复 ---
+            // 默认回复
             return {
                 id: `ai-${Date.now()}`,
                 role: 'assistant',
-                content: `🔍 收到："${userInput}"\n\n你可以问我这些，**直接帮你赚钱或省钱**：\n\n• **"优化收益"** — 让闲置资产赚更多\n• **"分析风险"** — 守护你的仓位安全\n• **"查看持仓"** — 跨链资产一目了然\n• **"黄金"** — 黄金趋势分析\n• **"你能做什么"** — 了解我的全部能力\n\n或者直接告诉我你的需求，我会给出最佳方案。\n\n💡 *付费用户平均收益提升 47%，试试看？*`,
+                content: `收到："${userInput}"\n\n你可以问我这些，直接帮你赚钱或省钱：\n\n• **"优化收益"** — 让闲置资产赚更多\n• **"分析风险"** — 守护你的仓位安全\n• **"查看持仓"** — 跨链资产一目了然\n• **"市场需求有多大"** — 市场规模量化分析\n• **"抢占市场"** — 定价与收费策略\n\n或者直接告诉我你的需求，我会给出最佳方案。\n\n*付费用户平均收益提升 47%，试试看？*`,
                 timestamp: new Date(),
                 type: 'text',
             };
@@ -1345,8 +1440,7 @@
             setTimeout(() => {
                 let response;
                 const lower = text.trim().toLowerCase();
-                if (lower.includes('报告') || lower.includes('项目') || lower.includes('市场') || lower.includes('亮点') && !lower
-                    .includes('风险')) {
+                if (lower.includes('报告') || lower.includes('项目')) {
                     response = {
                         id: `ai-${Date.now()}`,
                         role: 'assistant',
@@ -1411,9 +1505,9 @@
                 let typeLabel = '',
                     typeIcon = '';
                 if (msg.type === 'transaction_preview') { typeLabel = '交易预览 · 待确认';
-                    typeIcon = '✅'; } else if (msg.type === 'alert') { typeLabel = '风险提醒';
-                    typeIcon = '⚠️'; } else if (msg.type === 'asset_summary') { typeLabel = '持仓分析';
-                    typeIcon = '✨'; }
+                    typeIcon = ''; } else if (msg.type === 'alert') { typeLabel = '风险提醒';
+                    typeIcon = ''; } else if (msg.type === 'asset_summary') { typeLabel = '持仓分析';
+                    typeIcon = ''; }
                 const timeStr = msg.timestamp.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
                 html += `
                     <div class="flex items-start gap-2.5 ${isUser ? 'flex-row-reverse' : ''}">
@@ -1423,8 +1517,8 @@
                             <div class="text-sm leading-relaxed ${isUser ? 'text-white' : 'text-[#d0d0e0]'}">${contentHtml}</div>
                             ${msg.type === 'transaction_preview' ? `
                                 <div class="flex gap-2 mt-2.5">
-                                    <button class="text-xs bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg active:bg-emerald-500/30 transition-colors tap-active" onclick="alert('✅ 交易已模拟执行（演示版）')">确认执行</button>
-                                    <button class="text-xs bg-[#1a1a2a] text-[#6a6a7a] px-3 py-1.5 rounded-lg active:bg-[#2a2a3a] transition-colors tap-active" onclick="alert('✏️ 修改参数功能（演示版）')">修改参数</button>
+                                    <button class="text-xs bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg active:bg-emerald-500/30 transition-colors tap-active" onclick="alert('交易已模拟执行（演示版）')">确认执行</button>
+                                    <button class="text-xs bg-[#1a1a2a] text-[#6a6a7a] px-3 py-1.5 rounded-lg active:bg-[#2a2a3a] transition-colors tap-active" onclick="alert('修改参数功能（演示版）')">修改参数</button>
                                 </div>
                             ` : ''}
                             <div class="text-[10px] mt-1.5 ${isUser ? 'text-blue-200/60' : 'text-[#4a4a5a]'}">${timeStr}</div>
@@ -1484,13 +1578,12 @@
 
             input.addEventListener('input', function() {
                 this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 60) + 'px';
+                this.style.height = Math.min(this.scrollHeight, 66) + 'px';
                 updateSendButton();
             });
 
             sendBtn.addEventListener('click', function() {
                 if (isVoiceMode) {
-                    // 语音模式下，点击发送按钮无效（由按住录音控制）
                     return;
                 }
                 const text = input.value.trim();
@@ -1503,7 +1596,7 @@
             });
 
             input.addEventListener('keydown', function(e) {
-                if (isVoiceMode) return; // 语音模式下键盘输入无效
+                if (isVoiceMode) return;
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     sendBtn.click();
