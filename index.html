@@ -78,8 +78,8 @@
             pointer-events: none;
         }
         #chatInput {
-            min-height: 40px;
-            max-height: 120px;
+            min-height: 32px;
+            max-height: 85px;
         }
         .quick-scroll {
             scrollbar-width: none;
@@ -318,6 +318,14 @@
         #app.show {
             display: flex;
         }
+        /* 顶部导航高度缩小30% */
+        .top-nav {
+            padding-top: 8px !important;
+            padding-bottom: 8px !important;
+        }
+        .top-nav-border {
+            border-bottom-width: 1px;
+        }
     </style>
 </head>
 <body>
@@ -357,7 +365,7 @@
                 <div class="splash-badge">🚀 支持 Ethereum · Solana · Arbitrum 等</div>
             </div>
 
-            <!-- 第3页：行动号召（已移除“开始你的睡后收益之旅”文字） -->
+            <!-- 第3页：行动号召 -->
             <div class="splash-slide" data-index="2" style="display:none;">
                 <div class="splash-icon">🚀</div>
                 <div class="splash-title">立即开启智能管理</div>
@@ -415,7 +423,7 @@
         </div>
 
         <!-- 顶部导航 -->
-        <div class="flex items-center justify-between px-4 py-3 border-b border-[#1a1a2a] bg-[#0a0a0f] z-10 flex-shrink-0">
+        <div class="top-nav flex items-center justify-between px-4 border-b border-[#1a1a2a] bg-[#0a0a0f] z-10 flex-shrink-0 top-nav-border">
             <button onclick="toggleDrawer()" class="p-2 -ml-2 tap-active" aria-label="打开菜单">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
@@ -434,8 +442,8 @@
         <!-- 输入区域 -->
         <div class="border-t border-[#1a1a2a] p-3 bg-[#0a0a0f] flex-shrink-0 safe-area-bottom">
             <div class="flex items-end gap-2 bg-[#12121f] rounded-2xl border border-[#1a1a2a] p-1.5 focus-within:border-blue-500/50 transition-colors">
-                <textarea id="chatInput" rows="1" placeholder="输入指令..." class="flex-1 bg-transparent outline-none resize-none text-sm min-h-[38px] max-h-[100px] px-3 py-2 text-[#e8e8f0] placeholder-[#4a4a5a] leading-5"></textarea>
-                <button id="sendBtn" class="p-2.5 rounded-xl transition-all flex-shrink-0 bg-[#1a1a2a] text-[#4a4a5a] cursor-not-allowed tap-active">
+                <textarea id="chatInput" rows="1" placeholder="输入指令..." class="flex-1 bg-transparent outline-none resize-none text-sm min-h-[32px] max-h-[85px] px-3 py-1.5 text-[#e8e8f0] placeholder-[#4a4a5a] leading-5"></textarea>
+                <button id="sendBtn" class="p-2 rounded-xl transition-all flex-shrink-0 bg-[#1a1a2a] text-[#4a4a5a] cursor-not-allowed tap-active">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4 20-7z"/><path d="M22 2 11 13"/></svg>
                 </button>
             </div>
@@ -448,7 +456,7 @@
 
     <script>
         // ============================================================
-        //  启动页逻辑（已修复进入主应用的逻辑）
+        //  启动页逻辑
         // ============================================================
         (function() {
             const container = document.getElementById('splashContainer');
@@ -486,7 +494,6 @@
                 setTimeout(() => {
                     container.style.display = 'none';
                     app.classList.add('show');
-                    // 确保主应用正确显示
                     app.style.display = 'flex';
                 }, 600);
             }
@@ -501,7 +508,6 @@
                 showSlide(prev);
             }
 
-            // 点击指示器跳转
             dots.forEach((dot) => {
                 dot.addEventListener('click', function() {
                     const idx = parseInt(this.dataset.index);
@@ -509,7 +515,6 @@
                 });
             });
 
-            // 按钮点击
             btn.addEventListener('click', function() {
                 if (current === total - 1) {
                     enterApp();
@@ -518,12 +523,10 @@
                 }
             });
 
-            // 跳过
             skipBtn.addEventListener('click', function() {
                 enterApp();
             });
 
-            // 触摸滑动支持
             let startX = 0;
             let startY = 0;
             container.addEventListener('touchstart', function(e) {
@@ -543,7 +546,6 @@
                 startX = 0;
             });
 
-            // 初始化：显示第一页
             showSlide(0);
         })();
 
@@ -562,7 +564,7 @@
         let messages = [{
             id: 'welcome',
             role: 'assistant',
-            content: '👋 你好！我是你的 AI 金融管家。\n\n你目前在 4 条链上持有约 **$38,174** 的资产。\n\n试试说：\n• "优化收益"\n• "分析风险"\n• "查看持仓"\n• "你能做什么"',
+            content: '👋 你好！我是你的 AI 金融管家。\n\n你目前在 4 条链上持有约 **$38,174** 的资产。\n\n试试说：\n• "优化收益"\n• "分析风险"\n• "查看持仓"\n• "黄金"\n• "你能做什么"',
             timestamp: new Date(),
             type: 'text',
         }];
@@ -642,24 +644,31 @@
                 { label: '📈 收益', prompt: '帮我优化闲置资产的收益' },
                 { label: '🛡️ 风险', prompt: '帮我分析当前持仓风险' },
                 { label: '📊 持仓', prompt: '查看我的完整持仓' },
+                { label: '🥇 黄金', prompt: '黄金' },
                 { label: '⚡ 智能', prompt: '根据当前市场自动调整配置' },
                 { label: '📄 报告', prompt: '查看项目报告' },
             ];
             container.innerHTML = actions.map((a, index) => {
                 const isReport = index === actions.length - 1;
-                return `<button onclick="sendMessage('${a.prompt}')" class="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full border border-[#1a1a2a] text-[#8a8a9a] active:bg-[#1a1a2a] active:text-[#e8e8f0] transition-all whitespace-nowrap tap-active ${isReport ? 'report-btn' : 'bg-[#12121f]'}">${a.label}</button>`;
+                const isGold = index === 3;
+                return `<button onclick="sendMessage('${a.prompt}')" class="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full border border-[#1a1a2a] text-[#8a8a9a] active:bg-[#1a1a2a] active:text-[#e8e8f0] transition-all whitespace-nowrap tap-active ${isReport ? 'report-btn' : isGold ? 'bg-[#1a2a1a] border-[#2a5a2a]' : 'bg-[#12121f]'}">${a.label}</button>`;
             }).join('');
         }
 
+        // ============================================================
+        //  报告生成函数
+        // ============================================================
         function generateReportContent() {
             return `
                 <div class="report-card">
                     <h3>📄 项目市场需求报告</h3>
                     <p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:10px;">AI驱动的个人金融助手 · 市场分析</p>
+
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#e8e8f0;">市场背景</strong><br>
                         当前加密市场正从"早期探索"转向"大规模应用"，核心矛盾在于<b style="color:#fbbf24;">日益复杂的链上生态</b>与用户有限认知能力的巨大鸿沟。
                     </div>
+
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#e8e8f0;">核心痛点</strong>
                         <ul>
@@ -669,6 +678,7 @@
                             <li>🔹 安全风险：钓鱼攻击、恶意合约防不胜防</li>
                         </ul>
                     </div>
+
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
                         <strong style="color:#e8e8f0;">目标用户</strong>
                         <div class="report-grid">
@@ -678,6 +688,7 @@
                             <div class="item"><div class="num">📈</div><div class="label">市场规模</div><div style="font-size:0.6rem;color:#6a6a7a;">数亿用户 · 蓝海</div></div>
                         </div>
                     </div>
+
                     <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:8px;">
                         <strong style="color:#e8e8f0;">竞争定位</strong>
                         <ul>
@@ -688,6 +699,7 @@
                     </div>
                     <div class="tag">🚀 蓝海市场 · 差异化明显</div>
                 </div>
+
                 <div class="report-card" style="margin-top:12px;">
                     <h3>✨ 应用亮点</h3>
                     <ul>
@@ -703,10 +715,62 @@
         }
 
         // ============================================================
-        //  消息生成逻辑
+        //  消息生成逻辑（新增黄金分析）
         // ============================================================
         function generateAIResponse(userInput) {
             const lower = userInput.toLowerCase();
+
+            // --- 新增：处理黄金相关提问 ---
+            if (lower.includes('黄金') || lower.includes('gold') || lower.includes('金价') || lower.includes('贵金属')) {
+                return {
+                    id: `ai-${Date.now()}`,
+                    role: 'assistant',
+                    content: `
+        🥇 **黄金市场趋势分析**（实时数据模拟）
+
+        ---
+
+        📊 **当前价格**
+        • 现货黄金：**$2,546.30** ⬆️ +0.42%
+        • 黄金期货（12月）：**$2,568.20** ⬆️ +0.38%
+        • 今日波动区间：$2,528.50 ~ $2,552.80
+
+        ---
+
+        📈 **短期趋势**（24h）
+        黄金今日震荡上行，受美元指数小幅走弱及地缘政治不确定性支撑。亚盘时段突破 $2,540 阻力位后加速上行，目前测试 $2,555 附近压力。
+
+        📉 **中期趋势**（周线）
+        • 周线级别：**多头排列**，MA5 上穿 MA10 形成金叉
+        • 关键支撑：$2,480
+        • 关键阻力：$2,580
+        • RSI（14）：**62.5**（中性偏强，未超买）
+
+        🔍 **核心驱动因素**
+        ✅ 美联储降息预期升温（9月降息概率 68%）
+        ✅ 全球央行持续增持黄金（中国连续 18 个月增持）
+        ✅ 中东局势紧张，避险资金流入
+        ⚠️ 美元指数反弹可能短期压制金价
+
+        ---
+
+        📅 **今日关注数据**
+        • 20:30 美国初请失业金人数
+        • 22:00 美国成屋销售数据
+
+        ---
+
+        🎯 **短期操作参考**
+        > 当前金价处于上升通道中，短期偏向**逢低做多**。关键入场区间 **$2,530~$2,540**，止损 $2,510，目标 $2,580。
+
+        ⚠️ *以上为市场数据分析，不构成投资建议，请结合自身风险承受能力决策。*
+                    `,
+                    timestamp: new Date(),
+                    type: 'text',
+                };
+            }
+
+            // --- 处理“你能做什么”类问题 ---
             if (lower.includes('你能做什么') || lower.includes('你会什么') || lower.includes('功能介绍') || lower.includes('有什么用') || lower.includes('帮助') && lower.includes('什么')) {
                 return {
                     id: `ai-${Date.now()}`,
@@ -737,6 +801,10 @@
         • 设定策略：比如“当 ETH 跌破 3000 时买入 10%”
         • 我替你盯盘并自动执行 — **你睡觉，我打工**
 
+        🥇 **黄金趋势分析**
+        • 实时金价、技术面分析、核心驱动因素
+        • 短期操作参考
+
         ---
 
         🔥 **为什么你应该现在开始用？**
@@ -745,6 +813,7 @@
         🎯 **立即体验：**
         • 试试说：“优化我的 USDC 收益”
         • 或者：“分析我的持仓风险”
+        • 或者：“黄金”
         • 或者直接说：“开始自动化”
 
         ---
@@ -760,6 +829,8 @@
                     type: 'text',
                 };
             }
+
+            // --- 原有的其他判断逻辑（收益、风险、持仓等） ---
             if (lower.includes('收益') || lower.includes('apy') || lower.includes('利息') || lower.includes('优化')) {
                 return {
                     id: `ai-${Date.now()}`,
@@ -790,10 +861,11 @@
                     type: 'asset_summary',
                 };
             }
+            // --- 默认回复 ---
             return {
                 id: `ai-${Date.now()}`,
                 role: 'assistant',
-                content: `🔍 收到："${userInput}"\n\n你可以问我这些，**直接帮你赚钱或省钱**：\n\n• **"优化收益"** — 让闲置资产赚更多\n• **"分析风险"** — 守护你的仓位安全\n• **"查看持仓"** — 跨链资产一目了然\n• **"你能做什么"** — 了解我的全部能力\n\n或者直接告诉我你的需求，我会给出最佳方案。\n\n💡 *付费用户平均收益提升 47%，试试看？*`,
+                content: `🔍 收到："${userInput}"\n\n你可以问我这些，**直接帮你赚钱或省钱**：\n\n• **"优化收益"** — 让闲置资产赚更多\n• **"分析风险"** — 守护你的仓位安全\n• **"查看持仓"** — 跨链资产一目了然\n• **"黄金"** — 黄金趋势分析\n• **"你能做什么"** — 了解我的全部能力\n\n或者直接告诉我你的需求，我会给出最佳方案。\n\n💡 *付费用户平均收益提升 47%，试试看？*`,
                 timestamp: new Date(),
                 type: 'text',
             };
@@ -918,12 +990,12 @@
             const hasText = input.value.trim() !== '';
             if (hasText && !isProcessing) {
                 btn.disabled = false;
-                btn.className = 'p-2.5 rounded-xl transition-all flex-shrink-0 bg-blue-500 text-white active:bg-blue-600 tap-active';
+                btn.className = 'p-2 rounded-xl transition-all flex-shrink-0 bg-blue-500 text-white active:bg-blue-600 tap-active';
                 btn.innerHTML =
                     `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4 20-7z"/><path d="M22 2 11 13"/></svg>`;
             } else {
                 btn.disabled = true;
-                btn.className = 'p-2.5 rounded-xl transition-all flex-shrink-0 bg-[#1a1a2a] text-[#4a4a5a] cursor-not-allowed';
+                btn.className = 'p-2 rounded-xl transition-all flex-shrink-0 bg-[#1a1a2a] text-[#4a4a5a] cursor-not-allowed';
                 btn.innerHTML =
                     `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4 20-7z"/><path d="M22 2 11 13"/></svg>`;
             }
@@ -938,7 +1010,7 @@
             const sendBtn = document.getElementById('sendBtn');
             input.addEventListener('input', function() {
                 this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+                this.style.height = Math.min(this.scrollHeight, 85) + 'px';
                 updateSendButton();
             });
             sendBtn.addEventListener('click', function() {
