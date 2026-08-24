@@ -4,8 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>AI 金融助手</title>
-    <script src="https://cdn.tailwindcss.com">
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
             margin: 0;
@@ -41,21 +40,19 @@
             color: #6a6a7a;
         }
         @keyframes blink {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
+        /* 手机底部安全区适配 */
         .safe-area-bottom {
             padding-bottom: env(safe-area-inset-bottom, 12px);
         }
+        /* 点击反馈 */
         .tap-active:active {
             transform: scale(0.96);
             opacity: 0.7;
         }
+        /* 左侧抽屉滑出动画 */
         .drawer {
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -76,10 +73,12 @@
             opacity: 0;
             pointer-events: none;
         }
+        /* 输入框自适应 */
         #chatInput {
             min-height: 40px;
             max-height: 120px;
         }
+        /* 快捷按钮滚动 */
         .quick-scroll {
             scrollbar-width: none;
             -ms-overflow-style: none;
@@ -87,504 +86,390 @@
         .quick-scroll::-webkit-scrollbar {
             display: none;
         }
-        /* 报告卡片样式 */
-        .report-card {
-            background: linear-gradient(145deg, #12121f, #0d0d18);
-            border: 1px solid #1a1a2a;
-            border-radius: 16px;
-            padding: 16px;
-            margin: 8px 0;
-        }
-        .report-card h3 {
-            color: #60a5fa;
-            font-weight: 600;
-            font-size: 1rem;
-            margin-bottom: 8px;
-        }
-        .report-card ul {
-            list-style: none;
-            padding: 0;
-        }
-        .report-card li {
-            padding: 6px 0;
-            border-bottom: 1px solid #1a1a2a;
-            font-size: 0.85rem;
-            color: #c8c8d8;
-        }
-        .report-card li:last-child {
-            border-bottom: none;
-        }
-        .report-card .highlight {
-            color: #fbbf24;
-            font-weight: 500;
-        }
-        .report-card .tag {
-            display: inline-block;
-            background: #1a1a2a;
-            color: #8a8a9a;
-            font-size: 0.7rem;
-            padding: 2px 10px;
-            border-radius: 20px;
-            margin-top: 4px;
-        }
-        .report-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 8px;
-        }
-        .report-grid .item {
-            background: #0a0a12;
-            padding: 10px;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid #1a1a2a;
-        }
-        .report-grid .item .num {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #e8e8f0;
-        }
-        .report-grid .item .label {
-            font-size: 0.65rem;
-            color: #6a6a7a;
-        }
     </style>
 </head>
 <body>
 
-    <div id="app" class="flex flex-col h-screen bg-[#0a0a0f] text-[#e8e8f0] relative">
+<div id="app" class="flex flex-col h-screen bg-[#0a0a0f] text-[#e8e8f0] relative">
 
-        <!-- 遮罩层 -->
-        <div id="overlay" class="overlay closed fixed inset-0 bg-black/60 z-40" onclick="closeDrawer()"></div>
+    <!-- ====== 遮罩层 ====== -->
+    <div id="overlay" class="overlay closed fixed inset-0 bg-black/60 z-40" onclick="closeDrawer()"></div>
 
-        <!-- 左侧抽屉 -->
-        <div id="drawer" class="drawer closed fixed top-0 left-0 h-full w-[280px] bg-[#0f0f1a] border-r border-[#1a1a2a] z-50 p-5 flex flex-col overflow-y-auto">
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">AI</div>
-                    <div>
-                        <h1 class="text-lg font-semibold">金融助手</h1>
-                        <p class="text-xs text-[#6a6a7a]">在线 · 4 条链</p>
-                    </div>
+    <!-- ====== 左侧抽屉（手机版侧边栏） ====== -->
+    <div id="drawer" class="drawer closed fixed top-0 left-0 h-full w-[280px] bg-[#0f0f1a] border-r border-[#1a1a2a] z-50 p-5 flex flex-col overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">AI</div>
+                <div>
+                    <h1 class="text-lg font-semibold">金融助手</h1>
+                    <p class="text-xs text-[#6a6a7a]">在线 · 4 条链</p>
                 </div>
-                <button onclick="closeDrawer()" class="text-[#6a6a7a] text-xl p-1 tap-active">✕</button>
             </div>
-            <div id="assetOverview" class="space-y-4 flex-1"></div>
-            <div class="pt-4 border-t border-[#1a1a2a] mt-auto">
-                <div class="flex items-center gap-2 text-xs text-[#5a5a6a]">
-                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                    安全模式 · 非托管
-                </div>
-                <p class="text-[10px] text-[#3a3a4a] mt-1">AI 可准备交易，执行需确认</p>
-            </div>
+            <button onclick="closeDrawer()" class="text-[#6a6a7a] text-xl p-1 tap-active">✕</button>
         </div>
 
-        <!-- 顶部导航 -->
-        <div class="flex items-center justify-between px-4 py-3 border-b border-[#1a1a2a] bg-[#0a0a0f] z-10 flex-shrink-0">
-            <button onclick="toggleDrawer()" class="p-2 -ml-2 tap-active" aria-label="打开菜单">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            </button>
-            <span class="text-sm font-medium text-[#8a8a9a]">💬 对话</span>
-            <div class="w-8"></div>
+        <!-- 资产总览 -->
+        <div id="assetOverview" class="space-y-4 flex-1">
+            <!-- 由 JS 动态渲染 -->
         </div>
 
-        <!-- 快捷操作 -->
-        <div class="px-4 py-2 border-b border-[#1a1a2a] bg-[#0a0a0f] flex-shrink-0">
-            <div id="quickActions" class="flex gap-2 overflow-x-auto quick-scroll"></div>
-        </div>
-
-        <!-- 消息列表 -->
-        <div id="messageList" class="flex-1 overflow-y-auto px-4 py-3 space-y-3"></div>
-
-        <!-- 输入区域 -->
-        <div class="border-t border-[#1a1a2a] p-3 bg-[#0a0a0f] flex-shrink-0 safe-area-bottom">
-            <div class="flex items-end gap-2 bg-[#12121f] rounded-2xl border border-[#1a1a2a] p-1.5 focus-within:border-blue-500/50 transition-colors">
-                <textarea id="chatInput" rows="1" placeholder="输入指令..." class="flex-1 bg-transparent outline-none resize-none text-sm min-h-[38px] max-h-[100px] px-3 py-2 text-[#e8e8f0] placeholder-[#4a4a5a] leading-5"></textarea>
-                <button id="sendBtn" class="p-2.5 rounded-xl transition-all flex-shrink-0 bg-[#1a1a2a] text-[#4a4a5a] cursor-not-allowed tap-active">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4 20-7z"/><path d="M22 2 11 13"/></svg>
-                </button>
+        <div class="pt-4 border-t border-[#1a1a2a] mt-auto">
+            <div class="flex items-center gap-2 text-xs text-[#5a5a6a]">
+                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                安全模式 · 非托管
             </div>
-            <div class="flex items-center justify-between mt-1.5 text-[10px] text-[#3a3a4a] px-1">
-                <span>AI 可读持仓，执行需确认</span>
-                <span>↵ 发送</span>
-            </div>
+            <p class="text-[10px] text-[#3a3a4a] mt-1">AI 可准备交易，执行需确认</p>
         </div>
     </div>
 
-    <script>
-        // ============================================================
-        //  数据
-        // ============================================================
-        const mockAssets = [
-            { symbol: 'ETH', name: 'Ethereum', balance: 3.42, usdValue: 8243.22, chain: 'Ethereum' },
-            { symbol: 'BTC', name: 'Bitcoin', balance: 0.15, usdValue: 8475.00, chain: 'Bitcoin' },
-            { symbol: 'USDC', name: 'USD Coin', balance: 12500.00, usdValue: 12500.00, chain: 'Ethereum' },
-            { symbol: 'SOL', name: 'Solana', balance: 120.5, usdValue: 3856.00, chain: 'Solana' },
-            { symbol: 'ARB', name: 'Arbitrum', balance: 8500, usdValue: 5100.00, chain: 'Arbitrum' },
-        ];
-        const totalValue = mockAssets.reduce((sum, a) => sum + a.usdValue, 0);
+    <!-- ====== 主界面 ====== -->
 
-        let messages = [{
+    <!-- 顶部导航栏 -->
+    <div class="flex items-center justify-between px-4 py-3 border-b border-[#1a1a2a] bg-[#0a0a0f] z-10 flex-shrink-0">
+        <button onclick="toggleDrawer()" class="p-2 -ml-2 tap-active" aria-label="打开菜单">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <span class="text-sm font-medium text-[#8a8a9a]">💬 对话</span>
+        <div class="w-8"></div> <!-- 占位保持居中 -->
+    </div>
+
+    <!-- 快捷操作（横向滚动） -->
+    <div class="px-4 py-2 border-b border-[#1a1a2a] bg-[#0a0a0f] flex-shrink-0">
+        <div id="quickActions" class="flex gap-2 overflow-x-auto quick-scroll">
+            <!-- 由 JS 动态渲染 -->
+        </div>
+    </div>
+
+    <!-- 消息列表 -->
+    <div id="messageList" class="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+        <!-- 由 JS 动态渲染 -->
+    </div>
+
+    <!-- 输入区域 -->
+    <div class="border-t border-[#1a1a2a] p-3 bg-[#0a0a0f] flex-shrink-0 safe-area-bottom">
+        <div class="flex items-end gap-2 bg-[#12121f] rounded-2xl border border-[#1a1a2a] p-1.5 focus-within:border-blue-500/50 transition-colors">
+            <textarea id="chatInput" rows="1" placeholder="输入指令..." class="flex-1 bg-transparent outline-none resize-none text-sm min-h-[38px] max-h-[100px] px-3 py-2 text-[#e8e8f0] placeholder-[#4a4a5a] leading-5"></textarea>
+            <button id="sendBtn" class="p-2.5 rounded-xl transition-all flex-shrink-0 bg-[#1a1a2a] text-[#4a4a5a] cursor-not-allowed tap-active">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4 20-7z"/><path d="M22 2 11 13"/></svg>
+            </button>
+        </div>
+        <div class="flex items-center justify-between mt-1.5 text-[10px] text-[#3a3a4a] px-1">
+            <span>AI 可读持仓，执行需确认</span>
+            <span>↵ 发送</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    //  数据
+    // ============================================================
+    const mockAssets = [
+        { symbol: 'ETH', name: 'Ethereum', balance: 3.42, usdValue: 8243.22, chain: 'Ethereum' },
+        { symbol: 'BTC', name: 'Bitcoin', balance: 0.15, usdValue: 8475.00, chain: 'Bitcoin' },
+        { symbol: 'USDC', name: 'USD Coin', balance: 12500.00, usdValue: 12500.00, chain: 'Ethereum' },
+        { symbol: 'SOL', name: 'Solana', balance: 120.5, usdValue: 3856.00, chain: 'Solana' },
+        { symbol: 'ARB', name: 'Arbitrum', balance: 8500, usdValue: 5100.00, chain: 'Arbitrum' },
+    ];
+    const totalValue = mockAssets.reduce((sum, a) => sum + a.usdValue, 0);
+
+    let messages = [
+        {
             id: 'welcome',
             role: 'assistant',
-            content: '👋 你好！我是你的 AI 金融管家。\n\n你目前在 4 条链上持有约 **$38,174** 的资产。\n\n试试说：\n• "优化收益"\n• "分析风险"\n• "查看持仓"\n• "项目报告"',
+            content: '👋 你好！我是你的 AI 金融管家。\n\n你目前在 4 条链上持有约 **$38,174** 的资产。\n\n试试说：\n• "优化收益"\n• "分析风险"\n• "查看持仓"',
             timestamp: new Date(),
             type: 'text',
-        }];
-        let isProcessing = false;
-
-        // ============================================================
-        //  抽屉控制
-        // ============================================================
-        function toggleDrawer() {
-            const drawer = document.getElementById('drawer');
-            const overlay = document.getElementById('overlay');
-            const isOpen = drawer.classList.contains('open');
-            drawer.classList.toggle('open');
-            drawer.classList.toggle('closed');
-            overlay.classList.toggle('open');
-            overlay.classList.toggle('closed');
-            document.body.style.overflow = isOpen ? '' : 'hidden';
         }
+    ];
+    let isProcessing = false;
 
-        function closeDrawer() {
-            const drawer = document.getElementById('drawer');
-            const overlay = document.getElementById('overlay');
-            drawer.classList.remove('open');
-            drawer.classList.add('closed');
-            overlay.classList.remove('open');
-            overlay.classList.add('closed');
-            document.body.style.overflow = '';
-        }
+    // ============================================================
+    //  抽屉控制
+    // ============================================================
+    function toggleDrawer() {
+        const drawer = document.getElementById('drawer');
+        const overlay = document.getElementById('overlay');
+        const isOpen = drawer.classList.contains('open');
+        drawer.classList.toggle('open');
+        drawer.classList.toggle('closed');
+        overlay.classList.toggle('open');
+        overlay.classList.toggle('closed');
+        document.body.style.overflow = isOpen ? '' : 'hidden';
+    }
 
-        // ============================================================
-        //  渲染函数
-        // ============================================================
+    function closeDrawer() {
+        const drawer = document.getElementById('drawer');
+        const overlay = document.getElementById('overlay');
+        drawer.classList.remove('open');
+        drawer.classList.add('closed');
+        overlay.classList.remove('open');
+        overlay.classList.add('closed');
+        document.body.style.overflow = '';
+    }
 
-        function renderAssetOverview() {
-            const container = document.getElementById('assetOverview');
-            const change = 2.3;
-            const changeColor = change >= 0 ? 'text-emerald-400' : 'text-red-400';
-            let html = `
-                <div class="bg-[#12121f] rounded-2xl p-4 border border-[#1a1a2a]">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-[#6a6a7a]">总资产</span>
-                        <span class="text-sm ${changeColor}">${change >= 0 ? '+' : ''}${change}%</span>
+    // ============================================================
+    //  渲染函数
+    // ============================================================
+
+    function renderAssetOverview() {
+        const container = document.getElementById('assetOverview');
+        const change = 2.3;
+        const changeColor = change >= 0 ? 'text-emerald-400' : 'text-red-400';
+
+        let html = `
+            <div class="bg-[#12121f] rounded-2xl p-4 border border-[#1a1a2a]">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-[#6a6a7a]">总资产</span>
+                    <span class="text-sm ${changeColor}">${change >= 0 ? '+' : ''}${change}%</span>
+                </div>
+                <div class="text-2xl font-bold mt-1">$${totalValue.toLocaleString()}</div>
+                <div class="flex items-center gap-2 mt-2 text-xs text-[#5a5a5a]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M6 6h12M6 18h12"/><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+                    <span>${mockAssets.length} 种 · 4 条链</span>
+                </div>
+            </div>
+            <div class="space-y-1">
+        `;
+
+        mockAssets.forEach(asset => {
+            const pct = ((asset.usdValue / totalValue) * 100).toFixed(1);
+            html += `
+                <div class="flex items-center justify-between py-2 px-3 rounded-xl active:bg-[#12121f] transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-[#1a1a2a] flex items-center justify-center text-xs font-bold text-[#6a6a7a]">${asset.symbol.slice(0, 2)}</div>
+                        <div>
+                            <div class="text-sm font-medium">${asset.symbol}</div>
+                            <div class="text-xs text-[#5a5a6a]">${asset.balance}</div>
+                        </div>
                     </div>
-                    <div class="text-2xl font-bold mt-1">$${totalValue.toLocaleString()}</div>
-                    <div class="flex items-center gap-2 mt-2 text-xs text-[#5a5a5a]">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M6 6h12M6 18h12"/><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
-                        <span>${mockAssets.length} 种 · 4 条链</span>
+                    <div class="text-right">
+                        <div class="text-sm font-medium">$${asset.usdValue.toLocaleString()}</div>
+                        <div class="text-xs text-[#5a5a6a]">${pct}%</div>
                     </div>
                 </div>
-                <div class="space-y-1">
             `;
-            mockAssets.forEach(asset => {
-                const pct = ((asset.usdValue / totalValue) * 100).toFixed(1);
-                html += `
-                    <div class="flex items-center justify-between py-2 px-3 rounded-xl active:bg-[#12121f] transition-colors">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-[#1a1a2a] flex items-center justify-center text-xs font-bold text-[#6a6a7a]">${asset.symbol.slice(0, 2)}</div>
-                            <div>
-                                <div class="text-sm font-medium">${asset.symbol}</div>
-                                <div class="text-xs text-[#5a5a6a]">${asset.balance}</div>
+        });
+
+        html += `</div>`;
+        container.innerHTML = html;
+    }
+
+    function renderQuickActions() {
+        const container = document.getElementById('quickActions');
+        const actions = [
+            { label: '📈 收益', prompt: '帮我优化闲置资产的收益' },
+            { label: '🛡️ 风险', prompt: '帮我分析当前持仓风险' },
+            { label: '📊 持仓', prompt: '查看我的完整持仓' },
+            { label: '⚡ 智能', prompt: '根据当前市场自动调整配置' },
+        ];
+
+        container.innerHTML = actions.map(a =>
+            `<button onclick="sendMessage('${a.prompt}')" class="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full bg-[#12121f] border border-[#1a1a2a] text-[#8a8a9a] active:bg-[#1a1a2a] active:text-[#e8e8f0] transition-all whitespace-nowrap tap-active">${a.label}</button>`
+        ).join('');
+    }
+
+    function renderMessages() {
+        const container = document.getElementById('messageList');
+        let html = '';
+
+        messages.forEach(msg => {
+            const isUser = msg.role === 'user';
+            const isSystem = msg.role === 'system';
+
+            if (isSystem) {
+                html += `<div class="flex justify-center"><div class="bg-[#12121f] text-xs text-[#5a5a6a] px-4 py-1.5 rounded-full border border-[#1a1a2a]">${msg.content}</div></div>`;
+                return;
+            }
+
+            const contentHtml = msg.content.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>').replace(/\n/g, '<br>');
+
+            let typeLabel = '';
+            let typeIcon = '';
+            if (msg.type === 'transaction_preview') {
+                typeLabel = '交易预览 · 待确认';
+                typeIcon = '✅';
+            } else if (msg.type === 'alert') {
+                typeLabel = '风险提醒';
+                typeIcon = '⚠️';
+            } else if (msg.type === 'asset_summary') {
+                typeLabel = '持仓分析';
+                typeIcon = '✨';
+            }
+
+            const timeStr = msg.timestamp.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+
+            html += `
+                <div class="flex items-start gap-2.5 ${isUser ? 'flex-row-reverse' : ''}">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${isUser ? 'bg-blue-500 text-white' : 'bg-[#1a1a2a] text-[#6a6a7a]'}">${isUser ? '我' : 'AI'}</div>
+                    <div class="max-w-[82%] ${isUser ? 'bg-blue-500 rounded-2xl rounded-tr-none' : 'bg-[#12121f] rounded-2xl rounded-tl-none border border-[#1a1a2a]'} px-3.5 py-2.5 message-bubble">
+                        ${typeLabel ? `<div class="flex items-center gap-1 text-xs ${msg.type === 'transaction_preview' ? 'text-emerald-400' : msg.type === 'alert' ? 'text-amber-400' : 'text-blue-400'} mb-1"><span>${typeIcon}</span> ${typeLabel}</div>` : ''}
+                        <div class="text-sm leading-relaxed ${isUser ? 'text-white' : 'text-[#d0d0e0]'}">${contentHtml}</div>
+                        ${msg.type === 'transaction_preview' ? `
+                            <div class="flex gap-2 mt-2.5">
+                                <button class="text-xs bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg active:bg-emerald-500/30 transition-colors tap-active" onclick="alert('✅ 交易已模拟执行（演示版）')">确认执行</button>
+                                <button class="text-xs bg-[#1a1a2a] text-[#6a6a7a] px-3 py-1.5 rounded-lg active:bg-[#2a2a3a] transition-colors tap-active" onclick="alert('✏️ 修改参数功能（演示版）')">修改参数</button>
                             </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-sm font-medium">$${asset.usdValue.toLocaleString()}</div>
-                            <div class="text-xs text-[#5a5a6a]">${pct}%</div>
-                        </div>
+                        ` : ''}
+                        <div class="text-[10px] mt-1.5 ${isUser ? 'text-blue-200/60' : 'text-[#4a4a5a]'}">${timeStr}</div>
                     </div>
-                `;
-            });
-            html += `</div>`;
-            container.innerHTML = html;
-        }
-
-        function renderQuickActions() {
-            const container = document.getElementById('quickActions');
-            const actions = [
-                { label: '📈 收益', prompt: '帮我优化闲置资产的收益' },
-                { label: '🛡️ 风险', prompt: '帮我分析当前持仓风险' },
-                { label: '📊 持仓', prompt: '查看我的完整持仓' },
-                { label: '📄 报告', prompt: '查看项目报告' }, // 新增报告入口
-                { label: '⚡ 智能', prompt: '根据当前市场自动调整配置' },
-            ];
-            container.innerHTML = actions.map(a =>
-                `<button onclick="sendMessage('${a.prompt}')" class="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full bg-[#12121f] border border-[#1a1a2a] text-[#8a8a9a] active:bg-[#1a1a2a] active:text-[#e8e8f0] transition-all whitespace-nowrap tap-active">${a.label}</button>`
-            ).join('');
-        }
-
-        // ============================================================
-        //  报告生成函数（核心植入内容）
-        // ============================================================
-        function generateReportContent() {
-            return `
-                <div class="report-card">
-                    <h3>📄 项目市场需求报告</h3>
-                    <p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:10px;">AI驱动的个人金融助手 · 市场分析</p>
-
-                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
-                        <strong style="color:#e8e8f0;">市场背景</strong><br>
-                        当前加密市场正从"早期探索"转向"大规模应用"，核心矛盾在于<b style="color:#fbbf24;">日益复杂的链上生态</b>与用户有限认知能力的巨大鸿沟。
-                    </div>
-
-                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
-                        <strong style="color:#e8e8f0;">核心痛点</strong>
-                        <ul>
-                            <li>🔹 操作门槛极高：Gas费、跨链、授权签名等概念复杂</li>
-                            <li>🔹 信息过载：海量协议和APY，难以决策</li>
-                            <li>🔹 资产分散：多链多钱包，缺乏统一管理</li>
-                            <li>🔹 安全风险：钓鱼攻击、恶意合约防不胜防</li>
-                        </ul>
-                    </div>
-
-                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:12px;">
-                        <strong style="color:#e8e8f0;">目标用户</strong>
-                        <div class="report-grid">
-                            <div class="item"><div class="num">💰</div><div class="label">持币者</div><div style="font-size:0.6rem;color:#6a6a7a;">有资产，少精力</div></div>
-                            <div class="item"><div class="num">🧭</div><div class="label">观望者</div><div style="font-size:0.6rem;color:#6a6a7a;">想参与，怕麻烦</div></div>
-                            <div class="item"><div class="num">🔗</div><div class="label">活跃用户</div><div style="font-size:0.6rem;color:#6a6a7a;">跨链多，难打理</div></div>
-                            <div class="item"><div class="num">📈</div><div class="label">市场规模</div><div style="font-size:0.6rem;color:#6a6a7a;">数亿用户 · 蓝海</div></div>
-                        </div>
-                    </div>
-
-                    <div style="font-size:0.8rem;color:#b0b0c0;margin-bottom:8px;">
-                        <strong style="color:#e8e8f0;">竞争定位</strong>
-                        <ul>
-                            <li>✅ 传统钱包：<span class="highlight">复杂菜单</span> → 我们：<span class="highlight">自然语言对话</span></li>
-                            <li>✅ DeFi聚合器：<span class="highlight">数据看板</span> → 我们：<span class="highlight">AI个性化策略</span></li>
-                            <li>✅ 被动安全 → 我们：<span class="highlight">主动风险守护</span></li>
-                        </ul>
-                    </div>
-                    <div class="tag">🚀 蓝海市场 · 差异化明显</div>
                 </div>
+            `;
+        });
 
-                <div class="report-card" style="margin-top:12px;">
-                    <h3>✨ 应用亮点</h3>
-                    <ul>
-                        <li><strong style="color:#60a5fa;">🗣️ 自然语言交互</strong> — 说出需求即可操作，零门槛</li>
-                        <li><strong style="color:#60a5fa;">🧠 AI Agent自动化</strong> — 夜间自动优化收益，实现"懒人理财"</li>
-                        <li><strong style="color:#60a5fa;">🛡️ 主动式守护</strong> — 拦截钓鱼攻击，预警清算风险</li>
-                        <li><strong style="color:#60a5fa;">👤 个性化服务</strong> — 越用越懂你，千人千面建议</li>
-                        <li><strong style="color:#60a5fa;">🔒 非托管透明</strong> — AI不碰私钥，资产由你全权控制</li>
-                    </ul>
-                    <div class="tag" style="background:#1a2a3a;color:#60a5fa;">💡 核心价值：让普通人轻松驾驭加密世界</div>
+        if (isProcessing) {
+            html += `
+                <div class="flex items-start gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-[#1a1a2a] flex items-center justify-center text-xs font-bold text-[#6a6a7a]">AI</div>
+                    <div class="bg-[#12121f] rounded-2xl rounded-tl-none px-4 py-3 border border-[#1a1a2a]">
+                        <div class="typing-cursor text-[#4a4a5a] text-sm">思考中</div>
+                    </div>
                 </div>
             `;
         }
 
-        // ============================================================
-        //  消息发送逻辑（已植入报告响应）
-        // ============================================================
+        container.innerHTML = html;
+        container.scrollTop = container.scrollHeight;
+    }
 
-        function sendMessage(text) {
-            if (!text || text.trim() === '' || isProcessing) return;
-            messages.push({
-                id: `user-${Date.now()}`,
-                role: 'user',
-                content: text.trim(),
-                timestamp: new Date(),
-                type: 'text',
-            });
-            isProcessing = true;
+    // ============================================================
+    //  消息发送逻辑
+    // ============================================================
+
+    function sendMessage(text) {
+        if (!text || text.trim() === '' || isProcessing) return;
+
+        messages.push({
+            id: `user-${Date.now()}`,
+            role: 'user',
+            content: text.trim(),
+            timestamp: new Date(),
+            type: 'text',
+        });
+
+        isProcessing = true;
+        renderMessages();
+        updateSendButton();
+
+        setTimeout(() => {
+            const response = generateAIResponse(text.trim());
+            messages.push(response);
+            isProcessing = false;
             renderMessages();
             updateSendButton();
+        }, 600 + Math.random() * 500);
+    }
 
-            setTimeout(() => {
-                let response;
-                const lower = text.trim().toLowerCase();
-                // 检测报告关键词
-                if (lower.includes('报告') || lower.includes('项目') || lower.includes('市场') || lower.includes('亮点') || lower.includes('分析')) {
-                    response = {
-                        id: `ai-${Date.now()}`,
-                        role: 'assistant',
-                        content: generateReportContent(),
-                        timestamp: new Date(),
-                        type: 'report', // 自定义类型，用于样式区分
-                    };
-                } else {
-                    response = generateAIResponse(text.trim());
-                }
-                messages.push(response);
-                isProcessing = false;
-                renderMessages();
-                updateSendButton();
-            }, 600 + Math.random() * 500);
-        }
+    function generateAIResponse(userInput) {
+        const lower = userInput.toLowerCase();
 
-        function generateAIResponse(userInput) {
-            const lower = userInput.toLowerCase();
-            if (lower.includes('收益') || lower.includes('apy') || lower.includes('利息') || lower.includes('优化')) {
-                return {
-                    id: `ai-${Date.now()}`,
-                    role: 'assistant',
-                    content: `📊 **收益优化建议**\n\n你有 **$12,500 USDC** 在 Ethereum 上闲置。\n\n当前最优收益：\n• **Ethena** — 8.9% APY ⭐\n• **Aave** — 4.8% APY\n• **Compound** — 4.2% APY\n\n建议转入 Ethena 获取更高收益。是否执行？`,
-                    timestamp: new Date(),
-                    type: 'transaction_preview',
-                };
-            }
-            if (lower.includes('风险') || lower.includes('波动') || lower.includes('调整')) {
-                return {
-                    id: `ai-${Date.now()}`,
-                    role: 'assistant',
-                    content: `🛡️ **风险分析报告**\n\n市场波动率指数处于 **72**（高波动区间）。\n\n持仓风险分布：\n• BTC/ETH — 43% (中等)\n• SOL — 10% (高风险)\n• 稳定币 — 33% (低风险)\n\n⚠️ 建议：SOL 仓位偏高，考虑部分转换为稳定币。`,
-                    timestamp: new Date(),
-                    type: 'alert',
-                };
-            }
-            if (lower.includes('持仓') || lower.includes('资产') || lower.includes('多少钱') || lower.includes('总览')) {
-                const assetLines = mockAssets.map(a =>
-                    `• ${a.symbol}: $${a.usdValue.toLocaleString()} (${((a.usdValue / totalValue) * 100).toFixed(1)}%)`
-                ).join('\n');
-                return {
-                    id: `ai-${Date.now()}`,
-                    role: 'assistant',
-                    content: `📈 **当前持仓总览**\n\n总资产：**$${totalValue.toLocaleString()}**\n\n${assetLines}\n\n24h 浮动：**+2.3%** ✅`,
-                    timestamp: new Date(),
-                    type: 'asset_summary',
-                };
-            }
+        if (lower.includes('收益') || lower.includes('apy') || lower.includes('利息') || lower.includes('优化')) {
             return {
                 id: `ai-${Date.now()}`,
                 role: 'assistant',
-                content: `🔍 收到："${userInput}"\n\n请更具体地告诉我：\n• 查询某个资产？\n• 执行交易？\n• 优化收益？\n• 分析风险？\n• 查看项目报告？\n\n我会给出更精准的建议。`,
+                content: `📊 **收益优化建议**\n\n你有 **$12,500 USDC** 在 Ethereum 上闲置。\n\n当前最优收益：\n• **Ethena** — 8.9% APY ⭐\n• **Aave** — 4.8% APY\n• **Compound** — 4.2% APY\n\n建议转入 Ethena 获取更高收益。是否执行？`,
                 timestamp: new Date(),
-                type: 'text',
+                type: 'transaction_preview',
             };
         }
 
-        // ============================================================
-        //  渲染消息（支持报告类型）
-        // ============================================================
-
-        function renderMessages() {
-            const container = document.getElementById('messageList');
-            let html = '';
-            messages.forEach(msg => {
-                const isUser = msg.role === 'user';
-                const isSystem = msg.role === 'system';
-                const isReport = msg.type === 'report';
-
-                if (isSystem) {
-                    html +=
-                        `<div class="flex justify-center"><div class="bg-[#12121f] text-xs text-[#5a5a6a] px-4 py-1.5 rounded-full border border-[#1a1a2a]">${msg.content}</div></div>`;
-                    return;
-                }
-
-                // 报告类型特殊渲染（直接插入HTML）
-                if (isReport) {
-                    html += `
-                        <div class="flex items-start gap-2.5">
-                            <div class="w-8 h-8 rounded-full bg-[#1a1a2a] flex items-center justify-center text-xs font-bold text-[#6a6a7a]">AI</div>
-                            <div class="max-w-[90%] bg-[#12121f] rounded-2xl rounded-tl-none border border-[#1a1a2a] px-3.5 py-2.5 message-bubble" style="overflow-x:auto;">
-                                ${msg.content}
-                                <div class="text-[10px] mt-2 text-[#4a4a5a]">${msg.timestamp.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</div>
-                            </div>
-                        </div>
-                    `;
-                    return;
-                }
-
-                const contentHtml = (msg.content || '').replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>').replace(
-                    /\n/g, '<br>');
-                let typeLabel = '',
-                    typeIcon = '';
-                if (msg.type === 'transaction_preview') { typeLabel = '交易预览 · 待确认';
-                    typeIcon = '✅'; } else if (msg.type === 'alert') { typeLabel = '风险提醒';
-                    typeIcon = '⚠️'; } else if (msg.type === 'asset_summary') { typeLabel = '持仓分析';
-                    typeIcon = '✨'; }
-                const timeStr = msg.timestamp.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-                html += `
-                    <div class="flex items-start gap-2.5 ${isUser ? 'flex-row-reverse' : ''}">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${isUser ? 'bg-blue-500 text-white' : 'bg-[#1a1a2a] text-[#6a6a7a]'}">${isUser ? '我' : 'AI'}</div>
-                        <div class="max-w-[82%] ${isUser ? 'bg-blue-500 rounded-2xl rounded-tr-none' : 'bg-[#12121f] rounded-2xl rounded-tl-none border border-[#1a1a2a]'} px-3.5 py-2.5 message-bubble">
-                            ${typeLabel ? `<div class="flex items-center gap-1 text-xs ${msg.type === 'transaction_preview' ? 'text-emerald-400' : msg.type === 'alert' ? 'text-amber-400' : 'text-blue-400'} mb-1"><span>${typeIcon}</span> ${typeLabel}</div>` : ''}
-                            <div class="text-sm leading-relaxed ${isUser ? 'text-white' : 'text-[#d0d0e0]'}">${contentHtml}</div>
-                            ${msg.type === 'transaction_preview' ? `
-                                <div class="flex gap-2 mt-2.5">
-                                    <button class="text-xs bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg active:bg-emerald-500/30 transition-colors tap-active" onclick="alert('✅ 交易已模拟执行（演示版）')">确认执行</button>
-                                    <button class="text-xs bg-[#1a1a2a] text-[#6a6a7a] px-3 py-1.5 rounded-lg active:bg-[#2a2a3a] transition-colors tap-active" onclick="alert('✏️ 修改参数功能（演示版）')">修改参数</button>
-                                </div>
-                            ` : ''}
-                            <div class="text-[10px] mt-1.5 ${isUser ? 'text-blue-200/60' : 'text-[#4a4a5a]'}">${timeStr}</div>
-                        </div>
-                    </div>
-                `;
-            });
-            if (isProcessing) {
-                html += `
-                    <div class="flex items-start gap-2.5">
-                        <div class="w-8 h-8 rounded-full bg-[#1a1a2a] flex items-center justify-center text-xs font-bold text-[#6a6a7a]">AI</div>
-                        <div class="bg-[#12121f] rounded-2xl rounded-tl-none px-4 py-3 border border-[#1a1a2a]">
-                            <div class="typing-cursor text-[#4a4a5a] text-sm">思考中</div>
-                        </div>
-                    </div>
-                `;
-            }
-            container.innerHTML = html;
-            container.scrollTop = container.scrollHeight;
+        if (lower.includes('风险') || lower.includes('波动') || lower.includes('调整')) {
+            return {
+                id: `ai-${Date.now()}`,
+                role: 'assistant',
+                content: `🛡️ **风险分析报告**\n\n市场波动率指数处于 **72**（高波动区间）。\n\n持仓风险分布：\n• BTC/ETH — 43% (中等)\n• SOL — 10% (高风险)\n• 稳定币 — 33% (低风险)\n\n⚠️ 建议：SOL 仓位偏高，考虑部分转换为稳定币。`,
+                timestamp: new Date(),
+                type: 'alert',
+            };
         }
 
-        // ============================================================
-        //  UI 控制
-        // ============================================================
-
-        function updateSendButton() {
-            const input = document.getElementById('chatInput');
-            const btn = document.getElementById('sendBtn');
-            const hasText = input.value.trim() !== '';
-            if (hasText && !isProcessing) {
-                btn.disabled = false;
-                btn.className = 'p-2.5 rounded-xl transition-all flex-shrink-0 bg-blue-500 text-white active:bg-blue-600 tap-active';
-                btn.innerHTML =
-                    `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4 20-7z"/><path d="M22 2 11 13"/></svg>`;
-            } else {
-                btn.disabled = true;
-                btn.className = 'p-2.5 rounded-xl transition-all flex-shrink-0 bg-[#1a1a2a] text-[#4a4a5a] cursor-not-allowed';
-                btn.innerHTML =
-                    `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4 20-7z"/><path d="M22 2 11 13"/></svg>`;
-            }
+        if (lower.includes('持仓') || lower.includes('资产') || lower.includes('多少钱') || lower.includes('总览')) {
+            const assetLines = mockAssets.map(a =>
+                `• ${a.symbol}: $${a.usdValue.toLocaleString()} (${((a.usdValue / totalValue) * 100).toFixed(1)}%)`
+            ).join('\n');
+            return {
+                id: `ai-${Date.now()}`,
+                role: 'assistant',
+                content: `📈 **当前持仓总览**\n\n总资产：**$${totalValue.toLocaleString()}**\n\n${assetLines}\n\n24h 浮动：**+2.3%** ✅`,
+                timestamp: new Date(),
+                type: 'asset_summary',
+            };
         }
 
-        // ============================================================
-        //  初始化
-        // ============================================================
+        return {
+            id: `ai-${Date.now()}`,
+            role: 'assistant',
+            content: `🔍 收到："${userInput}"\n\n请更具体地告诉我：\n• 查询某个资产？\n• 执行交易？\n• 优化收益？\n• 分析风险？\n\n我会给出更精准的建议。`,
+            timestamp: new Date(),
+            type: 'text',
+        };
+    }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const input = document.getElementById('chatInput');
-            const sendBtn = document.getElementById('sendBtn');
-            input.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-                updateSendButton();
-            });
-            sendBtn.addEventListener('click', function() {
-                const text = input.value.trim();
-                if (text && !isProcessing) {
-                    sendMessage(text);
-                    input.value = '';
-                    input.style.height = 'auto';
-                    updateSendButton();
-                }
-            });
-            input.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendBtn.click();
-                }
-            });
-            renderAssetOverview();
-            renderQuickActions();
-            renderMessages();
+    // ============================================================
+    //  UI 控制
+    // ============================================================
+
+    function updateSendButton() {
+        const input = document.getElementById('chatInput');
+        const btn = document.getElementById('sendBtn');
+        const hasText = input.value.trim() !== '';
+        if (hasText && !isProcessing) {
+            btn.disabled = false;
+            btn.className = 'p-2.5 rounded-xl transition-all flex-shrink-0 bg-blue-500 text-white active:bg-blue-600 tap-active';
+            btn.innerHTML =
+                `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4 20-7z"/><path d="M22 2 11 13"/></svg>`;
+        } else {
+            btn.disabled = true;
+            btn.className = 'p-2.5 rounded-xl transition-all flex-shrink-0 bg-[#1a1a2a] text-[#4a4a5a] cursor-not-allowed';
+            btn.innerHTML =
+                `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4 20-7z"/><path d="M22 2 11 13"/></svg>`;
+        }
+    }
+
+    // ============================================================
+    //  初始化
+    // ============================================================
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const input = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        input.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
             updateSendButton();
-            window.sendMessage = sendMessage;
-            window.toggleDrawer = toggleDrawer;
-            window.closeDrawer = closeDrawer;
-            document.getElementById('overlay').addEventListener('click', closeDrawer);
         });
-    </script>
+
+        sendBtn.addEventListener('click', function() {
+            const text = input.value.trim();
+            if (text && !isProcessing) {
+                sendMessage(text);
+                input.value = '';
+                input.style.height = 'auto';
+                updateSendButton();
+            }
+        });
+
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendBtn.click();
+            }
+        });
+
+        renderAssetOverview();
+        renderQuickActions();
+        renderMessages();
+        updateSendButton();
+
+        window.sendMessage = sendMessage;
+        window.toggleDrawer = toggleDrawer;
+        window.closeDrawer = closeDrawer;
+
+        // 点击遮罩关闭抽屉
+        document.getElementById('overlay').addEventListener('click', closeDrawer);
+    });
+</script>
 
 </body>
 </html>
